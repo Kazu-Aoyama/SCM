@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{color-scheme:light}
+html,body{margin:0}
+body{font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<title>派遣判断ガイド</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@500;600&display=swap">
+<style>
+:root{
+  --paper:#f7f8fa; --card:#ffffff; --ink:#101828; --ink2:#475064; --mut:#8a8f9d;
+  --navy:#16224a; --navy2:#25376e; --hair:#e3e6ec; --grid:#eceef3;
+  --sup:#2a78d6; --dem:#eb6834; --conf:#ec835a; --good:#0ca30c; --goodtx:#006300;
+  --wash:#eef3fa; --warmwash:#fdf1ea; --chip:#dfe8f6;
+  --acc: var(--sup);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0e1116; --card:#171b23; --ink:#f2f4f8; --ink2:#b9bfcc; --mut:#848b99;
+    --navy:#c9d6f2; --navy2:#a8bce8; --hair:#272c37; --grid:#232833;
+    --sup:#3987e5; --dem:#d95926; --conf:#ec835a; --good:#0ca30c; --goodtx:#4cc36b;
+    --wash:#1a2233; --warmwash:#2b2019; --chip:#223052;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0e1116; --card:#171b23; --ink:#f2f4f8; --ink2:#b9bfcc; --mut:#848b99;
+  --navy:#c9d6f2; --navy2:#a8bce8; --hair:#272c37; --grid:#232833;
+  --sup:#3987e5; --dem:#d95926; --conf:#ec835a; --good:#0ca30c; --goodtx:#4cc36b;
+  --wash:#1a2233; --warmwash:#2b2019; --chip:#223052;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);
+  font-family:'Noto Sans JP',system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:15px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px 72px}
+.mast{border-bottom:1px solid var(--hair);padding:30px 0 22px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.mast .org{font-size:12.5px;letter-spacing:.14em;color:var(--mut)}
+.mast .aud{font-size:12px;letter-spacing:.1em;color:var(--acc);border:1px solid var(--acc);
+  border-radius:999px;padding:3px 14px;white-space:nowrap}
+h1{font-family:'Shippori Mincho',serif;font-weight:600;font-size:clamp(26px,4vw,36px);
+   line-height:1.35;color:var(--navy);letter-spacing:.01em;text-wrap:balance;margin:34px 0 10px}
+.lede{color:var(--ink2);max-width:44em;font-size:15.5px}
+h2{font-family:'Shippori Mincho',serif;font-weight:600;font-size:21px;color:var(--navy);
+   margin:54px 0 6px;letter-spacing:.02em;text-wrap:balance}
+h2 + .sub{color:var(--mut);font-size:13px;margin-bottom:18px}
+h3{font-size:15.5px;font-weight:700;margin:22px 0 8px}
+p{margin:0 0 12px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:26px 0 8px}
+.st{background:var(--card);border:1px solid var(--hair);border-radius:10px;padding:16px 14px 13px;text-align:center}
+.st .v{font-size:30px;font-weight:700;color:var(--navy);line-height:1.15;font-variant-numeric:tabular-nums}
+.st .v em{font-style:normal;font-size:16px;font-weight:600}
+.st .v.o{color:var(--dem)}
+.st .l{font-size:12.5px;font-weight:700;margin-top:5px}
+.st .n{font-size:11px;color:var(--mut);margin-top:3px;line-height:1.5}
+.card{background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:22px 24px;margin:16px 0}
+.wash{background:var(--wash);border-color:transparent}
+.warmwash{background:var(--warmwash);border-color:transparent}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+.quote{border-left:3px solid var(--acc);padding:2px 0 2px 16px;margin:14px 0;color:var(--ink);font-size:14.5px}
+.quote .who{display:block;color:var(--mut);font-size:12px;margin-top:5px}
+table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--card);border:1px solid var(--hair);border-radius:10px;overflow:hidden}
+.tblwrap{overflow-x:auto;margin:14px 0}
+th{background:var(--navy);color:#fff;font-weight:600;font-size:12.5px;padding:9px 12px;text-align:left;white-space:nowrap}
+:root[data-theme="dark"] th{background:#25376e}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) th{background:#25376e}}
+td{padding:9px 12px;border-top:1px solid var(--hair);vertical-align:top}
+td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.note{font-size:12px;color:var(--mut);line-height:1.7;margin:10px 0}
+.src{border-top:1px solid var(--hair);margin-top:64px;padding-top:18px;font-size:12px;color:var(--mut);line-height:1.8}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12.5px;color:var(--ink2);margin:6px 0 14px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+/* paired bar rows */
+.brow{display:grid;grid-template-columns:180px 1fr 84px;gap:10px;align-items:center;margin:7px 0;font-size:13px}
+.brow .lb{text-align:right;color:var(--ink2);line-height:1.35}
+.brow .lb b{color:var(--ink)}
+.btrack{position:relative;height:30px}
+.bar{position:absolute;left:0;height:12px;border-radius:0 4px 4px 0;min-width:2px}
+.bar.s{top:2px;background:var(--sup)}
+.bar.d{top:16px;background:var(--dem)}
+.bar1{position:relative;height:14px;border-radius:0 4px 4px 0;background:var(--conf);min-width:2px}
+.brow .gp{font-size:12.5px;font-variant-numeric:tabular-nums;text-align:left;white-space:nowrap}
+.gp.plus{color:var(--dem);font-weight:700}
+.gp.minus{color:var(--sup);font-weight:700}
+.pill{display:inline-block;background:var(--chip);color:var(--navy);border-radius:999px;
+  padding:1px 10px;font-size:11.5px;font-weight:600;margin:0 4px 4px 0}
+:root[data-theme="dark"] .pill{color:#dbe6fb}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .pill{color:#dbe6fb}}
+.tag{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--mut)}
+.mode{display:flex;height:10px;border-radius:5px;overflow:hidden;margin:6px 0 2px}
+.mode i{display:block;height:100%}
+.mode .m1{background:var(--sup)}.mode .m2{background:#86b6ef}.mode .m3{background:#c3c2b7}
+a{color:var(--sup)}
+.toc{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 0}
+.toc a{font-size:12.5px;color:var(--navy2);text-decoration:none;border:1px solid var(--hair);
+  background:var(--card);border-radius:999px;padding:5px 14px}
+.toc a:hover{border-color:var(--acc)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+@media (prefers-reduced-motion: no-preference){
+  .bar,.bar1{transition:width .6s ease}
+}
+
+:root{--acc:#1baf7a}
+</style>
+<div class="wrap">
+<div class="mast"><div class="org">東京大学　SCMリカレント教育プログラム　｜　2025年度 実施データ分析</div>
+<div class="aud">派遣元企業・上司の方へ</div></div>
+
+<h1>派遣判断ガイド</h1>
+<p class="lede">部下を半年間・受講料100万円で送り出す判断に必要な事実を、実測データでまとめた。「本当に学ぶのか」「業務と両立できるのか」「会社に何が返るのか」の3点に、それぞれ記録で答える。</p>
+
+<h2>1　派遣した社員は、本当に学ぶのか</h2>
+<div class="sub">受講態度は自己申告ではなく、提出記録で確認できる。</div>
+<div class="stats">
+<div class="st"><div class="v">90.6<em>%</em></div><div class="l">ライブ出席率</div><div class="n">録画視聴でも可の制度下で、<br>対面57%＋オンライン33%が同時参加</div></div>
+<div class="st"><div class="v">784<em>件</em></div><div class="l">出席確認票の提出</div><div class="n">全講義で毎回、学びの内容を<br>文章で提出する運用</div></div>
+<div class="st"><div class="v">592<em>字</em></div><div class="l">ふりかえりの平均分量</div><div class="n">部課長クラスが毎回この分量を<br>自分の言葉で書いている</div></div>
+<div class="st"><div class="v">26<em> / 28</em></div><div class="l">修了率 93%</div><div class="n">2025年度・22社28名のうち</div></div>
+</div>
+<div class="card wash"><p style="margin:0;font-size:14px">出席確認票には「理解できたこと」だけでなく<b>「自社で何をするか」が書かれ始める</b>のが特徴です。実例：「欠品・適正在庫を会社の数字として定義することにした」（第4回受講後）、「社内で説明できなかった規模の経済を数値的に把握できることを知った」（第7回受講後）。受講中から投資回収が始まります。</p></div>
+
+<h2>2　業務と両立できるのか</h2>
+<div class="tblwrap"><table>
+<tr><th>懸念</th><th>実際</th></tr>
+<tr><td>平日の拘束</td><td>夜のオンライン90分（18:45〜20:15）のみ。移動なし。まとまった演習は土曜に集約（講義90分＋演習180分）</td></tr>
+<tr><td>総負荷</td><td>全35コマ・約60時間を約6か月に分散。<b>週あたり平均2〜3時間</b></td></tr>
+<tr><td>繁忙期・出張との衝突</td><td>全講義録画＋AI復習システム（講義テキスト・出典つき回答チャット）で欠席回をリカバリー。2025年度はこの仕組みで28名中26名が修了</td></tr>
+<tr><td>成果の見えにくさ</td><td>修了時にOpen Badge 3.0（エキスパートレベル）を発行。国際的なSCM能力体系（ASCM・CIPS等を参照した20項目中19項目カバー）に紐づく</td></tr>
+</table></div>
+
+<h2>3　会社に何が返るのか ― 修了半年後の実測</h2>
+<div class="sub">修了後アンケート（2026年7〜8月、修了者26名中24名回答・回答率92.3%）。修了直後の高揚ではなく、半年後の定着を測った数字。</div>
+<div class="stats">
+<div class="st"><div class="v">79.2<em>%</em></div><div class="l">学びを実務で活用</div><div class="n">「まったく活用されていない」は<br>ゼロ</div></div>
+<div class="st"><div class="v">75.0<em>%</em></div><div class="l">具体的な行動を起こした</div><div class="n">社内提案・プロジェクト推進・<br>部下指導・キャリア拡張</div></div>
+<div class="st"><div class="v o">25.0<em>%</em></div><div class="l">キャリアの変化</div><div class="n">昇進・役職付与・裁量拡大・異動<br>6名／24名</div></div>
+<div class="st"><div class="v">95.8<em>%</em></div><div class="l">本人の満足</div><div class="n">派遣が本人のリテンションにも<br>働く水準</div></div>
+</div>
+<div class="quote">SCM改革のプロジェクトの責任者に任命された。<span class="who">― 修了生（50代・完成品メーカー）</span></div>
+<div class="quote">グループ会社とのSCM効率化に向けた取組として、講義で学んだことを参考に全体最適に向けた新構想のプロジェクトに参画している。<span class="who">― 修了生（50代・完成品メーカー）</span></div>
+<div class="quote">物流の新規分析ソリューションの提案などで説得力が増し、意見が通りやすくなった。<span class="who">― 修了生（30代・IT・システム・コンサルティング）</span></div>
+<div class="card warmwash"><p style="margin:0;font-size:14px"><b>投資判断の置き換え方：</b>受講料100万円は、講義60時間の単価では約1.7万円/時間。ただし実際の判断軸は「<b>自社でSCM改革の動きが1件立ち上がるか</b>」に置くのが適切です。昨年度は24名中18名が具体的な行動を起こし、6名がプロジェクト責任者任命・昇進などの変化に至っています。</p></div>
+
+<h2>4　送り出した企業・検討した企業の声</h2>
+<div class="sub">開講前の企業ヒアリング（2025年8月、5社回答）より。関心度は5段階。</div>
+<div class="tblwrap"><table>
+<tr><th>業種</th><th>関心度</th><th>コメント（要旨）</th></tr>
+<tr><td>自動車メーカー</td><td class="num">5</td><td>「参加を検討できる規模」。意思決定は1〜2か月</td></tr>
+<tr><td>輸送機器メーカー</td><td class="num">5</td><td>予算確保に半年、確保後の人選は1か月程度</td></tr>
+<tr><td>自動車メーカー</td><td class="num">4</td><td>「社内では教育カリキュラムを体系的に組みづらい領域で、かつ経営インパクトの大きい課題に即効性がある」「50万は値段以上の価値、100万でも高くはない」</td></tr>
+<tr><td>運輸・製造請負</td><td class="num">4</td><td>「他の教育プログラムと比較しても高額とはいえない」。人選は社内承認込み1〜1.5か月</td></tr>
+<tr><td>建設（物流エンジニアリング）</td><td class="num">2</td><td>平日日中開催の希望、時間外労働の扱いに懸念 ― 勤怠設計は派遣時の検討事項</td></tr>
+</table></div>
+<div class="card"><h3 style="margin-top:0">稟議の実務メモ</h3>
+<p style="font-size:14px;margin:0">・多くの企業で教育予算は<b>前年3月までの年度予算</b>で確保 ― 2026年9月開講に間に合わせるなら早めの枠取りを推奨。<br>
+・平日夜・土曜の受講の勤怠上の扱い（業務指定か自己啓発か）は、派遣前に人事と整理しておくと受講者の負担感が大きく変わる。<br>
+・受講者の選定は「SCM部門の次期責任者」に限らない。2025年度は営業・新事業企画・金融など<b>SCM専任でない立場の派遣者も実務成果</b>を出している。</p></div>
+<div class="src"><b>データの出典と注意</b><br>
+・出席確認票：事務局「出席確認票FBとりまとめ」（全22日程・722件、受講者氏名／受講方法／講師名／自由記述3欄を含む）に、そこへ未収載のPDF提出票62件を統合した<b>提出784件</b>。自由記述は<b>2,016件・464,211字</b>で、全32回＋補講をカバーする。受講者26名（正規受講者24名＋聴講生2名）。<br>
+・修了後アンケート：2025年度修了者26名中24名回答（回答率92.3%、回答期間2026/7/30〜8/8、匿名集計）。<br>
+・カリキュラム情報：2025年度実施記録（全32コマ・57.5時間）および講義復習ポータル収載の講義データ。<br>
+・コンピテンシー体系 SCM-ECF v0.1：ASCM SCOR Digital Standard／CSCP・CLTD出題体系／CIPS Global Standard 等を参照して独自編成した20項目。講義×項目のマッピングは試行版であり、専門家パネルによる検証前。<br>
+・自由記述の分類はキーワード辞書によるマッチング（1件の記述が複数項目に言及し得る）。引用は原文の趣旨を保ち、固有名詞のみ一般化。<br>
+作成：2026年8月22日（8月23日 第2版：需要側データを事務局FBとりまとめベースに全面差し替え、記述量が約2倍に）　SCMリカレント教育プログラム事務局分析</div>
+
+</div>
+
+</body>
+</html>
