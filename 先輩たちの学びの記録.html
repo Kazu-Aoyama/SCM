@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{color-scheme:light}
+html,body{margin:0}
+body{font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<title>先輩たちの学びの記録</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@500;600&display=swap">
+<style>
+:root{
+  --paper:#f7f8fa; --card:#ffffff; --ink:#101828; --ink2:#475064; --mut:#8a8f9d;
+  --navy:#16224a; --navy2:#25376e; --hair:#e3e6ec; --grid:#eceef3;
+  --sup:#2a78d6; --dem:#eb6834; --conf:#ec835a; --good:#0ca30c; --goodtx:#006300;
+  --wash:#eef3fa; --warmwash:#fdf1ea; --chip:#dfe8f6;
+  --acc: var(--sup);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0e1116; --card:#171b23; --ink:#f2f4f8; --ink2:#b9bfcc; --mut:#848b99;
+    --navy:#c9d6f2; --navy2:#a8bce8; --hair:#272c37; --grid:#232833;
+    --sup:#3987e5; --dem:#d95926; --conf:#ec835a; --good:#0ca30c; --goodtx:#4cc36b;
+    --wash:#1a2233; --warmwash:#2b2019; --chip:#223052;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0e1116; --card:#171b23; --ink:#f2f4f8; --ink2:#b9bfcc; --mut:#848b99;
+  --navy:#c9d6f2; --navy2:#a8bce8; --hair:#272c37; --grid:#232833;
+  --sup:#3987e5; --dem:#d95926; --conf:#ec835a; --good:#0ca30c; --goodtx:#4cc36b;
+  --wash:#1a2233; --warmwash:#2b2019; --chip:#223052;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);
+  font-family:'Noto Sans JP',system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:15px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px 72px}
+.mast{border-bottom:1px solid var(--hair);padding:30px 0 22px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.mast .org{font-size:12.5px;letter-spacing:.14em;color:var(--mut)}
+.mast .aud{font-size:12px;letter-spacing:.1em;color:var(--acc);border:1px solid var(--acc);
+  border-radius:999px;padding:3px 14px;white-space:nowrap}
+h1{font-family:'Shippori Mincho',serif;font-weight:600;font-size:clamp(26px,4vw,36px);
+   line-height:1.35;color:var(--navy);letter-spacing:.01em;text-wrap:balance;margin:34px 0 10px}
+.lede{color:var(--ink2);max-width:44em;font-size:15.5px}
+h2{font-family:'Shippori Mincho',serif;font-weight:600;font-size:21px;color:var(--navy);
+   margin:54px 0 6px;letter-spacing:.02em;text-wrap:balance}
+h2 + .sub{color:var(--mut);font-size:13px;margin-bottom:18px}
+h3{font-size:15.5px;font-weight:700;margin:22px 0 8px}
+p{margin:0 0 12px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:26px 0 8px}
+.st{background:var(--card);border:1px solid var(--hair);border-radius:10px;padding:16px 14px 13px;text-align:center}
+.st .v{font-size:30px;font-weight:700;color:var(--navy);line-height:1.15;font-variant-numeric:tabular-nums}
+.st .v em{font-style:normal;font-size:16px;font-weight:600}
+.st .v.o{color:var(--dem)}
+.st .l{font-size:12.5px;font-weight:700;margin-top:5px}
+.st .n{font-size:11px;color:var(--mut);margin-top:3px;line-height:1.5}
+.card{background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:22px 24px;margin:16px 0}
+.wash{background:var(--wash);border-color:transparent}
+.warmwash{background:var(--warmwash);border-color:transparent}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+.quote{border-left:3px solid var(--acc);padding:2px 0 2px 16px;margin:14px 0;color:var(--ink);font-size:14.5px}
+.quote .who{display:block;color:var(--mut);font-size:12px;margin-top:5px}
+table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--card);border:1px solid var(--hair);border-radius:10px;overflow:hidden}
+.tblwrap{overflow-x:auto;margin:14px 0}
+th{background:var(--navy);color:#fff;font-weight:600;font-size:12.5px;padding:9px 12px;text-align:left;white-space:nowrap}
+:root[data-theme="dark"] th{background:#25376e}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) th{background:#25376e}}
+td{padding:9px 12px;border-top:1px solid var(--hair);vertical-align:top}
+td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.note{font-size:12px;color:var(--mut);line-height:1.7;margin:10px 0}
+.src{border-top:1px solid var(--hair);margin-top:64px;padding-top:18px;font-size:12px;color:var(--mut);line-height:1.8}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12.5px;color:var(--ink2);margin:6px 0 14px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+/* paired bar rows */
+.brow{display:grid;grid-template-columns:180px 1fr 84px;gap:10px;align-items:center;margin:7px 0;font-size:13px}
+.brow .lb{text-align:right;color:var(--ink2);line-height:1.35}
+.brow .lb b{color:var(--ink)}
+.btrack{position:relative;height:30px}
+.bar{position:absolute;left:0;height:12px;border-radius:0 4px 4px 0;min-width:2px}
+.bar.s{top:2px;background:var(--sup)}
+.bar.d{top:16px;background:var(--dem)}
+.bar1{position:relative;height:14px;border-radius:0 4px 4px 0;background:var(--conf);min-width:2px}
+.brow .gp{font-size:12.5px;font-variant-numeric:tabular-nums;text-align:left;white-space:nowrap}
+.gp.plus{color:var(--dem);font-weight:700}
+.gp.minus{color:var(--sup);font-weight:700}
+.pill{display:inline-block;background:var(--chip);color:var(--navy);border-radius:999px;
+  padding:1px 10px;font-size:11.5px;font-weight:600;margin:0 4px 4px 0}
+:root[data-theme="dark"] .pill{color:#dbe6fb}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .pill{color:#dbe6fb}}
+.tag{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--mut)}
+.mode{display:flex;height:10px;border-radius:5px;overflow:hidden;margin:6px 0 2px}
+.mode i{display:block;height:100%}
+.mode .m1{background:var(--sup)}.mode .m2{background:#86b6ef}.mode .m3{background:#c3c2b7}
+a{color:var(--sup)}
+.toc{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 0}
+.toc a{font-size:12.5px;color:var(--navy2);text-decoration:none;border:1px solid var(--hair);
+  background:var(--card);border-radius:999px;padding:5px 14px}
+.toc a:hover{border-color:var(--acc)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+@media (prefers-reduced-motion: no-preference){
+  .bar,.bar1{transition:width .6s ease}
+}
+
+:root{--acc:#eb6834}
+</style>
+<div class="wrap">
+<div class="mast"><div class="org">東京大学　SCMリカレント教育プログラム　｜　2025年度 実施データ分析</div>
+<div class="aud">受講を検討されている方へ</div></div>
+
+<h1>先輩たちの学びの記録</h1>
+<p class="lede">この講座で何が学べるかは、シラバスよりも、昨年度の受講生が毎回の講義後に自分の言葉で書いた記録がいちばん正確に語ります。多忙な部課長・役員クラスが、1回あたり平均592字のふりかえりを784回書いた ― その中身の一部です。</p>
+
+<div class="stats">
+<div class="st"><div class="v">46.4<em>万字</em></div><div class="l">受講生が書いたふりかえり</div><div class="n">出席確認票784回・記述2,016件分<br>1回平均592字</div></div>
+<div class="st"><div class="v">90.6<em>%</em></div><div class="l">ライブで出席</div><div class="n">録画もあるのに、9割以上が<br>その場で参加している</div></div>
+<div class="st"><div class="v">22<em>社</em></div><div class="l">7業種からの同期</div><div class="n">メーカー・商社・IT・物流・<br>金融・公的機関</div></div>
+<div class="st"><div class="v">26<em> / 28</em></div><div class="l">修了</div><div class="n">仕事と両立して<br>93%が走り切った</div></div>
+</div>
+
+<h2>講義の翌週、受講生はこう書いた</h2>
+<div class="sub">出席確認票「理解できた内容・興味を持った内容」より。固有名詞のみ一般化。</div>
+<div class="quote">「予測はほぼすべて外れる」。よって、予測を当てにいくのではなく、予測が外れても崩壊しないSCMを設計することが重要。<span class="who">― 2025年度受講生の出席確認票より（第7回 在庫理論と発注戦略）</span></div>
+<div class="quote">余白は無駄ではなく、変化を吸収して回復するための能力。アリが渋滞しない話が面白かった。2億年の進化・淘汰圧による最適化に感銘を受けた。<span class="who">― 2025年度受講生の出席確認票より（第4回 先端数理科学の活用）</span></div>
+<div class="quote">改めて、欠品・適正在庫など定義化できていないことを認識でき、基準値・閾値として、会社の数字として考え設定することとした。<span class="who">― 2025年度受講生の出席確認票より（第4回 → 実務での行動）</span></div>
+<div class="quote">今まで社内で上手く説明できなかった規模の経済（大ロットでの単価引き下げ）を、数値的に把握できることを知った。<span class="who">― 2025年度受講生の出席確認票より（第7回 → 実務での行動）</span></div>
+<div class="quote">日本は生産人口が限られており、インテグラル型（すり合わせ・調整集約型）の道を取るのが勝ち筋。モノづくりは、付加価値の良い流れを作ること。<span class="who">― 2025年度受講生の出席確認票より（第3回 SCMと産業競争力）</span></div>
+<div class="quote">全体最適には最適解はあるが、絶対解はない ― 状況によって答えは変わる。<span class="who">― 2025年度受講生の出席確認票より（第5回 SCMの基本プロセス）</span></div>
+<div class="quote">構造を見える化して改善ポイントを特定するうえで有益なツール。営業と生産の間に立つ自部署で、営業予測と海外調達在庫の持ち方に因果ループ図を使えそうだ。<span class="who">― 2025年度受講生の出席確認票より（第13回 SCMとサービス学）</span></div>
+<div class="quote">SCMを学ぶ上での最大の壁は「理論」ではなく「数学」だと改めて感じました。<span class="who">― 2025年度受講生の出席確認票より（第7回 ― だから演習と復習の仕組みがある）</span></div>
+
+<div class="card wash"><p style="margin:0;font-size:14px"><b>「わかった」で終わっていない</b>のがこの記録の特徴です。「会社の数字として設定することとした」「自部署で使えそうだ」― 講義から数日で自社への適用を書き始める。これは、講師が現場の意思決定の背景まで踏み込んで話すこと、同期が異業種の実務家であること、演習で実際に手を動かすことの、3つが揃って起きています。</p></div>
+
+<h2>正直に：難しい回はあります</h2>
+<p style="max-width:44em">数理・データ分析系の回では「待ち行列やポアソン分布は前提知識不足で理解できなかった」という声も実際にあります。つまずきの言及は数理系に集中しています（分析上、不明点言及の約35%）。ただし同じ回で「動画を見て復習したい」「勉強する必要があると思った」と続くのがこの講座の受講生で、そのための仕組みが用意されています。</p>
+<div class="grid2">
+<div class="card"><h3 style="margin-top:0">つまずいても戻れる</h3><p style="font-size:13.5px;margin:0">全講義を録画。講義テキスト（自動生成・校正済み）、出典つきで答える復習AIチャット、横断検索、オンライン・オフィスアワー。欠席回のリカバリーにも使えます。</p></div>
+<div class="card"><h3 style="margin-top:0">2026年度はさらに登りやすく</h3><p style="font-size:13.5px;margin:0">昨年度のこの声を受けて、数理・AI領域には事前学習資料を提供し、演習を1回3時間→4.5時間へ拡大。PC15台を大学側で用意し、会社のPC制約なしで実データ分析に取り組めます。</p></div>
+</div>
+
+<h2>学びの範囲 ― 国際的な能力体系の19/20をカバー</h2>
+<p style="max-width:44em">ASCM（米）・CIPS（英）などの国際的なSCMスキル指標をもとに経営層に必要な能力を20項目として定義したところ、本講座はそのうち19項目を扱っています。SC戦略・在庫・需要予測・調達・物流・データ分析・AI・リスク・地政学・GX・組織まで ― 断片ではなく、体系として一巡します。修了時にはOpen Badge 3.0（エキスパートレベル）が発行されます。</p>
+
+<h2>修了から半年後、何が起きたか</h2>
+<div class="sub">修了後アンケート（2026年7〜8月、修了者26名中24名回答・回答率92.3%）</div>
+<div class="stats">
+<div class="st"><div class="v">95.8<em>%</em></div><div class="l">いまも「満足」</div><div class="n">熱が冷めた半年後の数字<br>不満の回答ゼロ</div></div>
+<div class="st"><div class="v">79.2<em>%</em></div><div class="l">実務で活用中</div><div class="n">「まったく活用していない」は<br>1名もいない</div></div>
+<div class="st"><div class="v o">25.0<em>%</em></div><div class="l">キャリアが動いた</div><div class="n">昇進・役職付与・裁量拡大・異動<br>6名／24名</div></div>
+<div class="st"><div class="v">83.3<em>%</em></div><div class="l">学び続けたい</div><div class="n">継続学習への参加意向<br>断りの回答ゼロ</div></div>
+</div>
+<div class="quote">SCM改革のプロジェクトの責任者に任命された。<span class="who">― 修了生（50代・完成品メーカー）</span></div>
+<div class="quote">講義を参考にSCM勉強会を開催できた。不確実性（確率分布）や安全在庫を実務で実践した。物流の新規分析ソリューションの提案などで説得力が増し、意見が通りやすくなった。<span class="who">― 修了生（30代・IT・システム・コンサルティング）</span></div>
+<div class="quote">異なる業界の視点や課題感を共有でき、修了後も互いに相談やヒアリングができる、一生の財産となるコミュニティが形成された。<span class="who">― 修了生アンケートより</span></div>
+
+<div class="card wash" style="margin-top:34px"><h3 style="margin-top:0">2026年度 開講概要</h3>
+<p style="font-size:14px;margin:0">2026年9月中旬開講 ／ 全35コマ・約60時間 ／ 平日夜オンライン18:45–20:15＋土曜対面（講義90分＋演習180分）／ 週あたり平均2〜3時間 ／ 定員25〜30名 ／ 受講料100万円 ／ 修了者はPBL型アドバンスト演習（3か月）・大学院進学へ接続可能。<br>お問い合わせ：東京大学大学院工学系研究科附属 トランスポートイノベーション研究センター 事務局</p></div>
+<div class="src"><b>データの出典と注意</b><br>
+・出席確認票：事務局「出席確認票FBとりまとめ」（全22日程・722件、受講者氏名／受講方法／講師名／自由記述3欄を含む）に、そこへ未収載のPDF提出票62件を統合した<b>提出784件</b>。自由記述は<b>2,016件・464,211字</b>で、全32回＋補講をカバーする。受講者26名（正規受講者24名＋聴講生2名）。<br>
+・修了後アンケート：2025年度修了者26名中24名回答（回答率92.3%、回答期間2026/7/30〜8/8、匿名集計）。<br>
+・カリキュラム情報：2025年度実施記録（全32コマ・57.5時間）および講義復習ポータル収載の講義データ。<br>
+・コンピテンシー体系 SCM-ECF v0.1：ASCM SCOR Digital Standard／CSCP・CLTD出題体系／CIPS Global Standard 等を参照して独自編成した20項目。講義×項目のマッピングは試行版であり、専門家パネルによる検証前。<br>
+・自由記述の分類はキーワード辞書によるマッチング（1件の記述が複数項目に言及し得る）。引用は原文の趣旨を保ち、固有名詞のみ一般化。<br>
+作成：2026年8月22日（8月23日 第2版：需要側データを事務局FBとりまとめベースに全面差し替え、記述量が約2倍に）　SCMリカレント教育プログラム事務局分析</div>
+
+</div>
+
+</body>
+</html>
