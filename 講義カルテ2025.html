@@ -1,0 +1,357 @@
+<!doctype html><html lang="ja"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style><title>講義カルテ 2025</title>
+</head><body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@500;600&display=swap">
+<style>
+:root{
+  --paper:#f7f8fa; --card:#ffffff; --ink:#101828; --ink2:#475064; --mut:#8a8f9d;
+  --navy:#16224a; --navy2:#25376e; --hair:#e3e6ec; --grid:#eceef3;
+  --sup:#2a78d6; --dem:#eb6834; --conf:#ec835a; --good:#0ca30c; --goodtx:#006300;
+  --wash:#eef3fa; --warmwash:#fdf1ea; --chip:#dfe8f6;
+  --acc: var(--sup);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0e1116; --card:#171b23; --ink:#f2f4f8; --ink2:#b9bfcc; --mut:#848b99;
+    --navy:#c9d6f2; --navy2:#a8bce8; --hair:#272c37; --grid:#232833;
+    --sup:#3987e5; --dem:#d95926; --conf:#ec835a; --good:#0ca30c; --goodtx:#4cc36b;
+    --wash:#1a2233; --warmwash:#2b2019; --chip:#223052;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0e1116; --card:#171b23; --ink:#f2f4f8; --ink2:#b9bfcc; --mut:#848b99;
+  --navy:#c9d6f2; --navy2:#a8bce8; --hair:#272c37; --grid:#232833;
+  --sup:#3987e5; --dem:#d95926; --conf:#ec835a; --good:#0ca30c; --goodtx:#4cc36b;
+  --wash:#1a2233; --warmwash:#2b2019; --chip:#223052;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);
+  font-family:'Noto Sans JP',system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:15px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px 72px}
+.mast{border-bottom:1px solid var(--hair);padding:30px 0 22px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.mast .org{font-size:12.5px;letter-spacing:.14em;color:var(--mut)}
+.mast .aud{font-size:12px;letter-spacing:.1em;color:var(--acc);border:1px solid var(--acc);
+  border-radius:999px;padding:3px 14px;white-space:nowrap}
+h1{font-family:'Shippori Mincho',serif;font-weight:600;font-size:clamp(26px,4vw,36px);
+   line-height:1.35;color:var(--navy);letter-spacing:.01em;text-wrap:balance;margin:34px 0 10px}
+.lede{color:var(--ink2);max-width:44em;font-size:15.5px}
+h2{font-family:'Shippori Mincho',serif;font-weight:600;font-size:21px;color:var(--navy);
+   margin:54px 0 6px;letter-spacing:.02em;text-wrap:balance}
+h2 + .sub{color:var(--mut);font-size:13px;margin-bottom:18px}
+h3{font-size:15.5px;font-weight:700;margin:22px 0 8px}
+p{margin:0 0 12px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:26px 0 8px}
+.st{background:var(--card);border:1px solid var(--hair);border-radius:10px;padding:16px 14px 13px;text-align:center}
+.st .v{font-size:30px;font-weight:700;color:var(--navy);line-height:1.15;font-variant-numeric:tabular-nums}
+.st .v em{font-style:normal;font-size:16px;font-weight:600}
+.st .v.o{color:var(--dem)}
+.st .l{font-size:12.5px;font-weight:700;margin-top:5px}
+.st .n{font-size:11px;color:var(--mut);margin-top:3px;line-height:1.5}
+.card{background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:22px 24px;margin:16px 0}
+.wash{background:var(--wash);border-color:transparent}
+.warmwash{background:var(--warmwash);border-color:transparent}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+.quote{border-left:3px solid var(--acc);padding:2px 0 2px 16px;margin:14px 0;color:var(--ink);font-size:14.5px}
+.quote .who{display:block;color:var(--mut);font-size:12px;margin-top:5px}
+table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--card);border:1px solid var(--hair);border-radius:10px;overflow:hidden}
+.tblwrap{overflow-x:auto;margin:14px 0}
+th{background:var(--navy);color:#fff;font-weight:600;font-size:12.5px;padding:9px 12px;text-align:left;white-space:nowrap}
+:root[data-theme="dark"] th{background:#25376e}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) th{background:#25376e}}
+td{padding:9px 12px;border-top:1px solid var(--hair);vertical-align:top}
+td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.note{font-size:12px;color:var(--mut);line-height:1.7;margin:10px 0}
+.src{border-top:1px solid var(--hair);margin-top:64px;padding-top:18px;font-size:12px;color:var(--mut);line-height:1.8}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12.5px;color:var(--ink2);margin:6px 0 14px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+/* paired bar rows */
+.brow{display:grid;grid-template-columns:180px 1fr 84px;gap:10px;align-items:center;margin:7px 0;font-size:13px}
+.brow .lb{text-align:right;color:var(--ink2);line-height:1.35}
+.brow .lb b{color:var(--ink)}
+.btrack{position:relative;height:30px}
+.bar{position:absolute;left:0;height:12px;border-radius:0 4px 4px 0;min-width:2px}
+.bar.s{top:2px;background:var(--sup)}
+.bar.d{top:16px;background:var(--dem)}
+.bar1{position:relative;height:14px;border-radius:0 4px 4px 0;background:var(--conf);min-width:2px}
+.brow .gp{font-size:12.5px;font-variant-numeric:tabular-nums;text-align:left;white-space:nowrap}
+.gp.plus{color:var(--dem);font-weight:700}
+.gp.minus{color:var(--sup);font-weight:700}
+.pill{display:inline-block;background:var(--chip);color:var(--navy);border-radius:999px;
+  padding:1px 10px;font-size:11.5px;font-weight:600;margin:0 4px 4px 0}
+:root[data-theme="dark"] .pill{color:#dbe6fb}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .pill{color:#dbe6fb}}
+.tag{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--mut)}
+.mode{display:flex;height:10px;border-radius:5px;overflow:hidden;margin:6px 0 2px}
+.mode i{display:block;height:100%}
+.mode .m1{background:var(--sup)}.mode .m2{background:#86b6ef}.mode .m3{background:#c3c2b7}
+a{color:var(--sup)}
+.toc{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 0}
+.toc a{font-size:12.5px;color:var(--navy2);text-decoration:none;border:1px solid var(--hair);
+  background:var(--card);border-radius:999px;padding:5px 14px}
+.toc a:hover{border-color:var(--acc)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+@media (prefers-reduced-motion: no-preference){
+  .bar,.bar1{transition:width .6s ease}
+}
+</style>
+<div class="wrap">
+<div class="mast"><div class="org">東京大学　SCMリカレント教育プログラム　｜　2025年度 実施データ分析</div>
+<div class="aud">担当講師向け</div></div>
+
+<h1>講義カルテ 2025</h1>
+<p class="lede">受講生が毎回の出席確認票に書いた「理解できたこと」「理解できなかったこと」「知りたいこと」を、講義ごとに整理した。担当講師間で受講生の受け止めを共有し、次年度の各回設計に反映するための内部資料。</p>
+
+<div class="stats">
+<div class="st"><div class="v">784<em>件</em></div><div class="l">出席確認票の提出記録</div><div class="n">事務局FBとりまとめ722件＋PDF62件<br>（10/25〜2/7 全32回＋補講）</div></div>
+<div class="st"><div class="v">46.4<em>万字</em></div><div class="l">自由記述の総量</div><div class="n">記述欄2,016件<br>1回あたり平均24名が記入</div></div>
+<div class="st"><div class="v">90.6<em>%</em></div><div class="l">ライブ出席率</div><div class="n">対面57.3%＋オンライン33.3%<br>オンデマンドは9.4%</div></div>
+<div class="st"><div class="v">26<em> / 28</em></div><div class="l">修了</div><div class="n">2025年度参加28名<br>（ほかに聴講生2名が提出）</div></div>
+</div>
+
+<div class="card wash"><h3 style="margin-top:0">カルテを貫く3つの所見</h3>
+<p style="font-size:14px"><b>1. 「数学の壁」は本物だが、その先に最大の行動変容がある。</b>つまずき言及の11.2%がデータ分析・数理に集中し、これは全33回を通じて1位。一方で第7回（在庫理論）では「欠品・適正在庫を会社の数字として定義することにした」など実務行動の記述が最多。壁を下げる（事前資料・演習増）価値が最も高い。</p>
+<p style="font-size:14px"><b>2. 概念は届いている。次に求められているのは事例と適用。</b>「もう少し具体的な事例を」という要望がほぼ全回で出る。理解できなかったのではなく、使い方を知りたがっている。</p>
+<p style="font-size:14px;margin-bottom:0"><b>3. 受講生は互いからも学んでいる。</b>初回の相互プレゼン、著名講師回の質疑、演習のグループワークへの言及が多い。「講義より質疑が興味深かった」という記述は、事前質問収集の仕組み（受講生からの提案）を後押しする。</p></div>
+
+<h2>各回のカルテ</h2>
+<div class="sub">全32回＋補講（2025/10/25〜2026/2/7）。事務局の「出席確認票FBとりまとめ」全22日程と、そこに未収載のPDF提出票を統合して集計。<b>ほぼ全回で22〜27名分の記述が揃っており、どの回も同じ密度で読める</b>。引用は原文の趣旨を保持。</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第1・2回　イントロダクション／スキル棚卸プレゼン</h3><span class="tag">10/25　提出 31件</span></div>
+<div class="mode" title="対面44・オンライン0・オンデマンド1"><i class="m1" style="width:98%"></i><i class="m2" style="width:0%"></i><i class="m3" style="width:2%"></i></div><div style="font-size:11px;color:var(--mut)">対面 44 ／ オンライン 0 ／ オンデマンド 1</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>「物流とロジスティクスの違い」「文理融合スキル」への言及が多数。第2回の相互プレゼンは「幅広い業界の参加者の課題が多種多様であることを理解した」と、コホートの多様性自体が学びとして受け止められた。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>フィジカルインターネットの具体像（「2040年までに完成させる理由」「欧州の導入事例」）を問う声。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>CLOの課題・意思決定の行動学的側面・AIエージェントへの関心が既に初回から表明されている。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第3回　SCMと産業競争力（藤本教授）</h3><span class="tag">10/29　提出 27件</span></div>
+<div class="mode" title="対面12・オンライン13・オンデマンド4"><i class="m1" style="width:41%"></i><i class="m2" style="width:45%"></i><i class="m3" style="width:14%"></i></div><div style="font-size:11px;color:var(--mut)">対面 12 ／ オンライン 13 ／ オンデマンド 4</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>「すり合わせ（インテグラル型）が日本の勝ち筋」が最頻出の論点。「多能工のチームワークを活かす環境整備」「付加価値の良い流れを作ること」など、講義の中核概念がほぼ正確に再現されている。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>「最適立地と市場立地の具体例」「統計データの信憑性の確認方法」など、概念は伝わったうえでの事例要望が中心。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>具体的事例をもう一段。概念理解は良好。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第4回　先端数理科学の活用（西成教授）</h3><span class="tag">10/31　提出 26件</span></div>
+<div class="mode" title="対面6・オンライン18・オンデマンド2"><i class="m1" style="width:23%"></i><i class="m2" style="width:69%"></i><i class="m3" style="width:8%"></i></div><div style="font-size:11px;color:var(--mut)">対面 6 ／ オンライン 18 ／ オンデマンド 2</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>「アリの行列と余白」が圧倒的に強く残った。「2億年の淘汰圧による最適化に感銘」「J型人材になること」。余白＝無駄ではなく回復能力、という一文が後の回（在庫・安全在庫）への伏線として機能している。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>「待ち行列やポアソン分布は前提知識不足で理解できなかった」「合意形成AIの現場イメージが湧かない」。数理の壁が最初に現れた回。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>数理パートの事前資料（2026年度導入予定）はこの回が最優先の適用先。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第5回　SCMの基本プロセス（BCG）</h3><span class="tag">11/5　提出 27件</span></div>
+<div class="mode" title="対面7・オンライン16・オンデマンド4"><i class="m1" style="width:26%"></i><i class="m2" style="width:59%"></i><i class="m3" style="width:15%"></i></div><div style="font-size:11px;color:var(--mut)">対面 7 ／ オンライン 16 ／ オンデマンド 4</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>ETO/MTO/ATO/MTSの類型、「全体最適には最適解はあるが絶対解はない」、SCMができている会社の条件（全体調達・調整機能の存在）。フレームワークの吸収が良い。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>「S&OPを導入しPDCAを回す部分が、実践経験がなく消化できていない」― S&OP需要の初出。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>S&OPは座学では消化されない。ワークショップ形式の追加検討材料。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第6回　現場見学会（上組コンテナターミナル・佐川Xフロンティア）</h3><span class="tag">11/8　提出 22件</span></div>
+<div class="mode" title="対面22・オンライン0・オンデマンド0"><i class="m1" style="width:100%"></i><i class="m2" style="width:0%"></i><i class="m3" style="width:0%"></i></div><div style="font-size:11px;color:var(--mut)">対面 22 ／ オンライン 0 ／ オンデマンド 0</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>参加22名全員が長文を残した密度の高い回。上組では「輸入8割・輸出2割の極端なインバランス」「社員30名＋協力10名で24時間3シフト」という具体的数値と、「ベテランの勘と経験に依存」という現実。Xフロンティアでは「10拠点を1拠点に集約」「40〜50%の省人化」「トラック年間5万台削減」。<b>同じ現場を見て「点の課題（ゲート前混雑）」と「線・面の効率化（拠点集約）」という対比で捉え直す記述</b>が複数あり、俯瞰視点が育っている。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>「自動化できそうな作業がなぜ人力なのか ― 法規制か、単純に見えて難しいのか」「コンテナ配置に厳密な指示がなく担当者判断なのはなぜか」。最も多かったのは<b>「港湾ターミナルと内陸倉庫の間で、本船遅延や荷役進捗のデータがどう連携されているのか」</b>という拠点間の情報連携への問い。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>「事前情報や共通の観察課題をインプットしておけば、質問がもっと体系的になった」という具体的な改善提案。「半日見学＋半日講義」という構成案、「見学会の共通見解を先生方にまとめてほしい」という要望も。<b>事前課題と事後リフレクションの設計が次年度の最優先</b>。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第7回　在庫理論と発注戦略（川崎講師）</h3><span class="tag">11/12　提出 27件</span></div>
+<div class="mode" title="対面8・オンライン13・オンデマンド6"><i class="m1" style="width:30%"></i><i class="m2" style="width:48%"></i><i class="m3" style="width:22%"></i></div><div style="font-size:11px;color:var(--mut)">対面 8 ／ オンライン 13 ／ オンデマンド 6</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>「予測はほぼすべて外れる。予測を当てにいくのではなく、外れても崩壊しないSCMを設計する」が最も強く刺さった。「規模の経済を数値的に把握できることを初めて知った」「欠品・適正在庫を社の数字として定義することにした」と、実務行動への転換が既に記述されている。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>「最大の壁は理論ではなく数学」「2のべき乗方策の丸め方」「(s,S)のSの計算」。式変形で脱落した受講生と、式の先まで使いこなす受講生の分散が大きい。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>つまずき最多の回のひとつだが、行動変容の記述も最多。演習増強の効果が最も出る回。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第8回　ネットワーク設計（原・BCG北川）</h3><span class="tag">11/14　提出 27件</span></div>
+<div class="mode" title="対面13・オンライン15・オンデマンド6"><i class="m1" style="width:38%"></i><i class="m2" style="width:44%"></i><i class="m3" style="width:18%"></i></div><div style="font-size:11px;color:var(--mut)">対面 13 ／ オンライン 15 ／ オンデマンド 6</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>「レイヤーをまたいだ最適化の重要性と、それを支える組織体制」。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>「各ベースモデルを消化しきれていない」「コールドチェーンモデルの温度帯による劣化差」。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>モデル紹介の粒度と実装イメージの橋渡しに改善余地。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第9回　システムデザインとシステムダイナミクス（稗方教授）</h3><span class="tag">11/19　提出 27件</span></div>
+<div class="mode" title="対面6・オンライン17・オンデマンド4"><i class="m1" style="width:22%"></i><i class="m2" style="width:63%"></i><i class="m3" style="width:15%"></i></div><div style="font-size:11px;color:var(--mut)">対面 6 ／ オンライン 17 ／ オンデマンド 4</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>「システム思考＝課題をシステムとして捉え、運用ルール（ステークホルダー）との組合せで解く」。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>「システムズアプローチ〜利害関係の節は、SCMの何がどう改善されるのかイメージできなかった」― 率直で具体的な指摘。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>抽象論に現実のSCM事例を1つ通しで並走させる構成が有効。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第10〜12回　ゲスト講義（アパレルDX）／演習②③</h3><span class="tag">11/22　提出 50件</span></div>
+<div class="mode" title="対面48・オンライン1・オンデマンド4"><i class="m1" style="width:91%"></i><i class="m2" style="width:2%"></i><i class="m3" style="width:8%"></i></div><div style="font-size:11px;color:var(--mut)">対面 48 ／ オンライン 1 ／ オンデマンド 4</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>アパレルDX（ユニクロ事例・リードタイム1年）から、SCM Game（ブルウィップ体験）と在庫演習まで一日3コマ。「Insight Marketは便利だが、実務レベルのモデルには意味のあるパラメータ設定の経験値が必要」という成熟した指摘。<b>変数を自分で動かして初めて挙動が腹落ちした</b>という記述が演習回に共通する。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>演習中心のためつまずきの記述量は他回より少ないが、「シミュレーション結果をどう実務の意思決定に翻訳するか」への問いが残る。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span><b>3コマ合計50件・うち対面48件</b>と出席が跳ねる。演習・ゲストの対面吸引力は強く、この日の設計（ゲスト＋演習の組合せ）は再現する価値がある。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第13回　SCMとサービス学（原准教授）</h3><span class="tag">11/26　提出 26件</span></div>
+<div class="mode" title="対面11・オンライン13・オンデマンド2"><i class="m1" style="width:42%"></i><i class="m2" style="width:50%"></i><i class="m3" style="width:8%"></i></div><div style="font-size:11px;color:var(--mut)">対面 11 ／ オンライン 13 ／ オンデマンド 2</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>因果ループ図。「営業と生産の間に立つ自部署で、営業予測と海外調達在庫に使えそう」と適用先を自分で見つけた記述。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>「要因の洗い出しの粒度」「複数構造が併存するときの優先度」― 使おうとしたからこそのつまずき。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>演習で1事例を全員で描く時間があると定着する。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第14回　ゲーム理論の応用（西野教授）</h3><span class="tag">11/28　提出 26件</span></div>
+<div class="mode" title="対面8・オンライン14・オンデマンド4"><i class="m1" style="width:31%"></i><i class="m2" style="width:54%"></i><i class="m3" style="width:15%"></i></div><div style="font-size:11px;color:var(--mut)">対面 8 ／ オンライン 14 ／ オンデマンド 4</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>「数式より用語理解が重要」「囚人のジレンマは知っていたが微積分で解くのは難解」。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>数理展開で脱落気味。ただし「宿題をもらったので動画で復習したい」と復習意欲は高い。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>録画・復習ポータルとの連携が機能している回。事前資料の対象。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第15回　SCMとロボティクス（太田教授）</h3><span class="tag">12/3　提出 27件</span></div>
+<div class="mode" title="対面6・オンライン19・オンデマンド2"><i class="m1" style="width:22%"></i><i class="m2" style="width:70%"></i><i class="m3" style="width:7%"></i></div><div style="font-size:11px;color:var(--mut)">対面 6 ／ オンライン 19 ／ オンデマンド 2</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>「最適結果の評価の仕方が参考になった」「ドラえもんハンドの失敗研究が興味深い」。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>「実務で倉庫人員配置の厳密解を解いており、不確実性を考慮したモデル強化をしたいが理論の完全理解は難しい」― 高度な実務家のさらに上への要望。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>受講者の技術水準の分散が最大の回。オンライン19名と、この日はライブ参加が在宅に偏った。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第16〜18回　演習④／AI活用への期待（松尾教授）／ゲスト講義</h3><span class="tag">12/6　提出 79件</span></div>
+<div class="mode" title="対面70・オンライン3・オンデマンド4"><i class="m1" style="width:91%"></i><i class="m2" style="width:4%"></i><i class="m3" style="width:5%"></i></div><div style="font-size:11px;color:var(--mut)">対面 70 ／ オンライン 3 ／ オンデマンド 4</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>一日3コマの密度が高い回。演習④では「価値誘導型の経済実験でバブル発生を実証」、AI活用回では<b>「2035年にはSCMの前提が『人間がいかに効率的に働くか』から崩れる」</b>という将来像に衝撃を受けた記述が並ぶ。スケール則・Attention・Fit To Standardといった語が受講生自身の言葉で再構成されている。ゲスト回（グローバルD2C）ではブランド戦略とSCM設計の接続。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>「AIのオープン／クローズドの性能差がなぜ生じるのか」「AIエージェント定着に必要なチェンジマネジメントの実際」。演習④では「なぜ製造業者が生産量を決めるのか」という設定理解のつまずきも。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span><b>「松尾先生を生で拝見でき感動。個人的には講義より質疑の内容がとても興味深かった」</b>― 著名講師回は質疑自体が価値。事前質問収集（受講生からの要望）と相性が良い。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第19回　機械学習の基礎とSCM（岩澤講師）</h3><span class="tag">12/10　提出 27件</span></div>
+<div class="mode" title="対面10・オンライン12・オンデマンド5"><i class="m1" style="width:37%"></i><i class="m2" style="width:44%"></i><i class="m3" style="width:19%"></i></div><div style="font-size:11px;color:var(--mut)">対面 10 ／ オンライン 12 ／ オンデマンド 5</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>「機械学習＝データからルールを獲得する仕組み」という定義がほぼ全員の記述に登場し、ルールベース（If-Then）との対比が理解の軸として機能した。スケール則を学習CAPEXと運用コストの産業応用に結びつけた記述や、自社工程（加工条件・歩留まり・需要変動）への適用案を自分で書き出す受講生も。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>問いは既に「導入後の運用」に進んでいる：モデル劣化（データシフト）を現場で誰がどう検知するか、人間フィードバックのバイアスをどう排除するか。深層学習の内部構造への関心も。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>概念理解は良好。第23回演習（JDSC）との間隔が近く、講義→演習の接続が機能した。運用設計（MLOps的な話題）を一段足す余地。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第20回　SCMと地政学（柴崎准教授）</h3><span class="tag">12/12　提出 26件</span></div>
+<div class="mode" title="対面7・オンライン16・オンデマンド3"><i class="m1" style="width:27%"></i><i class="m2" style="width:62%"></i><i class="m3" style="width:12%"></i></div><div style="font-size:11px;color:var(--mut)">対面 7 ／ オンライン 16 ／ オンデマンド 3</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>「物流は経路依存型インフラ」「派生需要ゆえ平時はコスト扱い、有事に初めて重要性が顕在化」。歴史から説き起こしAISデータで検証するアプローチ自体への言及が多く、「工学と歴史・データの融合が説得力」という受け止め。タイ駐在経験者が「止まる前提の設計」を自らの体験と接続。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>「国・港湾・海運レベルの議論を、国内物流センターの在庫水準・BCPにどう落とすか」― マクロとミクロの接続。内陸輸送データの捕捉限界。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>「地政学をニュースとして知るのでなく、SCM戦略に落とす思考フレーム（チェックリスト・評価軸）が欲しい」という明確な要望。有事の港湾レジリエンス・シミュレーションへの関心。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第21回　我が国の政策動向（国交省 五十嵐氏）</h3><span class="tag">12/17　提出 27件</span></div>
+<div class="mode" title="対面10・オンライン15・オンデマンド2"><i class="m1" style="width:37%"></i><i class="m2" style="width:56%"></i><i class="m3" style="width:7%"></i></div><div style="font-size:11px;color:var(--mut)">対面 10 ／ オンライン 15 ／ オンデマンド 2</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>「2024年問題は通過点、2030年の輸送力34%不足が本命リスク」「物流DXは手段の高度化により物流の在り方を変えること」。改正物流法の規制的措置3本柱、荷主・事業者・消費者一体の行動変容という枠組み。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>努力義務の実効性と監査基準（「どこまで対応すれば十分か」）、中小事業者のコスト負担とインセンティブ設計、鉄道モーダルシフトの隘路。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>質疑が最も盛り上がった回のひとつ（適正原価と実勢運賃の乖離など）。「自社センターの荷待ち・バース・パレット共通化を最優先で検討したい」と行動宣言の記述も。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第22回　GX・新たな社会価値（田中教授）</h3><span class="tag">12/20　提出 27件</span></div>
+<div class="mode" title="対面25・オンライン2・オンデマンド1"><i class="m1" style="width:89%"></i><i class="m2" style="width:7%"></i><i class="m3" style="width:4%"></i></div><div style="font-size:11px;color:var(--mut)">対面 25 ／ オンライン 2 ／ オンデマンド 1</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>「物流は社会のセンサー」「経理情報より物流情報のほうが企業の代謝を正確に映す」。COO（成長期に強い）とCFO（成熟期に強い）のバランスの中でCLOが立ち回るという構図。平準化＝発注のばらつき対策という本質。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>中小規模事業者への段階的導入の道筋、GX投資の費用対効果評価。「キリン・アサヒの在庫削減はAI発注の効果か、そもそも過剰バッファだったのか」という鋭い問いも。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>「モデルのせいにすることで現場の心理的安全性を担保する」という組織論的知見に強い共鳴。技術導入を「責任の所在の再定義」として捉える視点が刺さっている。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第23回　演習⑤ 最適化と平準化（JDSC）</h3><span class="tag">12/20　提出 21件</span></div>
+<div class="mode" title="対面19・オンライン1・オンデマンド1"><i class="m1" style="width:90%"></i><i class="m2" style="width:5%"></i><i class="m3" style="width:5%"></i></div><div style="font-size:11px;color:var(--mut)">対面 19 ／ オンライン 1 ／ オンデマンド 1</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>「物流課題の本質は総量不足でなくピーク集中（波動の偏り）」が最頻出。安全係数αを自分で動かして欠品率と在庫量のトレードオフを体感し、「議論のスタートからゴールまで自分でコントロールできる」というPython可視化の手応え。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>実務適用の判断基準、プロモーション・季節性など外部要因のモデル組み込み。コーディング経験の分散が大きく、穴埋め課題の難易度がまちまちに。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>「第8回（ネットワーク設計）と近い日取りにすべき」という設計指摘は順序最適化の分析と一致。港湾で平準化実証に取り組む受講生から「需要側の協力なしに実現しない」という実感。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第24回　ゲスト講義③ 倉庫現場（白川氏）</h3><span class="tag">12/20　提出 26件</span></div>
+<div class="mode" title="対面23・オンライン2・オンデマンド1"><i class="m1" style="width:88%"></i><i class="m2" style="width:8%"></i><i class="m3" style="width:4%"></i></div><div style="font-size:11px;color:var(--mut)">対面 23 ／ オンライン 2 ／ オンデマンド 1</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>「入荷を制する者が物流を制す」。DC/FC/TCの機能整理、OMS-WMS連携、5S・3定の凡事徹底なくして自動化なし。Amazon・ディズニーの実体験エピソード（厳格なシステム制御と柔軟な現場対応の両立）。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>人手作業と自動化の切り分け基準、自動化投資の損益分岐（SKU・出荷量の目安）、RFP作成を3PL側がどこまでリードすべきか。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>「日本の3PLは請け負け構造。世界標準の物流思考が入る前に対等な取引先として再定義を」という論点が複数の受講生に刺さった。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">補講　ゲーム理論演習・宿題解説（西野教授）</h3><span class="tag">1/7　提出 3件</span></div>
+<div class="mode" title="対面0・オンライン1・オンデマンド0"><i class="m1" style="width:0%"></i><i class="m2" style="width:100%"></i><i class="m3" style="width:0%"></i></div><div style="font-size:11px;color:var(--mut)">対面 0 ／ オンライン 1 ／ オンデマンド 0</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>「偏微分する変数は、自分の意思でコントロールできる変数を選ぶ」が深く腹落ち。「式に書ければ計算できる」。シュタッケルベルグモデルでパワーバランスが利潤に与える影響を計算で体感。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>需要関数が非線形の場合の解析・近似手法。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>提出3件ながら記述は濃い。「手を動かし、調べ、講義で腹落ちさせる勉強の核を実践できた」― オンデマンド化しても成立する回。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第25回　ファイナンスからみたSCM（BCG北川氏）</h3><span class="tag">1/10　提出 26件</span></div>
+<div class="mode" title="対面21・オンライン3・オンデマンド1"><i class="m1" style="width:84%"></i><i class="m2" style="width:12%"></i><i class="m3" style="width:4%"></i></div><div style="font-size:11px;color:var(--mut)">対面 21 ／ オンライン 3 ／ オンデマンド 1</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>「SCMはWC圧縮・FCF創出でROIC/PERに直接貢献する」― SCMをコスト問題でなくバリュー問題として語り直す視点。アクティビストの物流子会社売却要求に経営が反論できない構造。事業・財務・投資家戦略の三位一体。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>「在庫回転率を○pt上げればマルチプルが○倍」という定量モデル化への渇望。資本市場の用語に馴染みのない受講生には壁が高かった（「初めて聞く単語ばかり」）。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>「オペレーションの最適化屋から、CFOにキャッシュ創出ストーリーを提供する経営の参謀へ」という視座転換の記述が多数。本プログラムの狙い（CLO育成）が受講生自身の言葉で再認識された回。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第26回　演習⑥ シナリオデザイン（木下准教授）</h3><span class="tag">1/10　提出 23件</span></div>
+<div class="mode" title="対面19・オンライン1・オンデマンド2"><i class="m1" style="width:86%"></i><i class="m2" style="width:5%"></i><i class="m3" style="width:9%"></i></div><div style="font-size:11px;color:var(--mut)">対面 19 ／ オンライン 1 ／ オンデマンド 2</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>フォアキャスティング／バックキャスティングの対比が軸。「シナリオは予測精度を競うものでなく、起こりうる幅を把握し意思決定に洞察を与えるもの」。グローバル自動車市場のシナリオと実績の比較に驚きの声。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>キードライバー選定の主観バイアスをどう排除するか。概論の時間不足（「2時間枠で聞きたかった」）。バックキャスティングの趣旨を掴む前に演習に入り消化不良という声も。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>中期経営計画・技術ロードマップへの落とし込み事例の要望。演習前にFC/BCの違いを明示する導入があれば防げるつまずき。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第27回　ゲスト講義⑤ 外航海運（日本郵船 林氏）</h3><span class="tag">1/10　提出 23件</span></div>
+<div class="mode" title="対面20・オンライン2・オンデマンド1"><i class="m1" style="width:87%"></i><i class="m2" style="width:9%"></i><i class="m3" style="width:4%"></i></div><div style="font-size:11px;color:var(--mut)">対面 20 ／ オンライン 2 ／ オンデマンド 1</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>「海運自由の原則」と国際航空との対比、日本がフルセット型の海事クラスターを持つ希少な国であること、不定期船市況が完全競争的に乱高下するメカニズム。「地味に見えて凄まじい戦略産業」という受け止め。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>便宜置籍・仕組船の戦略的意味（「日本籍船を維持するメリットはどこまで残るか」）、2026年以降のコンテナ需給の不確実性、代替燃料のデファクト形成要因。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>造船・港湾・商社・メーカーがそれぞれ自業務と接続した記述を残した波及の大きい回。スコープ3削減での海運会社との連携方法への問い。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第28回　循環型経済の実現に向けて（村上教授）</h3><span class="tag">1/14　提出 26件</span></div>
+<div class="mode" title="対面8・オンライン16・オンデマンド2"><i class="m1" style="width:31%"></i><i class="m2" style="width:62%"></i><i class="m3" style="width:8%"></i></div><div style="font-size:11px;color:var(--mut)">対面 8 ／ オンライン 16 ／ オンデマンド 2</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>「CEは環境対策ではなく資源・地政学リスクに対する経済安全保障」という再定義。Narrowing/Closing/Slowingの整理、「フローの最大化からストックの価値維持へ」という経済観の転換。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>デジタルプロダクトパスポートの実装方法、中小事業者までDX前提が届くのかという現実感。再生品市場の消費者受容性。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>「Reverse Logistics・回収物流はB/Cが成立しない前提でどう制度設計するか」― 物流側の宿題が明確に言語化された。静脈物流はCE港湾など受講生の実務とも直結。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第29回　農産物・食品のSCM（神井氏）</h3><span class="tag">1/16　提出 23件</span></div>
+<div class="mode" title="対面5・オンライン13・オンデマンド5"><i class="m1" style="width:22%"></i><i class="m2" style="width:57%"></i><i class="m3" style="width:22%"></i></div><div style="font-size:11px;color:var(--mut)">対面 5 ／ オンライン 13 ／ オンデマンド 5</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>Wicked Problem概念が圧倒的に強く残った。「正解/不正解でなく良い/悪い」。自社製品（バルブ製造、港湾輸出、鉄鋼）に当てはめて自分の言葉で再記述する受講生が続出 ― 概念の転移が起きている証拠。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>安全性と味のトレードオフの直感的理解、ネイチャーポジティブ・生態系サービスの価格への落とし込み、影響力の小さい関係者を含む合意形成の落としどころ。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>「食品SCMは他産業が将来直面する課題の先取り」という受け止め。食品以外のwicked problem適用事例への要望 ― 次年度の横断テーマ候補。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第30回　SCMとフィジカルインターネット（藤野氏）</h3><span class="tag">1/21　提出 23件</span></div>
+<div class="mode" title="対面10・オンライン11・オンデマンド2"><i class="m1" style="width:43%"></i><i class="m2" style="width:48%"></i><i class="m3" style="width:9%"></i></div><div style="font-size:11px;color:var(--mut)">対面 10 ／ オンライン 11 ／ オンデマンド 2</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>「SCMは静的最適化でなく動的制御の問題」「財務KPIの部門別適用が全体最適を阻害」。経営システムの設計思想としてのSCM。「本講義シリーズの内容が繋がった」という統合の記述 ― カリキュラム上のバス（統合）講義として機能。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>「VMIの失敗原因の説明は本質的でない気がする」という鋭い疑義、S&OPでなお人-人会議が必要な理由、ITリソースの乏しい中小へのCatena-X型標準化の適用プロセス。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>「120名規模の工場では何から手を付けるべきか」― 国家・業界レベルの議論を現場規模に翻訳する教材が次の需要。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第31回　PI国際講義（Thompson教授）</h3><span class="tag">1/28　提出 22件</span></div>
+<div class="mode" title="対面0・オンライン19・オンデマンド3"><i class="m1" style="width:0%"></i><i class="m2" style="width:86%"></i><i class="m3" style="width:14%"></i></div><div style="font-size:11px;color:var(--mut)">対面 0 ／ オンライン 19 ／ オンデマンド 3</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>クラウドシッピング・共同配送ハブ・AIオークション。「なぜ各社が合理的に動いているのに全体は非効率なのか、という現場感覚の疑問が理論的に説明された」。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>移行プロセスで既存事業者がどの段階まで標準化に踏み込むべきか、国・国際機関の動き。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>英語講義でも提出者の記述は濃い。メルボルンの取組を日本の地方中心部で実証するアイデアなど、具体の提案が出ている。</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+<h3 style="margin:0">第32回　課題発表・修了</h3><span class="tag">2/7　提出 4件</span></div>
+<div class="mode" title="対面2・オンライン0・オンデマンド0"><i class="m1" style="width:100%"></i><i class="m2" style="width:0%"></i><i class="m3" style="width:0%"></i></div><div style="font-size:11px;color:var(--mut)">対面 2 ／ オンライン 0 ／ オンデマンド 0</div>
+<p style="margin:10px 0 6px"><span class="pill">響いた論点</span>受講者相互のプレゼンから「環境は違えど悩みは共通」。ゲーム理論はじめ講義内容を自業務に活かすアプローチの宣言が多数。「多様な業種の課題と検討を聞けたこと自体が学び」。</p>
+<p style="margin:0 0 6px"><span class="pill" style="background:var(--warmwash);color:var(--conf)">つまずき</span>発表資料の事後共有への要望（後日改めて理解を深めたい）。</p>
+<p style="margin:0;color:var(--ink2);font-size:13.5px"><span class="pill">次年度へ</span>「交流の継続・意見交換は今後さらに重要」― 修了後コミュニティ（ニュースレター・同窓会）設計への直接のインプット。</p>
+</div>
+
+<p class="note">※ 提出件数は受講者単位（同一人物が同じ回に複数提出した場合は1件）。出席形態は記載のある分の内訳で、同日複数コマのカードはコマ数分を合算しているため件数と一致しない。第2回（演習①棚卸）・第11回（演習②）・補講・第32回は、事務局とりまとめに独立した集計欄がなくPDF提出のみのため件数が少ない。</p>
+<div class="src"><b>データの出典と注意</b><br>
+・出席確認票：事務局「出席確認票FBとりまとめ」（全22日程・722件、受講者氏名／受講方法／講師名／自由記述3欄を含む）に、そこへ未収載のPDF提出票62件を統合した<b>提出784件</b>。自由記述は<b>2,016件・464,211字</b>で、全32回＋補講をカバーする。受講者26名（正規受講者24名＋聴講生2名）。<br>
+・修了後アンケート：2025年度修了者26名中24名回答（回答率92.3%、回答期間2026/7/30〜8/8、匿名集計）。<br>
+・カリキュラム情報：2025年度実施記録（全32コマ・57.5時間）および講義復習ポータル収載の講義データ。<br>
+・コンピテンシー体系 SCM-ECF v0.1：ASCM SCOR Digital Standard／CSCP・CLTD出題体系／CIPS Global Standard 等を参照して独自編成した20項目。講義×項目のマッピングは試行版であり、専門家パネルによる検証前。<br>
+・自由記述の分類はキーワード辞書によるマッチング（1件の記述が複数項目に言及し得る）。引用は原文の趣旨を保ち、固有名詞のみ一般化。<br>
+作成：2026年8月22日（8月23日 第2版：需要側データを事務局FBとりまとめベースに全面差し替え、記述量が約2倍に）　SCMリカレント教育プログラム事務局分析</div>
+
+</div>
+
+</body></html>

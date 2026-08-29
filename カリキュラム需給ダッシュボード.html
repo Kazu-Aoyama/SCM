@@ -1,0 +1,277 @@
+<!doctype html><html lang="ja"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style><title>カリキュラム需給ダッシュボード</title>
+</head><body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@500;600&display=swap">
+<style>
+:root{
+  --paper:#f7f8fa; --card:#ffffff; --ink:#101828; --ink2:#475064; --mut:#8a8f9d;
+  --navy:#16224a; --navy2:#25376e; --hair:#e3e6ec; --grid:#eceef3;
+  --sup:#2a78d6; --dem:#eb6834; --conf:#ec835a; --good:#0ca30c; --goodtx:#006300;
+  --wash:#eef3fa; --warmwash:#fdf1ea; --chip:#dfe8f6;
+  --acc: var(--sup);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0e1116; --card:#171b23; --ink:#f2f4f8; --ink2:#b9bfcc; --mut:#848b99;
+    --navy:#c9d6f2; --navy2:#a8bce8; --hair:#272c37; --grid:#232833;
+    --sup:#3987e5; --dem:#d95926; --conf:#ec835a; --good:#0ca30c; --goodtx:#4cc36b;
+    --wash:#1a2233; --warmwash:#2b2019; --chip:#223052;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0e1116; --card:#171b23; --ink:#f2f4f8; --ink2:#b9bfcc; --mut:#848b99;
+  --navy:#c9d6f2; --navy2:#a8bce8; --hair:#272c37; --grid:#232833;
+  --sup:#3987e5; --dem:#d95926; --conf:#ec835a; --good:#0ca30c; --goodtx:#4cc36b;
+  --wash:#1a2233; --warmwash:#2b2019; --chip:#223052;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);
+  font-family:'Noto Sans JP',system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:15px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px 72px}
+.mast{border-bottom:1px solid var(--hair);padding:30px 0 22px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.mast .org{font-size:12.5px;letter-spacing:.14em;color:var(--mut)}
+.mast .aud{font-size:12px;letter-spacing:.1em;color:var(--acc);border:1px solid var(--acc);
+  border-radius:999px;padding:3px 14px;white-space:nowrap}
+h1{font-family:'Shippori Mincho',serif;font-weight:600;font-size:clamp(26px,4vw,36px);
+   line-height:1.35;color:var(--navy);letter-spacing:.01em;text-wrap:balance;margin:34px 0 10px}
+.lede{color:var(--ink2);max-width:44em;font-size:15.5px}
+h2{font-family:'Shippori Mincho',serif;font-weight:600;font-size:21px;color:var(--navy);
+   margin:54px 0 6px;letter-spacing:.02em;text-wrap:balance}
+h2 + .sub{color:var(--mut);font-size:13px;margin-bottom:18px}
+h3{font-size:15.5px;font-weight:700;margin:22px 0 8px}
+p{margin:0 0 12px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:26px 0 8px}
+.st{background:var(--card);border:1px solid var(--hair);border-radius:10px;padding:16px 14px 13px;text-align:center}
+.st .v{font-size:30px;font-weight:700;color:var(--navy);line-height:1.15;font-variant-numeric:tabular-nums}
+.st .v em{font-style:normal;font-size:16px;font-weight:600}
+.st .v.o{color:var(--dem)}
+.st .l{font-size:12.5px;font-weight:700;margin-top:5px}
+.st .n{font-size:11px;color:var(--mut);margin-top:3px;line-height:1.5}
+.card{background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:22px 24px;margin:16px 0}
+.wash{background:var(--wash);border-color:transparent}
+.warmwash{background:var(--warmwash);border-color:transparent}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+.quote{border-left:3px solid var(--acc);padding:2px 0 2px 16px;margin:14px 0;color:var(--ink);font-size:14.5px}
+.quote .who{display:block;color:var(--mut);font-size:12px;margin-top:5px}
+table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--card);border:1px solid var(--hair);border-radius:10px;overflow:hidden}
+.tblwrap{overflow-x:auto;margin:14px 0}
+th{background:var(--navy);color:#fff;font-weight:600;font-size:12.5px;padding:9px 12px;text-align:left;white-space:nowrap}
+:root[data-theme="dark"] th{background:#25376e}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) th{background:#25376e}}
+td{padding:9px 12px;border-top:1px solid var(--hair);vertical-align:top}
+td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.note{font-size:12px;color:var(--mut);line-height:1.7;margin:10px 0}
+.src{border-top:1px solid var(--hair);margin-top:64px;padding-top:18px;font-size:12px;color:var(--mut);line-height:1.8}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12.5px;color:var(--ink2);margin:6px 0 14px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+/* paired bar rows */
+.brow{display:grid;grid-template-columns:180px 1fr 84px;gap:10px;align-items:center;margin:7px 0;font-size:13px}
+.brow .lb{text-align:right;color:var(--ink2);line-height:1.35}
+.brow .lb b{color:var(--ink)}
+.btrack{position:relative;height:30px}
+.bar{position:absolute;left:0;height:12px;border-radius:0 4px 4px 0;min-width:2px}
+.bar.s{top:2px;background:var(--sup)}
+.bar.d{top:16px;background:var(--dem)}
+.bar1{position:relative;height:14px;border-radius:0 4px 4px 0;background:var(--conf);min-width:2px}
+.brow .gp{font-size:12.5px;font-variant-numeric:tabular-nums;text-align:left;white-space:nowrap}
+.gp.plus{color:var(--dem);font-weight:700}
+.gp.minus{color:var(--sup);font-weight:700}
+.pill{display:inline-block;background:var(--chip);color:var(--navy);border-radius:999px;
+  padding:1px 10px;font-size:11.5px;font-weight:600;margin:0 4px 4px 0}
+:root[data-theme="dark"] .pill{color:#dbe6fb}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .pill{color:#dbe6fb}}
+.tag{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--mut)}
+.mode{display:flex;height:10px;border-radius:5px;overflow:hidden;margin:6px 0 2px}
+.mode i{display:block;height:100%}
+.mode .m1{background:var(--sup)}.mode .m2{background:#86b6ef}.mode .m3{background:#c3c2b7}
+a{color:var(--sup)}
+.toc{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 0}
+.toc a{font-size:12.5px;color:var(--navy2);text-decoration:none;border:1px solid var(--hair);
+  background:var(--card);border-radius:999px;padding:5px 14px}
+.toc a:hover{border-color:var(--acc)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+@media (prefers-reduced-motion: no-preference){
+  .bar,.bar1{transition:width .6s ease}
+}
+</style>
+<div class="wrap">
+<div class="mast"><div class="org">東京大学　SCMリカレント教育プログラム　｜　2025年度 実施データ分析</div>
+<div class="aud">プログラム・デザイナー向け</div></div>
+
+<h1>カリキュラム需給ダッシュボード</h1>
+<p class="lede">供給（講義が時間を割いた領域）と需要（受講生が出席確認票に書いた関心・つまずき）を、同じ20項目のコンピテンシー体系の上で突き合わせた。カリキュラムの過不足を、感想ではなく分布の差として読むための資料。</p>
+
+<div class="stats">
+<div class="st"><div class="v">64.5<em>%</em></div><div class="l">適合度 Coverage</div><div class="n">目標習熟度に対する充足<br>（SCM-ECF 20項目）</div></div>
+<div class="st"><div class="v">0.459</div><div class="l">整合度指数 P</div><div class="n">配分の一致度<br>P=1−Σ|x−y|/2</div></div>
+<div class="st"><div class="v">19<em> / 20</em></div><div class="l">幅カバレッジ</div><div class="n">未カバーは B3<br>生産計画・能力管理のみ</div></div>
+<div class="st"><div class="v">48.6<em>%</em></div><div class="l">評価カバレッジ</div><div class="n">成績評価まで実施した割合<br>（重要度加重）</div></div>
+<div class="st"><div class="v o">784<em>件</em></div><div class="l">出席確認票（需要側データ）</div><div class="n">全32回＋補講・受講者26名<br>自由記述2,016件・46.4万字</div></div>
+</div>
+<div class="toc"><a href="#gap">需給ギャップ</a><a href="#conf">つまずき</a><a href="#bloom">認知レベル</a><a href="#act">2026設計指示</a></div>
+
+<h2 id="gap">需給ギャップ ― 講義配分と受講生の関心</h2>
+<div class="sub">上段＝講義の実効時間シェア E_i、下段＝自由記述での関心言及シェア（「理解できた・興味」＋「要望」4,271言及・全期間）。差が大きい順。</div>
+<div class="legend"><span><i class="sw" style="background:var(--sup)"></i>講義配分（供給）</span><span><i class="sw" style="background:var(--dem)"></i>受講生の関心（需要）</span><span>右端＝需要−供給</span></div>
+<div class="card"><div class="brow"><div class="lb"><b>B1</b>　需要予測</div>
+<div class="btrack" title="需要予測：講義配分 2.0% ／ 受講生の関心 4.7%">
+<i class="bar s" style="width:14.3%"></i><i class="bar d" style="width:33.6%"></i></div>
+<div class="gp plus">+2.7 pt</div></div>
+<div class="brow"><div class="lb"><b>D1</b>　データ分析・数理最適化</div>
+<div class="btrack" title="データ分析・数理最適化：講義配分 6.6% ／ 受講生の関心 9.2%">
+<i class="bar s" style="width:47.1%"></i><i class="bar d" style="width:65.7%"></i></div>
+<div class="gp plus">+2.6 pt</div></div>
+<div class="brow"><div class="lb"><b>B3</b>　生産計画・能力（未提供）</div>
+<div class="btrack" title="生産計画・能力（未提供）：講義配分 0.0% ／ 受講生の関心 2.5%">
+<i class="bar s" style="width:0.0%"></i><i class="bar d" style="width:17.9%"></i></div>
+<div class="gp plus">+2.5 pt</div></div>
+<div class="brow"><div class="lb"><b>B2</b>　在庫理論・発注</div>
+<div class="btrack" title="在庫理論・発注：講義配分 4.2% ／ 受講生の関心 6.3%">
+<i class="bar s" style="width:30.0%"></i><i class="bar d" style="width:45.0%"></i></div>
+<div class="gp plus">+2.1 pt</div></div>
+<div class="brow"><div class="lb"><b>D4</b>　SCシステム・情報連携</div>
+<div class="btrack" title="SCシステム・情報連携：講義配分 3.0% ／ 受講生の関心 5.0%">
+<i class="bar s" style="width:21.4%"></i><i class="bar d" style="width:35.7%"></i></div>
+<div class="gp plus">+2.0 pt</div></div>
+<div class="brow"><div class="lb"><b>C2</b>　輸配送</div>
+<div class="btrack" title="輸配送：講義配分 6.0% ／ 受講生の関心 7.8%">
+<i class="bar s" style="width:42.9%"></i><i class="bar d" style="width:55.7%"></i></div>
+<div class="gp plus">+1.8 pt</div></div>
+<div class="brow"><div class="lb"><b>E1</b>　リスク・BCP</div>
+<div class="btrack" title="リスク・BCP：講義配分 2.8% ／ 受講生の関心 4.0%">
+<i class="bar s" style="width:20.0%"></i><i class="bar d" style="width:28.6%"></i></div>
+<div class="gp plus">+1.2 pt</div></div>
+<div class="brow"><div class="lb"><b>D2</b>　機械学習・AI</div>
+<div class="btrack" title="機械学習・AI：講義配分 5.8% ／ 受講生の関心 6.9%">
+<i class="bar s" style="width:41.4%"></i><i class="bar d" style="width:49.3%"></i></div>
+<div class="gp plus">+1.1 pt</div></div>
+<div class="brow"><div class="lb"><b>D3</b>　生成AI</div>
+<div class="btrack" title="生成AI：講義配分 1.2% ／ 受講生の関心 2.0%">
+<i class="bar s" style="width:8.6%"></i><i class="bar d" style="width:14.3%"></i></div>
+<div class="gp ">+0.8 pt</div></div>
+<div class="brow"><div class="lb"><b>A4</b>　SC財務・投資評価</div>
+<div class="btrack" title="SC財務・投資評価：講義配分 2.4% ／ 受講生の関心 2.9%">
+<i class="bar s" style="width:17.1%"></i><i class="bar d" style="width:20.7%"></i></div>
+<div class="gp ">+0.5 pt</div></div>
+<div class="brow"><div class="lb"><b>C1</b>　調達・SRM（ゲーム理論含む）</div>
+<div class="btrack" title="調達・SRM（ゲーム理論含む）：講義配分 4.0% ／ 受講生の関心 4.5%">
+<i class="bar s" style="width:28.6%"></i><i class="bar d" style="width:32.1%"></i></div>
+<div class="gp ">+0.5 pt</div></div>
+<div class="brow"><div class="lb"><b>E2</b>　地政学・政策</div>
+<div class="btrack" title="地政学・政策：講義配分 3.6% ／ 受講生の関心 3.7%">
+<i class="bar s" style="width:25.7%"></i><i class="bar d" style="width:26.4%"></i></div>
+<div class="gp ">+0.1 pt</div></div>
+<div class="brow"><div class="lb"><b>A3</b>　S&OP・需給計画</div>
+<div class="btrack" title="S&OP・需給計画：講義配分 2.0% ／ 受講生の関心 1.2%">
+<i class="bar s" style="width:14.3%"></i><i class="bar d" style="width:8.6%"></i></div>
+<div class="gp ">-0.8 pt</div></div>
+<div class="brow"><div class="lb"><b>E3</b>　GX・循環経済</div>
+<div class="btrack" title="GX・循環経済：講義配分 4.8% ／ 受講生の関心 4.1%">
+<i class="bar s" style="width:34.3%"></i><i class="bar d" style="width:29.3%"></i></div>
+<div class="gp ">-0.7 pt</div></div>
+<div class="brow"><div class="lb"><b>A1</b>　SC戦略・全体最適</div>
+<div class="btrack" title="SC戦略・全体最適：講義配分 12.5% ／ 受講生の関心 10.4%">
+<i class="bar s" style="width:89.3%"></i><i class="bar d" style="width:74.3%"></i></div>
+<div class="gp minus">-2.1 pt</div></div>
+<div class="brow"><div class="lb"><b>C3</b>　倉庫・拠点オペ</div>
+<div class="btrack" title="倉庫・拠点オペ：講義配分 10.3% ／ 受講生の関心 8.3%">
+<i class="bar s" style="width:73.6%"></i><i class="bar d" style="width:59.3%"></i></div>
+<div class="gp minus">-2.0 pt</div></div>
+<div class="brow"><div class="lb"><b>B4</b>　変動・ブルウィップ</div>
+<div class="btrack" title="変動・ブルウィップ：講義配分 6.8% ／ 受講生の関心 4.9%">
+<i class="bar s" style="width:48.6%"></i><i class="bar d" style="width:35.0%"></i></div>
+<div class="gp minus">-1.9 pt</div></div>
+<div class="brow"><div class="lb"><b>E4</b>　SC組織・人材</div>
+<div class="btrack" title="SC組織・人材：講義配分 7.2% ／ 受講生の関心 4.9%">
+<i class="bar s" style="width:51.4%"></i><i class="bar d" style="width:35.0%"></i></div>
+<div class="gp minus">-2.3 pt</div></div>
+<div class="brow"><div class="lb"><b>A2</b>　ネットワーク設計</div>
+<div class="btrack" title="ネットワーク設計：講義配分 6.0% ／ 受講生の関心 2.6%">
+<i class="bar s" style="width:42.9%"></i><i class="bar d" style="width:18.6%"></i></div>
+<div class="gp minus">-3.4 pt</div></div>
+<div class="brow"><div class="lb"><b>C4</b>　国際物流・通商</div>
+<div class="btrack" title="国際物流・通商：講義配分 8.5% ／ 受講生の関心 4.0%">
+<i class="bar s" style="width:60.7%"></i><i class="bar d" style="width:28.6%"></i></div>
+<div class="gp minus">-4.5 pt</div></div>
+</div>
+<div class="grid2">
+<div class="card wash"><h3>需要超過 ― 関心が配分を上回る</h3>
+<p style="font-size:13.5px">上位は<b>需要予測 +2.7pt・データ分析／数理 +2.6・生産計画 +2.5・在庫理論 +2.1・情報連携 +2.0</b>。順位の細部は動くが、<b>「計画と数理」の一群が需要超過を占める構図は、データを2倍に増やしても変わらなかった</b>。とくにB3 生産計画は講義を提供していないのに言及が続く＝潜在需要。D4 情報連携（PI・データ連携）は後半講義が喚起した新しい需要で、実装・運用への関心として現れている。</p></div>
+<div class="card wash"><h3>供給超過 ― 配分が関心を上回る</h3>
+<p style="font-size:13.5px">国際物流（−4.5pt）、ネットワーク設計（−3.4）、組織・人材（−2.3）、SC戦略（−2.1）、ブルウィップ（−1.9）、倉庫オペ（−2.0）。倉庫・国際物流は見学会・ゲスト講義由来の時間であり、言及率だけで「削る」判断はしない。A3 S&amp;OPは需給差こそ小さい（−0.8）が、<b>供給2.0%・需要1.2%と両方が薄い「教えていないから需要も見えない」型</b>のまま。<b>「時間の割に演習・評価がなく深度が上がらない」</b>という適合度分析の所見と併せて読む。</p></div>
+</div>
+
+<h2 id="conf">つまずきの分布 ― 「理解できなかった」777言及の内訳（全期間）</h2>
+<div class="sub">受講生が自分の言葉で書いた不明点。多い順に上位8項目。</div>
+<div class="card"><div class="brow"><div class="lb"><b>D1</b>　データ分析・数理最適化</div>
+<div title="「理解できなかった」言及に占める割合 11.2%"><i class="bar1" style="width:93.3%;display:block"></i></div>
+<div class="gp">11.2%</div></div>
+<div class="brow"><div class="lb"><b>C2</b>　輸配送</div>
+<div title="「理解できなかった」言及に占める割合 8.0%"><i class="bar1" style="width:66.7%;display:block"></i></div>
+<div class="gp">8.0%</div></div>
+<div class="brow"><div class="lb"><b>D2</b>　機械学習・AI</div>
+<div title="「理解できなかった」言及に占める割合 8.0%"><i class="bar1" style="width:66.7%;display:block"></i></div>
+<div class="gp">8.0%</div></div>
+<div class="brow"><div class="lb"><b>C3</b>　倉庫・拠点オペ</div>
+<div title="「理解できなかった」言及に占める割合 7.7%"><i class="bar1" style="width:64.2%;display:block"></i></div>
+<div class="gp">7.7%</div></div>
+<div class="brow"><div class="lb"><b>A1</b>　SC戦略・全体最適</div>
+<div title="「理解できなかった」言及に占める割合 7.5%"><i class="bar1" style="width:62.5%;display:block"></i></div>
+<div class="gp">7.5%</div></div>
+<div class="brow"><div class="lb"><b>D4</b>　SCシステム・情報連携</div>
+<div title="「理解できなかった」言及に占める割合 6.9%"><i class="bar1" style="width:57.5%;display:block"></i></div>
+<div class="gp">6.9%</div></div>
+<div class="brow"><div class="lb"><b>B2</b>　在庫理論・発注</div>
+<div title="「理解できなかった」言及に占める割合 4.8%"><i class="bar1" style="width:40.0%;display:block"></i></div>
+<div class="gp">4.8%</div></div>
+<div class="brow"><div class="lb"><b>C1</b>　調達・SRM（ゲーム理論含む）</div>
+<div title="「理解できなかった」言及に占める割合 4.6%"><i class="bar1" style="width:38.3%;display:block"></i></div>
+<div class="gp">4.6%</div></div>
+</div>
+<div class="card warmwash"><p style="font-size:13.5px;margin:0"><b>D1 データ分析・数理（11.2%）が年間を通じてつまずき1位で、これは動かない。</b>「SCMを学ぶ上での最大の壁は『理論』ではなく『数学』だと改めて感じました」（第7回）。そのうえで、<b>C2 輸配送・D2 AI・C3 現場自動化・D4 システム連携（計30.6%）が続く</b> ― 後半の受講生の問いは「モデル劣化を現場で誰が検知するのか」「中小事業者までDX前提が届くのか」といった<b>導入後の実装・運用の壁</b>に移っている。前半は「数学の壁」を事前学習と演習で、後半は「運用の壁」を導入事例・運用設計の教材で登れるようにするのが打ち手。2026年度の「事前学習資料の提供」「演習3h→4.5h」は前者と整合する。</p></div>
+
+<h2 id="bloom">認知レベルの配分 ― 依然として最大の構造課題</h2>
+<div class="sub">実際の時間配分と、目標水準から導いた配分。適合度分析（2026年8月）より再掲。</div>
+<div class="legend"><span><i class="sw" style="background:var(--sup)"></i>実際 X</span><span><i class="sw" style="background:var(--dem)"></i>目標 Y</span></div>
+<div class="card"><div class="brow"><div class="lb"><b>1 理解</b></div>
+<div class="btrack" title="1 理解：実際 64.0% ／ 目標 26.2%"><i class="bar s" style="width:100.0%"></i><i class="bar d" style="width:40.9%"></i></div>
+<div class="gp">+37.8 pt</div></div>
+<div class="brow"><div class="lb"><b>2 適用</b></div>
+<div class="btrack" title="2 適用：実際 21.9% ／ 目標 34.2%"><i class="bar s" style="width:34.2%"></i><i class="bar d" style="width:53.4%"></i></div>
+<div class="gp">−12.3 pt</div></div>
+<div class="brow"><div class="lb"><b>3 分析・評価</b></div>
+<div class="btrack" title="3 分析・評価：実際 10.5% ／ 目標 27.9%"><i class="bar s" style="width:16.4%"></i><i class="bar d" style="width:43.6%"></i></div>
+<div class="gp">−17.4 pt</div></div>
+<div class="brow"><div class="lb"><b>4 創造・設計</b></div>
+<div class="btrack" title="4 創造・設計：実際 3.6% ／ 目標 11.7%"><i class="bar s" style="width:5.6%"></i><i class="bar d" style="width:18.3%"></i></div>
+<div class="gp">−8.1 pt</div></div>
+</div>
+<p class="note">「理解」偏重（+37.8pt）が整合度指数 P=0.459 の主因。出席確認票の「実務でどう使うか」を問う記述の多さは、受講生自身が適用・分析レベルを求めている証拠でもある。</p>
+
+<h2 id="act">2026年度への設計指示</h2>
+<div class="tblwrap"><table>
+<tr><th>優先</th><th>対象</th><th>需給上の根拠</th><th>打ち手</th><th>状態</th></tr>
+<tr><td>1</td><td>D1 データ分析・数理／B1 需要予測</td><td>D1はつまずき1位（11.2%）かつ需要2位（+2.6pt）、B1は需要超過1位（+2.7pt）。両者は同じ演習で扱える</td><td>演習4.5時間化＋PC15台＋事前学習資料</td><td>決定済（本分析が裏づけ）</td></tr>
+<tr><td>2</td><td>D3 生成AI</td><td>供給1.2%に対し需要2.0%・出席票でも多数</td><td>「生成AI×SCM業務変革」新設</td><td>決定済</td></tr>
+<tr><td>3</td><td>E1 リスク・BCP</td><td>需要超過（+1.2pt）＋適合度分析で過小配分</td><td>「SCMリスク管理・BCP策定」新設</td><td>決定済</td></tr>
+<tr><td>4</td><td><b>B3 生産計画・能力管理</b></td><td><b>唯一の未カバーなのに全期間で言及が続く（潜在需要+2.5pt・つまずきにも2.7%）</b></td><td>第15回等への部分組込み、または独立コマ</td><td><b>未対応 ― 本分析で検出</b></td></tr>
+<tr><td>5</td><td><b>A3 S&amp;OP・需給計画</b></td><td>供給2.0%・需要1.2%＝<b>教えていないから需要も見えない</b>。修了後アンケートでは「S&amp;OPワークショップを受けたい」の声</td><td>ワークショップ型の1コマ追加</td><td><b>未対応 ― 本分析で検出</b></td></tr>
+<tr><td>6</td><td><b>D4 情報連携（PI・データ基盤）</b></td><td>需要+2.0pt・つまずき6.9% ― 後半講義が喚起した「実装・運用」需要</td><td>導入事例・運用設計（データ連携の始め方）の教材化。PI講義とセットで</td><td><b>新規 ― 全期間データで検出</b></td></tr>
+<tr><td>7</td><td><b>C2 輸配送</b></td><td>需要+1.8pt・<b>つまずき2位（8.0%）</b>。全業界の関心プロファイルで上位に入る唯一の領域</td><td>既存講義に横串の位置づけを与える（各回で輸配送への含意を明示）</td><td><b>新規 ― v2データで検出</b></td></tr>
+<tr><td>8</td><td>C4・C3・A2 供給超過群</td><td>言及率は低いが見学・ゲスト由来。削減より深度化</td><td>見学会に事前課題・事後リフレクションを接続</td><td>検討</td></tr>
+</table></div>
+<p class="note">2026年8月23日 第2版：事務局の「出席確認票FBとりまとめ」（全22日程・722件）を取り込み、PDF提出票の未収載分62件と統合した。需要側データは<b>提出784件・自由記述2,016件・46.4万字</b>となり、旧版（525件・958件・23.1万字）の約2倍。受講者も23名→26名（聴講生2名を含む）に拡大し、全員が分析可能な記述量に達した。データが倍増しても需給ギャップの構図（計画・数理系の需要超過）とつまずき1位（D1）は変わらず、<b>結論の頑健性が確認された</b>。供給側（講義配分・適合度・認知レベル）は2026年8月の適合度分析の値。</p>
+<div class="src"><b>データの出典と注意</b><br>
+・出席確認票：Googleフォーム回答225件（2025/10/25〜12/6のスナップショット、うち自由記述101件・48,789字）およびPDF提出426件（〜2026/2/24、うち12/8以降286件）。両経路の重複を除いた判明分の提出記録は約511件。<br>
+・修了後アンケート：2025年度修了者26名中24名回答（回答率92.3%、回答期間2026/7/30〜8/8、匿名集計）。<br>
+・カリキュラム情報：2025年度実施記録（全32コマ・57.5時間）および講義復習ポータル収載の講義データ。<br>
+・コンピテンシー体系 SCM-ECF v0.1：ASCM SCOR Digital Standard／CSCP・CLTD出題体系／CIPS Global Standard 等を参照して独自編成した20項目。講義×項目のマッピングは試行版であり、専門家パネルによる検証前。<br>
+・自由記述の分類はキーワード辞書によるマッチング（1件の記述が複数項目に言及し得る）。引用は原文の趣旨を保ち、固有名詞のみ一般化。<br>
+作成：2026年8月22日　SCMリカレント教育プログラム事務局分析</div>
+
+</div>
+
+</body></html>
