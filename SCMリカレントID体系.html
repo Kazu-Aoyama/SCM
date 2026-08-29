@@ -1,0 +1,253 @@
+<!doctype html><html lang="ja"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style><title>SCMリカレント ID体系</title>
+</head><body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{--paper:#f7f8fa;--card:#ffffff;--ink:#101828;--ink2:#475064;--mut:#8a8f9d;
+ --navy:#16224a;--hair:#e3e6ec;--acc:#2a78d6;--warm:#fdf1ea;--wash:#eef3fa;--plus:#c2410c;--minus:#1d4ed8;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+ --paper:#0e1116;--card:#171b23;--ink:#f2f4f8;--ink2:#b9bfcc;--mut:#848b99;
+ --navy:#c9d6f2;--hair:#272c37;--acc:#3987e5;--warm:#2b2019;--wash:#1a2233;--plus:#fb923c;--minus:#7aa5f5;}}
+:root[data-theme="dark"]{
+ --paper:#0e1116;--card:#171b23;--ink:#f2f4f8;--ink2:#b9bfcc;--mut:#848b99;
+ --navy:#c9d6f2;--hair:#272c37;--acc:#3987e5;--warm:#2b2019;--wash:#1a2233;--plus:#fb923c;--minus:#7aa5f5;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:'Noto Sans JP',system-ui,sans-serif;font-size:14px;line-height:1.7}
+.wrap{max-width:1080px;margin:0 auto;padding:0 22px 70px}
+.mast{border-bottom:1px solid var(--hair);padding:26px 0 18px;font-size:12.5px;letter-spacing:.12em;color:var(--mut)}
+h1{font-family:'Shippori Mincho',serif;font-size:clamp(25px,4vw,33px);color:var(--navy);margin:30px 0 8px;font-weight:600}
+.lede{color:var(--ink2);max-width:46em;margin-bottom:12px}
+h2{font-family:'Shippori Mincho',serif;font-size:19px;color:var(--navy);margin:44px 0 6px;font-weight:600}
+.sub{font-size:12.5px;color:var(--mut);margin-bottom:12px}
+.toc{display:flex;gap:9px;flex-wrap:wrap;margin:16px 0 0}
+.toc a{font-size:12.5px;color:var(--navy);text-decoration:none;border:1px solid var(--hair);background:var(--card);border-radius:999px;padding:5px 14px}
+.toc a:hover{border-color:var(--acc);color:var(--acc)}
+.card{background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:4px 0;margin:12px 0;overflow:hidden}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;color:var(--mut);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--hair);white-space:nowrap;position:sticky;top:0;background:var(--card)}
+td{padding:6px 10px;border-bottom:1px solid var(--hair);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td.c,th.c{text-align:center;font-variant-numeric:tabular-nums}
+td.nw{white-space:nowrap;font-variant-numeric:tabular-nums}
+td.id{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11.5px;white-space:nowrap;color:var(--ink2)}
+td.hl{color:var(--acc);font-weight:500}
+td.plus{color:var(--plus);font-weight:700}
+td.minus{color:var(--minus)}
+.rule{display:grid;grid-template-columns:150px 150px 1fr;gap:0;border-bottom:1px solid var(--hair);padding:10px 14px;align-items:baseline}
+.rule:last-child{border-bottom:0}
+.rule b{font-size:13px}
+tr.off td{color:var(--mut)}
+.rule code{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--acc)}
+.rule span{font-size:12.5px;color:var(--ink2)}
+@media(max-width:720px){.rule{grid-template-columns:1fr;gap:2px}}
+.box{background:var(--wash);border-radius:12px;padding:16px 20px;margin:14px 0;font-size:13px;color:var(--ink2)}
+.box.warm{background:var(--warm)}
+.box b{color:var(--ink)}
+ul{margin:6px 0 0 20px} li{margin:3px 0}
+.src{border-top:1px solid var(--hair);margin-top:52px;padding-top:16px;font-size:12px;color:var(--mut);line-height:1.8}
+</style>
+<div class="wrap">
+<div class="mast">東京大学　SCMリカレント教育プログラム　｜　データ基盤</div>
+<h1>ID体系と対応表</h1>
+<p class="lede">分析データで使うIDの命名規則と、公開されている全IDの一覧です。実名・企業名・連絡先・修了証番号との対応表は事務局内部用のExcelにあり、このページには含みません。年度をまたいで比較できるよう、講師・企業・業種・コンピテンシーは年度に依存しないIDにしています。</p>
+<div class="toc"><a href="#rule">命名規則</a><a href="#lec">講義</a><a href="#tea">講師</a><a href="#stu">受講者</a><a href="#org">企業</a><a href="#ind">業種</a><a href="#cmp">コンピテンシー</a></div>
+
+<h2 id="rule">命名規則</h2>
+<div class="sub">年度ごとに採番するもの（講義・受講者・提出レコード）と、年度をまたいで固定するもの（講師・企業・業種・コンピテンシー）を分けています。</div>
+<div class="card">
+<div class="rule"><b>講義（コマ）</b><code>L{年度2桁}-{回2桁}</code><span>例 <code>L25-04</code>。公式回番号をそのまま使い、補講は99。1日複数コマの日は回番号で分かれます。</span></div>
+<div class="rule"><b>講師</b><code>T-{通し3桁}</code><span>例 <code>T-004</code>。開催順の初出で採番。<b>年度非依存</b>で、同じ講師には翌年度も同じIDを使います。</span></div>
+<div class="rule"><b>受講者</b><code>S{年度2桁}-{通し3桁}</code><span>例 <code>S25-018</code>。業種順→名簿順。実名との対応は内部Excelのみ。</span></div>
+<div class="rule"><b>受講者（公開用）</b><code>R{通し2桁}</code><span>例 <code>R18</code>。受講者IDと1対1。公開資料はすべてこちらを使います。<b>版が変わると割当も変わる</b>ため版をまたいだ比較は不可。</span></div>
+<div class="rule"><b>企業・所属機関</b><code>C-{通し3桁}</code><span>例 <code>C-011</code>。業種順→初出順。<b>年度非依存</b>。同一企業から複数名の受講があります。</span></div>
+<div class="rule"><b>業種タイプ</b><code>G{1桁}</code><span>例 <code>G2</code>。7分類で固定。受講者は所属企業を通じて業種が決まります。</span></div>
+<div class="rule"><b>コンピテンシー</b><code>{領域}{番号}</code><span>例 <code>D1</code>。SCM-ECF v0.1の20項目。体系を改訂したらv番号を上げます。</span></div>
+<div class="rule"><b>提出レコード</b><code>P{年度2桁}-{通し4桁}</code><span>例 <code>P25-0123</code>。出席確認票1件＝1レコード。講義→受講者の順に採番。</span></div>
+<div class="rule"><b>修了証番号</b><code>{通し番号}</code><span>例 <code>18</code>。修了証発行時の連番で、事務局が別途採番。受講者IDと1対1で対応します（対応表は内部Excel）。</span></div>
+</div>
+<div class="box"><b>参照の書き方</b>：分析結果で個票に触れるときは「R18（G2・C-011）」のように<b>匿名ID＋業種＋企業ID</b>で書き、実名は使いません。IDは欠番が出ても再利用しません。</div>
+
+<h2 id="lec">講義 <span class="sub" style="font-weight:400">L25-01 〜 L25-32、L25-99</span></h2>
+<div class="sub">「ポータルキー」は復習ポータルとMDM構造分析ツールの列に使っている既存キーで、公式回番号とは一部ずれます。「モジュール」は2026年度35コマ配置案の記号です。</div>
+<div class="card"><div class="tbl"><table>
+<tr><th>講義ID</th><th>公式回</th><th>開催日</th><th>講義名</th><th>講師ID</th><th class="c">ポータル<br>キー</th><th class="c">モジュール</th><th class="c">提出</th></tr>
+<tr><td class='id'>L25-01</td><td>第1回</td><td class='nw'>2025-10-25</td><td>イントロダクション／SCMの全体像</td><td class='id'>T-001／T-002</td><td class='c'>L01g・L01</td><td class='c'>M0</td><td class='c'>27</td></tr>
+<tr><td class='id'>L25-02</td><td>第2回</td><td class='nw'>2025-10-25</td><td>演習① スキル棚卸プレゼン</td><td class='id'>T-001／T-002</td><td class='c'>―</td><td class='c'>M0</td><td class='c'>4</td></tr>
+<tr><td class='id'>L25-03</td><td>第3回</td><td class='nw'>2025-10-29</td><td>SCMと産業競争力</td><td class='id'>T-003</td><td class='c'>L03</td><td class='c'>M1</td><td class='c'>27</td></tr>
+<tr><td class='id'>L25-04</td><td>第4回</td><td class='nw'>2025-10-31</td><td>先端数理科学の活用</td><td class='id'>T-004</td><td class='c'>L04</td><td class='c'>M3</td><td class='c'>26</td></tr>
+<tr><td class='id'>L25-05</td><td>第5回</td><td class='nw'>2025-11-05</td><td>SCMの基本プロセス</td><td class='id'>T-005</td><td class='c'>L05</td><td class='c'>M1</td><td class='c'>27</td></tr>
+<tr><td class='id'>L25-06</td><td>第6回</td><td class='nw'>2025-11-08</td><td>現場見学会</td><td class='id'>T-006</td><td class='c'>―</td><td class='c'>M2</td><td class='c'>22</td></tr>
+<tr><td class='id'>L25-07</td><td>第7回</td><td class='nw'>2025-11-12</td><td>在庫理論と発注戦略</td><td class='id'>T-007</td><td class='c'>L07</td><td class='c'>M3</td><td class='c'>27</td></tr>
+<tr><td class='id'>L25-08</td><td>第8回</td><td class='nw'>2025-11-14</td><td>サプライチェーンネットワークの設計</td><td class='id'>T-008／T-009</td><td class='c'>L08</td><td class='c'>M3</td><td class='c'>27</td></tr>
+<tr><td class='id'>L25-09</td><td>第9回</td><td class='nw'>2025-11-19</td><td>システムデザインとシステムダイナミクス</td><td class='id'>T-010</td><td class='c'>L09</td><td class='c'>M4</td><td class='c'>27</td></tr>
+<tr><td class='id'>L25-10</td><td>第10回</td><td class='nw'>2025-11-22</td><td>ゲスト講義① アパレル業界のDX推進</td><td class='id'>T-011</td><td class='c'>L10</td><td class='c'>M6</td><td class='c'>22</td></tr>
+<tr><td class='id'>L25-11</td><td>第11回</td><td class='nw'>2025-11-22</td><td>演習② 在庫理論・ネットワーク設計</td><td class='id'>T-009</td><td class='c'>L11</td><td class='c'>M3</td><td class='c'>5</td></tr>
+<tr><td class='id'>L25-12</td><td>第12回</td><td class='nw'>2025-11-22</td><td>演習③ SCM Game</td><td class='id'>T-012／T-001</td><td class='c'>L11</td><td class='c'>M3</td><td class='c'>23</td></tr>
+<tr><td class='id'>L25-13</td><td>第13回</td><td class='nw'>2025-11-26</td><td>SCMとサービス学</td><td class='id'>T-013</td><td class='c'>L13</td><td class='c'>M4</td><td class='c'>26</td></tr>
+<tr><td class='id'>L25-14</td><td>第14回</td><td class='nw'>2025-11-28</td><td>SCMにおけるゲーム理論の応用</td><td class='id'>T-014</td><td class='c'>L14</td><td class='c'>M5</td><td class='c'>26</td></tr>
+<tr><td class='id'>L25-15</td><td>第15回</td><td class='nw'>2025-12-03</td><td>SCMとロボティクス</td><td class='id'>T-015</td><td class='c'>L15</td><td class='c'>M4</td><td class='c'>27</td></tr>
+<tr><td class='id'>L25-16</td><td>第16回</td><td class='nw'>2025-12-06</td><td>演習④ ゲーム理論・経済実験</td><td class='id'>T-014</td><td class='c'>L16</td><td class='c'>M5</td><td class='c'>25</td></tr>
+<tr><td class='id'>L25-17</td><td>第17回</td><td class='nw'>2025-12-06</td><td>SCMにおけるAI活用への期待</td><td class='id'>T-016</td><td class='c'>L17</td><td class='c'>M6</td><td class='c'>27</td></tr>
+<tr><td class='id'>L25-18</td><td>第18回</td><td class='nw'>2025-12-06</td><td>ゲスト講義② グローバルブランドのSCM戦略</td><td class='id'>T-017</td><td class='c'>L18</td><td class='c'>M1</td><td class='c'>27</td></tr>
+<tr><td class='id'>L25-19</td><td>第19回</td><td class='nw'>2025-12-10</td><td>機械学習の基礎とSCM</td><td class='id'>T-018</td><td class='c'>L19</td><td class='c'>M6</td><td class='c'>27</td></tr>
+<tr><td class='id'>L25-20</td><td>第20回</td><td class='nw'>2025-12-12</td><td>SCMと地政学</td><td class='id'>T-019</td><td class='c'>L20</td><td class='c'>M7</td><td class='c'>26</td></tr>
+<tr><td class='id'>L25-21</td><td>第21回</td><td class='nw'>2025-12-17</td><td>我が国の政策動向及び進むべき方向性</td><td class='id'>T-020</td><td class='c'>L21</td><td class='c'>M7</td><td class='c'>27</td></tr>
+<tr><td class='id'>L25-22</td><td>第22回</td><td class='nw'>2025-12-20</td><td>SCM業界におけるGX・新たな社会価値</td><td class='id'>T-021</td><td class='c'>L22</td><td class='c'>M8</td><td class='c'>27</td></tr>
+<tr><td class='id'>L25-23</td><td>第23回</td><td class='nw'>2025-12-20</td><td>演習⑤ 物流ネットワークの最適化と平準化</td><td class='id'>T-022／T-023</td><td class='c'>L23</td><td class='c'>M6</td><td class='c'>21</td></tr>
+<tr><td class='id'>L25-24</td><td>第24回</td><td class='nw'>2025-12-20</td><td>ゲスト講義③ 倉庫現場の実オペレーション</td><td class='id'>T-024</td><td class='c'>L24</td><td class='c'>M2</td><td class='c'>26</td></tr>
+<tr><td class='id'>L25-25</td><td>第25回</td><td class='nw'>2026-01-10</td><td>ファイナンスからみたSCMパフォーマンス</td><td class='id'>T-008</td><td class='c'>L26</td><td class='c'>M3</td><td class='c'>26</td></tr>
+<tr><td class='id'>L25-26</td><td>第26回</td><td class='nw'>2026-01-10</td><td>演習⑥ シナリオデザイン</td><td class='id'>T-025</td><td class='c'>L27</td><td class='c'>M7</td><td class='c'>23</td></tr>
+<tr><td class='id'>L25-27</td><td>第27回</td><td class='nw'>2026-01-10</td><td>ゲスト講義⑤ 外航海運業の実務と現状</td><td class='id'>T-026</td><td class='c'>L28</td><td class='c'>M7</td><td class='c'>23</td></tr>
+<tr><td class='id'>L25-28</td><td>第28回</td><td class='nw'>2026-01-14</td><td>循環型経済の実現に向けて</td><td class='id'>T-027</td><td class='c'>L29</td><td class='c'>M8</td><td class='c'>26</td></tr>
+<tr><td class='id'>L25-29</td><td>第29回</td><td class='nw'>2026-01-16</td><td>農産物・食品のSCMにおけるやっかいな問題</td><td class='id'>T-028</td><td class='c'>L30</td><td class='c'>M8</td><td class='c'>23</td></tr>
+<tr><td class='id'>L25-30</td><td>第30回</td><td class='nw'>2026-01-21</td><td>SCMとフィジカルインターネット</td><td class='id'>T-029</td><td class='c'>L31</td><td class='c'>M9</td><td class='c'>23</td></tr>
+<tr><td class='id'>L25-31</td><td>第31回</td><td class='nw'>2026-01-28</td><td>Physical Internet: Opportunities & Challenges</td><td class='id'>T-030</td><td class='c'>L32T</td><td class='c'>M9</td><td class='c'>22</td></tr>
+<tr><td class='id'>L25-32</td><td>第32回</td><td class='nw'>2026-02-07</td><td>課題発表・プログラム総括</td><td class='id'>T-001</td><td class='c'>―</td><td class='c'>M9</td><td class='c'>4</td></tr>
+<tr><td class='id'>L25-99</td><td>補講</td><td class='nw'>2026-01-07</td><td>補講 ゲーム理論演習・宿題解説</td><td class='id'>T-014</td><td class='c'>L25</td><td class='c'>M5</td><td class='c'>3</td></tr>
+</table></div></div>
+
+<h2 id="tea">講師 <span class="sub" style="font-weight:400">T-001 〜 T-030・年度非依存</span></h2>
+<div class="sub">氏名は事務局内部Excelに収載しています。ここでは所属と担当講義のみ。</div>
+<div class="card"><div class="tbl"><table>
+<tr><th>講師ID</th><th>所属・肩書</th><th>担当講義ID</th><th class="c">担当回数</th></tr>
+<tr><td class='id'>T-001</td><td>東京大学 大学院工学系研究科 教授</td><td class='id'>L25-01／L25-02／L25-12／L25-32</td><td class='c'>4</td></tr>
+<tr><td class='id'>T-002</td><td>東京大学 プロジェクトリサーチフェロー</td><td class='id'>L25-01／L25-02</td><td class='c'>2</td></tr>
+<tr><td class='id'>T-003</td><td>早稲田大学 教授（東京大学名誉教授）</td><td class='id'>L25-03</td><td class='c'>1</td></tr>
+<tr><td class='id'>T-004</td><td>東京大学 大学院工学系研究科 教授</td><td class='id'>L25-04</td><td class='c'>1</td></tr>
+<tr><td class='id'>T-005</td><td>ボストン コンサルティング グループ</td><td class='id'>L25-05</td><td class='c'>1</td></tr>
+<tr><td class='id'>T-006</td><td>上組 東京コンテナターミナル／佐川急便 Xフロンティア</td><td class='id'>L25-06</td><td class='c'>1</td></tr>
+<tr><td class='id'>T-007</td><td>東京大学 大学院工学系研究科 准教授</td><td class='id'>L25-07</td><td class='c'>1</td></tr>
+<tr><td class='id'>T-008</td><td>ボストン コンサルティング グループ</td><td class='id'>L25-08／L25-25</td><td class='c'>2</td></tr>
+<tr><td class='id'>T-009</td><td>東京大学 大学院工学系研究科 准教授</td><td class='id'>L25-08／L25-11</td><td class='c'>2</td></tr>
+<tr><td class='id'>T-010</td><td>東京大学 大学院新領域創成科学研究科 教授</td><td class='id'>L25-09</td><td class='c'>1</td></tr>
+<tr><td class='id'>T-011</td><td>フクミー（アパレルDX）</td><td class='id'>L25-10</td><td class='c'>1</td></tr>
+<tr><td class='id'>T-012</td><td>東京大学 大学院工学系研究科 修士課程学生</td><td class='id'>L25-12</td><td class='c'>1</td></tr>
+<tr><td class='id'>T-013</td><td>東京大学 大学院工学系研究科 准教授</td><td class='id'>L25-13</td><td class='c'>1</td></tr>
+<tr><td class='id'>T-014</td><td>東京大学 大学院工学系研究科 教授</td><td class='id'>L25-14／L25-16／L25-99</td><td class='c'>3</td></tr>
+<tr><td class='id'>T-015</td><td>東京大学 大学院工学系研究科 教授</td><td class='id'>L25-15</td><td class='c'>1</td></tr>
+<tr><td class='id'>T-016</td><td>東京大学 大学院工学系研究科 教授</td><td class='id'>L25-17</td><td class='c'>1</td></tr>
+<tr><td class='id'>T-017</td><td>グローバルD2Cブランド 代表</td><td class='id'>L25-18</td><td class='c'>1</td></tr>
+<tr><td class='id'>T-018</td><td>東京大学 大学院工学系研究科 准教授</td><td class='id'>L25-19</td><td class='c'>1</td></tr>
+<tr><td class='id'>T-019</td><td>東京大学 大学院工学系研究科 准教授</td><td class='id'>L25-20</td><td class='c'>1</td></tr>
+<tr><td class='id'>T-020</td><td>国土交通省</td><td class='id'>L25-21</td><td class='c'>1</td></tr>
+<tr><td class='id'>T-021</td><td>東京大学 大学院工学系研究科 教授</td><td class='id'>L25-22</td><td class='c'>1</td></tr>
+<tr><td class='id'>T-022</td><td>JDSC</td><td class='id'>L25-23</td><td class='c'>1</td></tr>
+<tr><td class='id'>T-023</td><td>JDSC</td><td class='id'>L25-23</td><td class='c'>1</td></tr>
+<tr><td class='id'>T-024</td><td>withRiver 代表</td><td class='id'>L25-24</td><td class='c'>1</td></tr>
+<tr><td class='id'>T-025</td><td>東京大学 大学院工学系研究科 准教授</td><td class='id'>L25-26</td><td class='c'>1</td></tr>
+<tr><td class='id'>T-026</td><td>日本郵船</td><td class='id'>L25-27</td><td class='c'>1</td></tr>
+<tr><td class='id'>T-027</td><td>東京大学 大学院工学系研究科 教授</td><td class='id'>L25-28</td><td class='c'>1</td></tr>
+<tr><td class='id'>T-028</td><td>（講師）</td><td class='id'>L25-29</td><td class='c'>1</td></tr>
+<tr><td class='id'>T-029</td><td>野村総合研究所</td><td class='id'>L25-30</td><td class='c'>1</td></tr>
+<tr><td class='id'>T-030</td><td>メルボルン大学 教授</td><td class='id'>L25-31</td><td class='c'>1</td></tr>
+</table></div></div>
+
+<h2 id="stu">受講者 <span class="sub" style="font-weight:400">S25-001 〜 S25-028 ／ R01 〜 R26</span></h2>
+<div class="sub">修了証発行対象の28名。うちS25-001〜026の26名は出席確認票の提出があり分析対象で、青字の匿名IDが公開資料で使われます。末尾2名は提出がないため分析対象外です。</div>
+<div class="card"><div class="tbl"><table>
+<tr><th>受講者ID</th><th>公開用</th><th class="c">業種</th><th>業種タイプ</th><th>企業ID</th><th class="c">区分</th><th class="c">提出</th><th class="c">文字数</th><th>関心上位3</th></tr>
+<tr><td class='id'>S25-001</td><td class='id hl'>R01</td><td class='c'>G1</td><td>IT・コンサル</td><td class='id'>C-001</td><td class='c'>―</td><td class='c'>30</td><td class='c'>11,950</td><td>C4・C2・D2</td></tr>
+<tr><td class='id'>S25-002</td><td class='id hl'>R02</td><td class='c'>G1</td><td>IT・コンサル</td><td class='id'>C-002</td><td class='c'>―</td><td class='c'>29</td><td class='c'>3,738</td><td>D1・B2・A1</td></tr>
+<tr><td class='id'>S25-003</td><td class='id hl'>R03</td><td class='c'>G1</td><td>IT・コンサル</td><td class='id'>C-003</td><td class='c'>―</td><td class='c'>30</td><td class='c'>9,615</td><td>C3・D1・D4</td></tr>
+<tr><td class='id'>S25-004</td><td class='id hl'>R04</td><td class='c'>G1</td><td>IT・コンサル</td><td class='id'>C-004</td><td class='c'>―</td><td class='c'>32</td><td class='c'>16,442</td><td>C2・A1・C3</td></tr>
+<tr><td class='id'>S25-005</td><td class='id hl'>R05</td><td class='c'>G1</td><td>IT・コンサル</td><td class='id'>C-005</td><td class='c'>―</td><td class='c'>29</td><td class='c'>19,275</td><td>A1・B2・C2</td></tr>
+<tr><td class='id'>S25-006</td><td class='id hl'>R06</td><td class='c'>G1</td><td>IT・コンサル</td><td class='id'>C-006</td><td class='c'>―</td><td class='c'>30</td><td class='c'>17,472</td><td>D1・B1・C2</td></tr>
+<tr><td class='id'>S25-007</td><td class='id hl'>R07</td><td class='c'>G1</td><td>IT・コンサル</td><td class='id'>C-007</td><td class='c'>―</td><td class='c'>28</td><td class='c'>16,969</td><td>C2・A1・D1</td></tr>
+<tr><td class='id'>S25-008</td><td class='id hl'>R08</td><td class='c'>G2</td><td>完成品メーカー</td><td class='id'>C-008</td><td class='c'>―</td><td class='c'>27</td><td class='c'>23,476</td><td>B2・A1・C2</td></tr>
+<tr><td class='id'>S25-009</td><td class='id hl'>R09</td><td class='c'>G2</td><td>完成品メーカー</td><td class='id'>C-009</td><td class='c'>―</td><td class='c'>33</td><td class='c'>24,804</td><td>A1・C2・D2</td></tr>
+<tr><td class='id'>S25-010</td><td class='id hl'>R10</td><td class='c'>G2</td><td>完成品メーカー</td><td class='id'>C-010</td><td class='c'>―</td><td class='c'>28</td><td class='c'>21,211</td><td>B2・C2・C3</td></tr>
+<tr><td class='id'>S25-011</td><td class='id hl'>R11</td><td class='c'>G2</td><td>完成品メーカー</td><td class='id'>C-008</td><td class='c'>―</td><td class='c'>28</td><td class='c'>15,948</td><td>B2・C2・D2</td></tr>
+<tr><td class='id'>S25-012</td><td class='id hl'>R12</td><td class='c'>G2</td><td>完成品メーカー</td><td class='id'>C-011</td><td class='c'>―</td><td class='c'>28</td><td class='c'>29,628</td><td>C2・C3・D2</td></tr>
+<tr><td class='id'>S25-013</td><td class='id hl'>R13</td><td class='c'>G2</td><td>完成品メーカー</td><td class='id'>C-012</td><td class='c'>―</td><td class='c'>28</td><td class='c'>15,294</td><td>C2・A1・D2</td></tr>
+<tr><td class='id'>S25-014</td><td class='id hl'>R14</td><td class='c'>G2</td><td>完成品メーカー</td><td class='id'>C-013</td><td class='c'>―</td><td class='c'>32</td><td class='c'>10,175</td><td>A1・D2・C2</td></tr>
+<tr><td class='id'>S25-015</td><td class='id hl'>R15</td><td class='c'>G2</td><td>完成品メーカー</td><td class='id'>C-014</td><td class='c'>―</td><td class='c'>30</td><td class='c'>49,770</td><td>A1・C2・D1</td></tr>
+<tr><td class='id'>S25-016</td><td class='id hl'>R16</td><td class='c'>G2</td><td>完成品メーカー</td><td class='id'>C-012</td><td class='c'>―</td><td class='c'>30</td><td class='c'>11,793</td><td>C3・C2・B2</td></tr>
+<tr><td class='id'>S25-017</td><td class='id hl'>R17</td><td class='c'>G2</td><td>完成品メーカー</td><td class='id'>C-008</td><td class='c'>聴講</td><td class='c'>31</td><td class='c'>7,064</td><td>C3・A1・B2</td></tr>
+<tr><td class='id'>S25-018</td><td class='id hl'>R18</td><td class='c'>G2</td><td>完成品メーカー</td><td class='id'>C-008</td><td class='c'>聴講</td><td class='c'>25</td><td class='c'>6,567</td><td>A1・D1・C2</td></tr>
+<tr><td class='id'>S25-019</td><td class='id hl'>R19</td><td class='c'>G3</td><td>卸売・商社</td><td class='id'>C-015</td><td class='c'>―</td><td class='c'>33</td><td class='c'>11,282</td><td>D2・D1・C3</td></tr>
+<tr><td class='id'>S25-020</td><td class='id hl'>R20</td><td class='c'>G3</td><td>卸売・商社</td><td class='id'>C-016</td><td class='c'>―</td><td class='c'>24</td><td class='c'>22,200</td><td>B2・D1・C3</td></tr>
+<tr><td class='id'>S25-021</td><td class='id hl'>R21</td><td class='c'>G3</td><td>卸売・商社</td><td class='id'>C-017</td><td class='c'>―</td><td class='c'>27</td><td class='c'>8,361</td><td>C3・A1・B2</td></tr>
+<tr><td class='id'>S25-022</td><td class='id hl'>R22</td><td class='c'>G4</td><td>金融・保険</td><td class='id'>C-018</td><td class='c'>―</td><td class='c'>28</td><td class='c'>4,409</td><td>C3・D2・E1</td></tr>
+<tr><td class='id'>S25-023</td><td class='id hl'>R23</td><td class='c'>G5</td><td>公的機関</td><td class='id'>C-019</td><td class='c'>―</td><td class='c'>24</td><td class='c'>8,455</td><td>C4・C2・E2</td></tr>
+<tr><td class='id'>S25-024</td><td class='id hl'>R24</td><td class='c'>G6</td><td>素材・部品メーカー</td><td class='id'>C-020</td><td class='c'>―</td><td class='c'>31</td><td class='c'>37,340</td><td>C3・D2・A1</td></tr>
+<tr><td class='id'>S25-025</td><td class='id hl'>R25</td><td class='c'>G6</td><td>素材・部品メーカー</td><td class='id'>C-021</td><td class='c'>―</td><td class='c'>28</td><td class='c'>4,355</td><td>E3・A1・C2</td></tr>
+<tr><td class='id'>S25-026</td><td class='id hl'>R26</td><td class='c'>G7</td><td>運輸・倉庫・物流</td><td class='id'>C-022</td><td class='c'>―</td><td class='c'>31</td><td class='c'>21,736</td><td>D2・C2・A1</td></tr>
+<tr class='off'><td class='id'>S25-027</td><td class='id hl'>対象外</td><td class='c'>G2</td><td>完成品メーカー</td><td class='id'>C-010</td><td class='c'>―</td><td class='c'>―</td><td class='c'>0</td><td>提出なし（修了証のみ）</td></tr>
+<tr class='off'><td class='id'>S25-028</td><td class='id hl'>対象外</td><td class='c'>G2</td><td>完成品メーカー</td><td class='id'>C-008</td><td class='c'>聴講</td><td class='c'>―</td><td class='c'>0</td><td>提出なし（修了証のみ）</td></tr>
+</table></div></div>
+
+<h2 id="org">企業・所属機関 <span class="sub" style="font-weight:400">C-001 〜 C-022・年度非依存</span></h2>
+<div class="sub">企業名は事務局内部Excelに収載しています。1社から複数名が参加しているのは3社（C-008が5名、C-010・C-012が各2名）。</div>
+<div class="card"><div class="tbl"><table>
+<tr><th>企業ID</th><th class="c">業種</th><th>業種タイプ</th><th class="c">参加者数</th><th class="c">うち分析対象</th><th>所属する受講者</th><th class="c">提出計</th><th class="c">文字数計</th></tr>
+<tr><td class='id'>C-001</td><td class='c'>G1</td><td>IT・コンサル</td><td class='c'><b>1</b></td><td class='c'>1</td><td class='id hl'>R01</td><td class='c'>30</td><td class='c'>11,950</td></tr>
+<tr><td class='id'>C-002</td><td class='c'>G1</td><td>IT・コンサル</td><td class='c'><b>1</b></td><td class='c'>1</td><td class='id hl'>R02</td><td class='c'>29</td><td class='c'>3,738</td></tr>
+<tr><td class='id'>C-003</td><td class='c'>G1</td><td>IT・コンサル</td><td class='c'><b>1</b></td><td class='c'>1</td><td class='id hl'>R03</td><td class='c'>30</td><td class='c'>9,615</td></tr>
+<tr><td class='id'>C-004</td><td class='c'>G1</td><td>IT・コンサル</td><td class='c'><b>1</b></td><td class='c'>1</td><td class='id hl'>R04</td><td class='c'>32</td><td class='c'>16,442</td></tr>
+<tr><td class='id'>C-005</td><td class='c'>G1</td><td>IT・コンサル</td><td class='c'><b>1</b></td><td class='c'>1</td><td class='id hl'>R05</td><td class='c'>29</td><td class='c'>19,275</td></tr>
+<tr><td class='id'>C-006</td><td class='c'>G1</td><td>IT・コンサル</td><td class='c'><b>1</b></td><td class='c'>1</td><td class='id hl'>R06</td><td class='c'>30</td><td class='c'>17,472</td></tr>
+<tr><td class='id'>C-007</td><td class='c'>G1</td><td>IT・コンサル</td><td class='c'><b>1</b></td><td class='c'>1</td><td class='id hl'>R07</td><td class='c'>28</td><td class='c'>16,969</td></tr>
+<tr><td class='id'>C-008</td><td class='c'>G2</td><td>完成品メーカー</td><td class='c'><b>5</b></td><td class='c'>4</td><td class='id hl'>R08／R11／R17／R18</td><td class='c'>111</td><td class='c'>53,055</td></tr>
+<tr><td class='id'>C-009</td><td class='c'>G2</td><td>完成品メーカー</td><td class='c'><b>1</b></td><td class='c'>1</td><td class='id hl'>R09</td><td class='c'>33</td><td class='c'>24,804</td></tr>
+<tr><td class='id'>C-010</td><td class='c'>G2</td><td>完成品メーカー</td><td class='c'><b>2</b></td><td class='c'>1</td><td class='id hl'>R10</td><td class='c'>28</td><td class='c'>21,211</td></tr>
+<tr><td class='id'>C-011</td><td class='c'>G2</td><td>完成品メーカー</td><td class='c'><b>1</b></td><td class='c'>1</td><td class='id hl'>R12</td><td class='c'>28</td><td class='c'>29,628</td></tr>
+<tr><td class='id'>C-012</td><td class='c'>G2</td><td>完成品メーカー</td><td class='c'><b>2</b></td><td class='c'>2</td><td class='id hl'>R13／R16</td><td class='c'>58</td><td class='c'>27,087</td></tr>
+<tr><td class='id'>C-013</td><td class='c'>G2</td><td>完成品メーカー</td><td class='c'><b>1</b></td><td class='c'>1</td><td class='id hl'>R14</td><td class='c'>32</td><td class='c'>10,175</td></tr>
+<tr><td class='id'>C-014</td><td class='c'>G2</td><td>完成品メーカー</td><td class='c'><b>1</b></td><td class='c'>1</td><td class='id hl'>R15</td><td class='c'>30</td><td class='c'>49,770</td></tr>
+<tr><td class='id'>C-015</td><td class='c'>G3</td><td>卸売・商社</td><td class='c'><b>1</b></td><td class='c'>1</td><td class='id hl'>R19</td><td class='c'>33</td><td class='c'>11,282</td></tr>
+<tr><td class='id'>C-016</td><td class='c'>G3</td><td>卸売・商社</td><td class='c'><b>1</b></td><td class='c'>1</td><td class='id hl'>R20</td><td class='c'>24</td><td class='c'>22,200</td></tr>
+<tr><td class='id'>C-017</td><td class='c'>G3</td><td>卸売・商社</td><td class='c'><b>1</b></td><td class='c'>1</td><td class='id hl'>R21</td><td class='c'>27</td><td class='c'>8,361</td></tr>
+<tr><td class='id'>C-018</td><td class='c'>G4</td><td>金融・保険</td><td class='c'><b>1</b></td><td class='c'>1</td><td class='id hl'>R22</td><td class='c'>28</td><td class='c'>4,409</td></tr>
+<tr><td class='id'>C-019</td><td class='c'>G5</td><td>公的機関</td><td class='c'><b>1</b></td><td class='c'>1</td><td class='id hl'>R23</td><td class='c'>24</td><td class='c'>8,455</td></tr>
+<tr><td class='id'>C-020</td><td class='c'>G6</td><td>素材・部品メーカー</td><td class='c'><b>1</b></td><td class='c'>1</td><td class='id hl'>R24</td><td class='c'>31</td><td class='c'>37,340</td></tr>
+<tr><td class='id'>C-021</td><td class='c'>G6</td><td>素材・部品メーカー</td><td class='c'><b>1</b></td><td class='c'>1</td><td class='id hl'>R25</td><td class='c'>28</td><td class='c'>4,355</td></tr>
+<tr><td class='id'>C-022</td><td class='c'>G7</td><td>運輸・倉庫・物流</td><td class='c'><b>1</b></td><td class='c'>1</td><td class='id hl'>R26</td><td class='c'>31</td><td class='c'>21,736</td></tr>
+</table></div></div>
+
+<h2 id="ind">業種タイプ <span class="sub" style="font-weight:400">G1 〜 G7・固定</span></h2>
+<div class="card"><div class="tbl"><table>
+<tr><th>業種ID</th><th>業種タイプ</th><th class="c">企業数</th><th class="c">参加者数</th><th class="c">うち分析対象</th><th>企業ID</th><th>関心上位4（業界内シェア）</th></tr>
+<tr><td class='id'>G1</td><td>IT・コンサル</td><td class='c'>7</td><td class='c'><b>7</b></td><td class='c'>7</td><td class='id'>C-001／C-002／C-003／C-004／C-005／C-006／C-007</td><td>C2 11%・D1 10%・A1 10%・D2 8%</td></tr>
+<tr><td class='id'>G2</td><td>完成品メーカー</td><td class='c'>7</td><td class='c'><b>13</b></td><td class='c'>11</td><td class='id'>C-008／C-009／C-010／C-011／C-012／C-013／C-014</td><td>C2 12%・A1 11%・B2 9%・C3 9%</td></tr>
+<tr><td class='id'>G3</td><td>卸売・商社</td><td class='c'>3</td><td class='c'><b>3</b></td><td class='c'>3</td><td class='id'>C-015／C-016／C-017</td><td>C3 12%・B2 11%・D1 10%・A1 9%</td></tr>
+<tr><td class='id'>G4</td><td>金融・保険</td><td class='c'>1</td><td class='c'><b>1</b></td><td class='c'>1</td><td class='id'>C-018</td><td>C3 15%・D2 10%・A4 8%・E1 8%</td></tr>
+<tr><td class='id'>G5</td><td>公的機関</td><td class='c'>1</td><td class='c'><b>1</b></td><td class='c'>1</td><td class='id'>C-019</td><td>C4 14%・C2 11%・E2 9%・D2 9%</td></tr>
+<tr><td class='id'>G6</td><td>素材・部品メーカー</td><td class='c'>2</td><td class='c'><b>2</b></td><td class='c'>2</td><td class='id'>C-020／C-021</td><td>C3 12%・A1 10%・D2 9%・C2 8%</td></tr>
+<tr><td class='id'>G7</td><td>運輸・倉庫・物流</td><td class='c'>1</td><td class='c'><b>1</b></td><td class='c'>1</td><td class='id'>C-022</td><td>D2 13%・C2 10%・A1 9%・C3 8%</td></tr>
+</table></div></div>
+<div class="box">n=1〜2の業種（G4 金融・保険／G5 公的機関／G6 素材・部品／G7 運輸・物流）の関心プロファイルは参考値です。分析上の結論は、主要3業種（G1・G2・G3）の比較に基づいています。</div>
+
+<h2 id="cmp">コンピテンシー <span class="sub" style="font-weight:400">SCM-ECF v0.1・20項目</span></h2>
+<div class="sub">供給＝講義の実効時間シェア、需要＝自由記述での関心言及シェア、つまずき＝「理解できなかった」言及に占める割合。</div>
+<div class="card"><div class="tbl"><table>
+<tr><th>コード</th><th>領域</th><th>名称</th><th class="c">供給%</th><th class="c">需要%</th><th class="c">差</th><th class="c">つまずき%</th></tr>
+<tr><td class='id'>A1</td><td>戦略・設計</td><td>SC戦略・全体最適</td><td class='c'>12.5</td><td class='c'>10.4</td><td class='c minus'>-2.1</td><td class='c'>7.5</td></tr>
+<tr><td class='id'>A2</td><td>戦略・設計</td><td>ネットワーク設計</td><td class='c'>6.0</td><td class='c'>2.6</td><td class='c minus'>-3.4</td><td class='c'>2.4</td></tr>
+<tr><td class='id'>A3</td><td>戦略・設計</td><td>S&OP・需給計画</td><td class='c'>2.0</td><td class='c'>1.2</td><td class='c '>-0.8</td><td class='c'>1.3</td></tr>
+<tr><td class='id'>A4</td><td>戦略・設計</td><td>SC財務・投資評価</td><td class='c'>2.4</td><td class='c'>2.9</td><td class='c '>+0.5</td><td class='c'>3.9</td></tr>
+<tr><td class='id'>B1</td><td>計画</td><td>需要予測</td><td class='c'>2.0</td><td class='c'>4.7</td><td class='c plus'>+2.7</td><td class='c'>4.5</td></tr>
+<tr><td class='id'>B2</td><td>計画</td><td>在庫理論・発注</td><td class='c'>4.2</td><td class='c'>6.3</td><td class='c plus'>+2.1</td><td class='c'>4.8</td></tr>
+<tr><td class='id'>B3</td><td>計画</td><td>生産計画・能力</td><td class='c'>0.0</td><td class='c'>2.5</td><td class='c plus'>+2.5</td><td class='c'>2.7</td></tr>
+<tr><td class='id'>B4</td><td>計画</td><td>変動・ブルウィップ</td><td class='c'>6.8</td><td class='c'>4.9</td><td class='c minus'>-1.9</td><td class='c'>4.4</td></tr>
+<tr><td class='id'>C1</td><td>実行</td><td>調達・SRM</td><td class='c'>4.0</td><td class='c'>4.5</td><td class='c '>+0.5</td><td class='c'>4.6</td></tr>
+<tr><td class='id'>C2</td><td>実行</td><td>輸配送</td><td class='c'>6.0</td><td class='c'>7.8</td><td class='c plus'>+1.8</td><td class='c'>8.0</td></tr>
+<tr><td class='id'>C3</td><td>実行</td><td>倉庫・拠点オペ</td><td class='c'>10.3</td><td class='c'>8.3</td><td class='c minus'>-2.0</td><td class='c'>7.7</td></tr>
+<tr><td class='id'>C4</td><td>実行</td><td>国際物流・通商</td><td class='c'>8.5</td><td class='c'>4.0</td><td class='c minus'>-4.5</td><td class='c'>3.7</td></tr>
+<tr><td class='id'>D1</td><td>デジタル</td><td>データ分析・数理最適化</td><td class='c'>6.6</td><td class='c'>9.2</td><td class='c plus'>+2.6</td><td class='c'>11.2</td></tr>
+<tr><td class='id'>D2</td><td>デジタル</td><td>機械学習・AI</td><td class='c'>5.8</td><td class='c'>6.9</td><td class='c plus'>+1.1</td><td class='c'>8.0</td></tr>
+<tr><td class='id'>D3</td><td>デジタル</td><td>生成AI</td><td class='c'>1.2</td><td class='c'>2.0</td><td class='c '>+0.8</td><td class='c'>2.6</td></tr>
+<tr><td class='id'>D4</td><td>デジタル</td><td>SCシステム・情報連携</td><td class='c'>3.0</td><td class='c'>5.0</td><td class='c plus'>+2.0</td><td class='c'>6.9</td></tr>
+<tr><td class='id'>E1</td><td>リスク・組織</td><td>リスク・BCP</td><td class='c'>2.8</td><td class='c'>4.0</td><td class='c plus'>+1.2</td><td class='c'>3.9</td></tr>
+<tr><td class='id'>E2</td><td>リスク・組織</td><td>地政学・政策</td><td class='c'>3.6</td><td class='c'>3.7</td><td class='c '>+0.1</td><td class='c'>4.4</td></tr>
+<tr><td class='id'>E3</td><td>リスク・組織</td><td>GX・循環経済</td><td class='c'>4.8</td><td class='c'>4.1</td><td class='c '>-0.7</td><td class='c'>3.7</td></tr>
+<tr><td class='id'>E4</td><td>リスク・組織</td><td>SC組織・人材</td><td class='c'>7.2</td><td class='c'>4.9</td><td class='c minus'>-2.3</td><td class='c'>3.9</td></tr>
+</table></div></div>
+
+<div class="box warm"><b>実名との対応表について</b><br>
+受講者ID↔氏名・修了証番号・メールアドレス・Googleアカウント、企業ID↔企業名、講師ID↔氏名、および提出784件の全レコード対応は「SCMリカレント_ID体系・対応表.xlsx」（事務局内部用・10シート）にあります。個人情報を含むため、共有範囲を事務局に限定してください。</div>
+
+<div class="src">作成：2026年8月23日　東京大学 SCMリカレント教育プログラム。対象データ：2025年度 出席確認票784件（自由記述2,016件・46.4万字）、受講者名簿、修了証発行一覧（2026年3月23日版・28名）、講義復習ポータル。ID体系はこのページを正本とし、変更時はここを更新します。</div>
+</div>
+
+</body></html>
