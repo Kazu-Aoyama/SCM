@@ -289,44 +289,77 @@
     try { var s = localStorage.getItem(INBOX + tool); if (!s) return null; localStorage.removeItem(INBOX + tool); var o = JSON.parse(s); return isEnvelope(o) ? o : null; } catch (e) { return null; }
   }
   function peek(tool) { try { var s = localStorage.getItem(INBOX + tool); return s ? JSON.parse(s) : null; } catch (e) { return null; } }
-  function onInbox(tool, cb) {
-    window.addEventListener('storage', function (ev) { if (ev.key === INBOX + tool && ev.newValue) { var o = take(tool); if (o) cb(o); } });
-    window.addEventListener('message', function (ev) { var o = ev.data; if (isEnvelope(o) && (!o.to || o.to === tool)) cb(o); });
-  }
-  /* ツールのファイル名（版が変わっても見つけられるよう，同じフォルダの候補を順に試す） */
-  var TOOL_FILES = {
-    index: ['演習ファイル索引'],
-    navi: ['システム分析ナビ'],
-    workbench: ['システム分析ワークベンチ'],
-    lab: ['システム分析ラボ'],
-    data: ['SCMミステリー-データブラウザ', 'データブラウザ']
-  };
+  /* ツールのファイル名：build.py が tools/ の実際のファイル名を TOOL_FILES に書き込む */
+  var TOOL_FILES = /*TOOL_FILES*/{}/*END*/;
   var TOOL_LABEL = { index: '演習ファイル索引', navi: 'システム分析ナビ', workbench: 'システム分析ワークベンチ', lab: 'システム分析ラボ', data: 'データブラウザ' };
+  var SELF = null;
   function rememberSelf(tool) {
-    // 自分のファイル名を覚えておき，ほかのツールから開けるようにする
-    try { var reg = JSON.parse(localStorage.getItem('scm.tools') || '{}'); reg[tool] = { href: location.href, seen: new Date().toISOString() }; localStorage.setItem('scm.tools', JSON.stringify(reg)); } catch (e) { }
+    SELF = tool;
+    try { var reg = JSON.parse(localStorage.getItem('scm.tools') || '{}'); reg[tool] = { href: location.href.split('#')[0], seen: new Date().toISOString() }; localStorage.setItem('scm.tools', JSON.stringify(reg)); } catch (e) { }
+    // 開いてくれた相手（window.opener）に「準備できた」と知らせる
+    try { if (window.opener && window.opener !== window) window.opener.postMessage({ scmReady: tool }, '*'); } catch (e) { }
   }
   function toolHref(tool) {
+    // 1) 同じフォルダにある，いまの版のファイル名  2) このブラウザで最後に開いた場所
+    var here = location.href.split('#')[0].split('?')[0];
+    if (TOOL_FILES[tool]) return here.replace(/[^\/]*$/, '') + encodeURIComponent(TOOL_FILES[tool]);
     try { var reg = JSON.parse(localStorage.getItem('scm.tools') || '{}'); if (reg[tool]) return reg[tool].href; } catch (e) { }
     return null;
   }
-  /* 渡して開く：受け箱に入れ，相手のツールを開く（場所が分からなければ保存ファイルにする） */
+  function openTool(tool, hash) {
+    var href = toolHref(tool); if (!href) return null;
+    return window.open(href + (hash ? '#' + hash : ''), 'scm_' + tool);
+  }
+  /* 渡して開く
+   *  1) 受け箱（localStorage）に入れる（同じブラウザ・同じ場所のツールならこれで届く）
+   *  2) 相手を開き，「準備できた」の合図を待って postMessage で渡す（file:// でも届く）
+   *  3) どちらも確かめられなければ，.scm.json として保存し，相手の「開く」で読み込んでもらう
+   *  cb(result) : 'delivered' | 'downloaded'
+   */
   function sendTo(toTool, env, opts) {
     opts = opts || {};
-    env.to = toTool;
-    var ok = post(toTool, env), href = toolHref(toTool);
-    if (ok && href) { var w = window.open(href, 'scm_' + toTool); if (w) { try { w.focus(); } catch (e) { } setTimeout(function () { try { w.postMessage(env, '*'); } catch (e) { } }, 1500); return 'opened'; } }
-    if (ok) return 'queued';
-    download(JSON.stringify(env, null, 1), (opts.filename || (stamp() + '_' + env.kind)) + '.scm.json', 'application/json');
-    return 'downloaded';
+    env.to = toTool; env.id = env.id || (Date.now().toString(36) + Math.random().toString(36).slice(2, 7));
+    post(toTool, env);
+    var w = openTool(toTool), done = false;
+    function finish(r) { if (done) return; done = true; window.removeEventListener('message', onMsg); if (opts.done) opts.done(r); }
+    function onMsg(ev) {
+      var d = ev.data;
+      if (w && ev.source === w && d && d.scmReady === toTool) { try { w.postMessage(env, '*'); } catch (e) { } }
+      if (w && ev.source === w && d && d.scmAck === env.id) finish('delivered');
+    }
+    if (w) { window.addEventListener('message', onMsg); try { w.postMessage(env, '*'); } catch (e) { } }
+    setTimeout(function () {
+      if (done) return;
+      download(JSON.stringify(env, null, 1), (opts.filename || (stamp() + '_scm-recurrent-program_' + TOOL_LABEL[toTool] + '用-' + env.kind)) + '.scm.json', 'application/json');
+      finish('downloaded');
+    }, opts.timeout || 6000);
+    return w;
   }
+  /* 受け取る側：起動時の受け箱と，postMessage の両方を見る。同じ封筒は1度だけ渡す */
+  function receive(tool, cb) {
+    var seen = {};
+    function give(o, src) {
+      if (!isEnvelope(o) || (o.to && o.to !== tool)) return;
+      if (src) { try { src.postMessage({ scmAck: o.id }, '*'); } catch (e) { } }
+      if (o.id && seen[o.id]) return; if (o.id) seen[o.id] = 1;
+      try { localStorage.removeItem(INBOX + tool); } catch (e) { }
+      cb(o);
+    }
+    window.addEventListener('message', function (ev) { give(ev.data, ev.source); });
+    window.addEventListener('storage', function (ev) { if (ev.key === INBOX + tool && ev.newValue) { try { give(JSON.parse(ev.newValue)); } catch (e) { } } });
+    var first = peek(tool); if (first) setTimeout(function () { give(first); }, 0);
+    rememberSelf(tool);
+  }
+  /* ファイルから封筒を読む（.scm.json）：開くボタンの前段で使う */
+  function envelopeFromText(text) { try { var o = JSON.parse(text); return isEnvelope(o) ? o : null; } catch (e) { return null; } }
 
   root.SCMIO = {
     version: VERSION,
     readFile: readFile, readXlsx: readXlsx, parseCsv: parseCsv, decodeText: decodeText,
     toObjects: toObjects, findHeaderRow: findHeaderRow, guessMapping: guessMapping, toDate: toDate, toNum: toNum,
     writeXlsx: writeXlsx, toCsv: toCsv, download: download, stamp: stamp,
-    envelope: envelope, isEnvelope: isEnvelope, post: post, take: take, peek: peek, onInbox: onInbox,
-    sendTo: sendTo, rememberSelf: rememberSelf, toolHref: toolHref, TOOL_LABEL: TOOL_LABEL, TOOL_FILES: TOOL_FILES
+    envelope: envelope, isEnvelope: isEnvelope, envelopeFromText: envelopeFromText, post: post, take: take, peek: peek,
+    sendTo: sendTo, receive: receive, openTool: openTool, rememberSelf: rememberSelf, toolHref: toolHref,
+    TOOL_LABEL: TOOL_LABEL, TOOL_FILES: TOOL_FILES
   };
 })(typeof window !== 'undefined' ? window : this);

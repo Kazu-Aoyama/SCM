@@ -14,8 +14,24 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 MODULES = [("SCMIO", ROOT / "src" / "scm-io.js")]
 
 
+TOOL_KEYS = {"index": "演習ファイル索引", "navi": "システム分析ナビ", "workbench": "システム分析ワークベンチ",
+             "lab": "システム分析ラボ", "data": "データブラウザ"}
+
+
+def tool_files():
+    import json
+    m = {}
+    for k, kw in TOOL_KEYS.items():
+        c = sorted(f.name for f in (ROOT / "tools").glob("*.html") if kw in f.name)
+        if len(c) != 1:
+            raise SystemExit(f"tools/ に「{kw}」のファイルがちょうど1つ必要です: {c}")
+        m[k] = c[0]
+    return json.dumps(m, ensure_ascii=False)
+
+
 def block(name, path):
     code = path.read_text(encoding="utf-8")
+    code = re.sub(r"/\*TOOL_FILES\*/.*?/\*END\*/", lambda _: "/*TOOL_FILES*/" + tool_files() + "/*END*/", code)
     if "</script" in code.lower():
         raise SystemExit(f"{path}: '</script' を含めないでください")
     return f"<!-- {name}:BEGIN -->\n<script>\n{code}</script>\n<!-- {name}:END -->"
