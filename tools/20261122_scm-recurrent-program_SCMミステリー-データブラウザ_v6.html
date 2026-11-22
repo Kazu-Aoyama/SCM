@@ -70,7 +70,7 @@ nav .ionavbtn{color:var(--teal)!important;font-weight:bold}
  * ・CSV の読み込み（UTF-8／Shift_JIS 自動判定）・書き出し
  * ・ツール間の受け渡し（同じブラウザ内：localStorage／開いたウィンドウ：postMessage）
  * データは端末の外へ一切送らない。
- * このファイルは src/scm-io.js が原本。build.py が各ツールの <!-- SCMIO:BEGIN --> 〜 <!-- SCMIO:END --> に埋め込む。
+ * このファイルは src/scm-io.js が原本。build.py が各ツールの SCMIO の目印のあいだに埋め込む（ツール側で直接直さない）。
  */
 (function (root) {
   'use strict';
@@ -134,8 +134,12 @@ nav .ionavbtn{color:var(--teal)!important;font-weight:bold}
   function colIndex(ref) { var m = /^([A-Z]+)(\d+)$/.exec(ref); if (!m) return null; var c = 0; for (var i = 0; i < m[1].length; i++) c = c * 26 + (m[1].charCodeAt(i) - 64); return { c: c - 1, r: +m[2] - 1 }; }
   var BUILTIN_DATE = { 14: 1, 15: 1, 16: 1, 17: 1, 18: 2, 19: 2, 20: 2, 21: 2, 22: 1, 27: 1, 28: 1, 29: 1, 30: 1, 31: 1, 32: 2, 33: 2, 34: 2, 35: 2, 36: 1, 45: 2, 46: 2, 47: 2, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 58: 1 };
   function isDateFmt(code) {
-    var s = code.replace(/"[^"]*"/g, '').replace(/\[(?!h\]|m\]|s\])[^\]]*\]/gi, '').replace(/\\./g, '');
-    return /[ymdhsge]/i.test(s) && !/^[#0.,%E+\- ]*$/.test(s) ? (/[ymdge]/i.test(s) ? 1 : 2) : 0;
+    // 書式コードから文字列・色指定・エスケープ・General・指数表記を除き，日付時刻の記号が残れば日付とみなす
+    var t = String(code).replace(/"[^"]*"/g, '').replace(/\\./g, '').replace(/_.|\*./g, '').replace(/General/gi, '')
+      .replace(/\[(h|hh|m|mm|s|ss)\]/gi, 'h').replace(/\[[^\]]*\]/g, '').replace(/[0#?.,]+E[+-]\d+/gi, '').replace(/AM\/PM|A\/P/gi, 'h');
+    if (!/[ymdhsge]/i.test(t)) return 0;
+    // y・d・年号があれば日付。m だけで h・s がなければ月（日付），h・s があれば時刻
+    return (/[ydge]/i.test(t) || (/m/i.test(t) && !/[hs]/i.test(t))) ? 1 : 2;
   }
   function serialToISO(v, kind, date1904) {
     var ms = Math.round((v + (date1904 ? 1462 : 0) - 25569) * 86400000);
@@ -143,6 +147,34 @@ nav .ionavbtn{color:var(--teal)!important;font-weight:bold}
     if (kind === 2 && v < 1) return iso.substr(11, 8);
     if (d.getUTCHours() === 0 && d.getUTCMinutes() === 0 && d.getUTCSeconds() === 0) return iso.substr(0, 10);
     return iso.substr(0, 10) + ' ' + iso.substr(11, 8);
+  }
+
+  /* シート XML を DOM を使わずに走査する（大きな表でも速い） */
+  function unesc(t) { return t.indexOf('&') < 0 ? t : t.replace(/&(lt|gt|amp|quot|apos|#x?[0-9a-fA-F]+);/g, function (m, e) { return e === 'lt' ? '<' : e === 'gt' ? '>' : e === 'amp' ? '&' : e === 'quot' ? '"' : e === 'apos' ? "'" : String.fromCodePoint(e[1] === 'x' ? parseInt(e.slice(2), 16) : +e.slice(1)); }); }
+  function attr(tag, name) { var m = new RegExp('\\s' + name + '="([^"]*)"').exec(tag); return m ? m[1] : null; }
+  function parseSheetXml(txt, sst, styleKind, date1904) {
+    var rows = [], i0 = txt.indexOf('<sheetData'), end = txt.indexOf('</sheetData>');
+    if (i0 < 0) return rows; if (end < 0) end = txt.length;
+    var re = /<(?:\w+:)?(row|c)\b([^>]*?)(\/?)>/g, m, row = null, rIdx = -1, cIdx = -1;
+    re.lastIndex = i0;
+    while ((m = re.exec(txt)) && m.index < end) {
+      if (m[1] === 'row') { var r = attr(m[2], 'r'); rIdx = r ? +r - 1 : rIdx + 1; row = rows[rIdx] = []; cIdx = -1; continue; }
+      var ref = attr(m[2], 'r'), pos = ref ? colIndex(ref) : null; cIdx = pos ? pos.c : cIdx + 1;
+      if (!row) { rIdx++; row = rows[rIdx] = []; }
+      if (m[3] === '/') { row[cIdx] = null; continue; }
+      var close = txt.indexOf('</c>', re.lastIndex); if (close < 0) close = txt.indexOf('/c>', re.lastIndex);
+      var inner = txt.slice(re.lastIndex, close); re.lastIndex = close + 4;
+      var t = attr(m[2], 't') || 'n', vm = /<(?:\w+:)?v>([\s\S]*?)<\/(?:\w+:)?v>/.exec(inner), v = vm ? unesc(vm[1]) : null, val = null;
+      if (t === 's') val = v == null ? null : sst[+v];
+      else if (t === 'inlineStr') { val = ''; inner.replace(/<(?:\w+:)?rPh\b[\s\S]*?<\/(?:\w+:)?rPh>/g, '').replace(/<(?:\w+:)?t\b[^>]*>([\s\S]*?)<\/(?:\w+:)?t>/g, function (_, x) { val += unesc(x); }); }
+      else if (t === 'str') val = v;
+      else if (t === 'b') val = v === '1';
+      else if (t === 'e') val = null;
+      else if (t === 'd') val = v;
+      else if (v != null && v !== '') { val = +v; var kind = styleKind[+(attr(m[2], 's') || 0)]; if (kind) val = serialToISO(val, kind, date1904); }
+      row[cIdx] = val;
+    }
+    return rows;
   }
 
   async function readXlsx(buf) {
@@ -167,25 +199,7 @@ nav .ionavbtn{color:var(--teal)!important;font-weight:bold}
       var target = rels[rid] || ''; target = target.replace(/^\/?xl\//, '').replace(/^\//, '');
       var path = 'xl/' + target, txt = await z.text(path);
       if (!txt) continue;
-      var doc = xml(txt), rows = [];
-      all(doc, 'row').forEach(function (rEl, ri) {
-        var rIdx = rEl.getAttribute('r') ? +rEl.getAttribute('r') - 1 : ri, row = rows[rIdx] = [];
-        kids(rEl, 'c').forEach(function (c, ci) {
-          var pos = c.getAttribute('r') ? colIndex(c.getAttribute('r')) : { c: ci };
-          var t = c.getAttribute('t') || 'n', vEl = kids(c, 'v')[0], v = vEl ? vEl.textContent : null, val = null;
-          if (t === 's') val = v == null ? null : sst[+v];
-          else if (t === 'inlineStr') { var is = kids(c, 'is')[0]; val = is ? textOf(is) : ''; }
-          else if (t === 'str') val = v;
-          else if (t === 'b') val = v === '1';
-          else if (t === 'e') val = null;
-          else if (t === 'd') val = v;
-          else if (v != null && v !== '') {
-            val = +v; var kind = styleKind[+(c.getAttribute('s') || 0)];
-            if (kind) val = serialToISO(val, kind, date1904);
-          }
-          row[pos.c] = val;
-        });
-      });
+      var rows = parseSheetXml(txt, sst, styleKind, date1904);
       for (var i = 0; i < rows.length; i++) { if (!rows[i]) rows[i] = []; for (var j = 0; j < rows[i].length; j++) if (rows[i][j] === undefined) rows[i][j] = null; }
       sheets.push({ name: s.getAttribute('name'), rows: rows });
     }
@@ -357,7 +371,7 @@ nav .ionavbtn{color:var(--teal)!important;font-weight:bold}
   }
   function peek(tool) { try { var s = localStorage.getItem(INBOX + tool); return s ? JSON.parse(s) : null; } catch (e) { return null; } }
   /* ツールのファイル名：build.py が tools/ の実際のファイル名を TOOL_FILES に書き込む */
-  var TOOL_FILES = /*TOOL_FILES*/{"index": "20261122_scm-recurrent-program_演習ファイル索引_v5.html", "navi": "20261122_scm-recurrent-program_システム分析ナビ_v8.html", "workbench": "20261122_scm-recurrent-program_システム分析ワークベンチ_v21.html", "lab": "20261122_scm-recurrent-program_システム分析ラボ_v6.html", "data": "20261122_scm-recurrent-program_SCMミステリー-データブラウザ_v6.html"}/*END*/;
+  var TOOL_FILES = /*TOOL_FILES*/{"index": "../20261122_scm-recurrent-program_演習ファイル索引_v5.html", "navi": "20261122_scm-recurrent-program_システム分析ナビ_v8.html", "workbench": "20261122_scm-recurrent-program_システム分析ワークベンチ_v21.html", "lab": "20261122_scm-recurrent-program_システム分析ラボ_v6.html", "data": "20261122_scm-recurrent-program_SCMミステリー-データブラウザ_v6.html"}/*END*/;
   var TOOL_LABEL = { index: '演習ファイル索引', navi: 'システム分析ナビ', workbench: 'システム分析ワークベンチ', lab: 'システム分析ラボ', data: 'データブラウザ' };
   var SELF = null;
   function rememberSelf(tool) {
@@ -367,9 +381,11 @@ nav .ionavbtn{color:var(--teal)!important;font-weight:bold}
     try { if (window.opener && window.opener !== window) window.opener.postMessage({ scmReady: tool }, '*'); } catch (e) { }
   }
   function toolHref(tool) {
-    // 1) 同じフォルダにある，いまの版のファイル名  2) このブラウザで最後に開いた場所
-    var here = location.href.split('#')[0].split('?')[0];
-    if (TOOL_FILES[tool]) return here.replace(/[^\/]*$/, '') + encodeURIComponent(TOOL_FILES[tool]);
+    // TOOL_FILES は tools/ フォルダから見た相対パス（索引だけは ../）。いまのページの場所から解決する
+    var here = location.href.split('#')[0].split('?')[0], file = decodeURIComponent(here.replace(/^.*\//, ''));
+    var base = here;
+    if (TOOL_FILES.index && TOOL_FILES.index.replace(/^\.\.\//, '') === file && TOOL_FILES.index.indexOf('../') === 0) base = here.replace(/[^\/]*$/, '') + 'tools/x';
+    if (TOOL_FILES[tool]) { try { return new URL(TOOL_FILES[tool].split('/').map(encodeURIComponent).join('/').replace(/^\.\./, '..'), base).href; } catch (e) { } }
     try { var reg = JSON.parse(localStorage.getItem('scm.tools') || '{}'); if (reg[tool]) return reg[tool].href; } catch (e) { }
     return null;
   }
@@ -658,7 +674,7 @@ function BOOT(DATA,mode){
   const lo=aggregate('ord',{by:'line',bucket:'y',flt:MTSF()});
   h.innerHTML=`<h2>読み込んだデータの概要：${esc(APP.name)}</h2>
   <div class="see">期間 <b>${MON[0]}〜${MON[NM-1]}</b>（${NM}か月${part.length?'，'+part.join('，'):''}）　SKU ${SKU.length}品目　ライン ${LINES.length}（${LINES.map(esc).join('，')}）${DCS.length>1?'　DC '+DCS.length:''}。年別の値は「${YEARS.join('→')}」の順。${AV.dlv?`OTIF：注文行（受注番号×品番）ごとに，約束納期までの納品数量の合計が注文数量に達していれば OTIF。取消のある注文行は分母から除く。OTIF が最も低いライン：<b>${esc(WORST)}</b>。`:'<b>納品の記録がないため OTIF・初回充足率は出せない。</b>'}${NM<12?'<br><b style="color:#C8553D">12か月に満たないため，季節の動きや年の比較は読み取りにくい。</b>':''}</div>
-  <div class="kpi">${k.map(([a,b])=>`<div><small>${a}</small><b>${b}</b></div>`).join('')}</div><div class="grid2" id="ovg"></div><h3>読み込んだ表</h3><div class="card" id="ovt"></div>`;
+  <div class="kpi">${k.map(([a,b])=>`<div><small>${a}</small><b>${b}</b></div>`).join('')}</div><div class="card iohint">このデータにある変数（名前と単位だけ。数値は含まない）をシステム分析ワークベンチに知らせると，CLD の矢印を「データで確かめる」ときに使える。<button class="btn" id="ovmeta">ワークベンチに変数一覧を送る</button>　矢印の検証は「矢印の検証」タブ。</div><div class="grid2" id="ovg"></div><h3>読み込んだ表</h3><div class="card" id="ovt"></div>`;
   const g=$('#ovg');const al=aggregate('ord',{by:'all',bucket:'m'});
   if(HAS('ord','otif')){const a=DIMS.mode?aggregate('ord',{by:'mode',bucket:'m'}):null;chart(g,{title:'月別OTIF'+(a?'：生産方式別':''),x:al.x,series:[{name:'全体',data:al.get('全体','otif'),color:'#17384A',w:2.5},...(a?a.keys.map((k,i)=>({name:k,data:a.get(k,'otif'),color:PAL[i]})):[])],unit:'％',tight:true,vbands:VB()});
    const l=aggregate('ord',{by:'line',bucket:'m',flt:MTSF()});chart(g,{title:`ライン別のOTIF${MTSL?'（'+MTSL+'）':''}：最も低いのは ${WORST}`,x:l.x,series:l.keys.map(k=>({name:k,data:l.get(k,'otif'),color:k===WORST?'#C8553D':undefined,w:k===WORST?3:1.6})),unit:'％',tight:true,vbands:VB()})}
@@ -666,6 +682,7 @@ function BOOT(DATA,mode){
   const lq=aggregate('ord',{by:'line',bucket:'m'});chart(g,{title:'ライン別の受注数量（月別）',type:'stack',x:lq.x,series:lq.keys.map(k=>({name:k,data:lq.get(k,'q')})),unit:'個'});
   const T=(DATA.META&&DATA.META.tables)||[];
   $('#ovt').innerHTML=tableHTML(['表','内容','読み込んだシート','行数','集計に使った行','期間','状態'],T.map(t=>[t.label,t.desc,t.src||'—',t.rows==null?'—':t.rows,t.used==null?'—':t.used,t.from?t.from+'〜'+t.to:'—',t.rows?'読み込み済み':'データなし（関係する指標・タブは非表示）']),{left:3,hl:r=>r[3]==='—'});
+  const om=$('#ovmeta');if(om)om.onclick=()=>APP.sendMeta&&APP.sendMeta();
   h.querySelector('h3').insertAdjacentHTML('afterend','<div class="note">「データなし」の表に関係する指標・タブ・矢印の変数は表示しない。年別の値の推移と，OTIF のライン別比較は「エクスプローラ」で切り口を変えて確かめる。</div>');
   }
   h.querySelectorAll('[data-go]').forEach(a=>a.onclick=e=>{e.preventDefault();showTab(a.dataset.go)});
@@ -908,8 +925,8 @@ function BOOT(DATA,mode){
    $('#cvfe').disabled=one;$('#cvfen').textContent=one?'（ラインが1つなので使わない。ライン内で標準化した値の相関で判定する）':'';
    R=st.cands.map(c=>CV.test(c[0],c[1],c[2],{fe:st.fe,lines}));
    const col={ok:'#0F7C8C',ng:'#C8553D',na:'#7A8C99',id:'#17384A'};
-   $('#cvt').innerHTML=`<div class="tw" style="max-height:520px"><table class="t"><tr><th class="l">#</th><th class="l">原因 → 結果</th><th>想定の極性</th><th>相関 r</th><th>遅れ（月）</th><th>判定の目安 ±2/√n</th><th>負荷率≥95％のr</th><th>＜95％のr</th><th>ライン×年の水準 r</th><th>変化の向きが合うライン</th><th class="l">判定</th><th class="l">補足</th><th></th></tr>${R.map((t,i)=>`<tr data-i="${i}" style="cursor:pointer;${i===st.sel?'background:#E6F2F3':''}"><td class="l">${i+1}</td><td class="l">${esc(V[t.xk].name)} → ${esc(V[t.yk].name)}</td><td style="text-align:center">${t.pol}</td><td>${fmtN(t.r,2)}</td><td>${t.best}</td><td>${fmtN(t.crit,2)}</td><td>${fmtN(t.rh.r,2)}（${t.rh.n}）</td><td>${fmtN(t.rl.r,2)}（${t.rl.n}）</td><td>${fmtN(t.lr.r,2)}（${t.lr.n}）</td><td>${t.agree}／${lines.length}</td><td class="l"><b style="color:${col[t.cls]}">${t.v}</b></td><td class="l" style="white-space:normal;min-width:180px">${t.notes.join('。')}</td><td><button class="btn" data-del="${i}">削除</button></td></tr>`).join('')}</table></div><div class="note">行をクリックすると下に詳細を表示。（ ）内は月の数。</div>`;
-   $('#cvt').querySelectorAll('tr[data-i]').forEach(tr=>tr.onclick=e=>{if(e.target.dataset.del!=null){st.cands.splice(+e.target.dataset.del,1);st.sel=0;run();return}st.sel=+tr.dataset.i;run()});
+   $('#cvt').innerHTML=`<div class="tw" style="max-height:520px"><table class="t"><tr><th class="l">#</th><th class="l">原因 → 結果</th><th>想定の極性</th><th>相関 r</th><th>遅れ（月）</th><th>判定の目安 ±2/√n</th><th>負荷率≥95％のr</th><th>＜95％のr</th><th>ライン×年の水準 r</th><th>変化の向きが合うライン</th><th class="l">判定</th><th class="l">補足</th><th></th></tr>${R.map((t,i)=>`<tr data-i="${i}" style="cursor:pointer;${i===st.sel?'background:#E6F2F3;':''}${st.mark&&st.mark.has(i)?'font-weight:bold':''}"><td class="l">${i+1}</td><td class="l">${esc(V[t.xk].name)} → ${esc(V[t.yk].name)}</td><td style="text-align:center">${t.pol}</td><td>${fmtN(t.r,2)}</td><td>${t.best}</td><td>${fmtN(t.crit,2)}</td><td>${fmtN(t.rh.r,2)}（${t.rh.n}）</td><td>${fmtN(t.rl.r,2)}（${t.rl.n}）</td><td>${fmtN(t.lr.r,2)}（${t.lr.n}）</td><td>${t.agree}／${lines.length}</td><td class="l"><b style="color:${col[t.cls]}">${t.v}</b></td><td class="l" style="white-space:normal;min-width:180px">${t.notes.join('。')}</td><td><button class="btn" data-del="${i}">削除</button></td></tr>`).join('')}</table></div><div class="note">行をクリックすると下に詳細を表示。（ ）内は月の数。</div>`;
+   $('#cvt').querySelectorAll('tr[data-i]').forEach(tr=>tr.onclick=e=>{if(e.target.dataset.del!=null){st.cands.splice(+e.target.dataset.del,1);st.sel=0;st.mark=null;run();return}st.sel=+tr.dataset.i;run()});
    detail(R[st.sel],lines)};
   function detail(t,lines){const d=$('#cvd');d.innerHTML='';if(!t)return;const V=CV.build();const g=document.createElement('div');g.className='grid2';d.appendChild(g);
    const xn=V[t.xk].name,yn=V[t.yk].name;
@@ -930,9 +947,9 @@ function BOOT(DATA,mode){
    SCMIO.sendTo('workbench',SCMIO.envelope('arrows','data',{title,arrows,dataset:APP.name},title),{done:r=>toast(r==='delivered'?'ワークベンチに判定の結果を返した':'ワークベンチに直接届かなかったため .scm.json を保存した（ワークベンチの「開く」で読み込む）')})};
   // 外から矢印を並べる（URLの #cv= ・ワークベンチからの封筒）
   APP.cvApi={add(list,title,replace,from){const V=CV.build();const miss=[];const add=[];list.forEach(([x,y,p])=>{const a=CV.key(x),c=CV.key(y);if(!a||!c||a===c){miss.push(x+' → '+y);return}add.push([a,c,p==='-'?'-':'+'])});
-    if(replace)st.cands=[];add.forEach(c=>{if(!st.cands.some(o=>o[0]===c[0]&&o[1]===c[1]&&o[2]===c[2]))st.cands.push(c)});st.sel=replace?0:Math.max(0,st.cands.length-add.length);st.title=title;
-    $('#cvbn').innerHTML=`<div class="card" style="border:2px solid #7B3FA0;background:#F6F1FB"><b>${esc(from||'ワークベンチの経路から開いた')}</b>：${esc(title||'')}<br>矢印 ${add.length} 本を下の表に並べた${replace?'（例題の候補は外した。戻すときはこのページを開き直す）':'（いまの候補に追加）'}。行をクリックすると，その矢印の原因と結果のデータ（ライン×月）と判定が下に出る。「ワークベンチへ結果を返す」で判定をワークベンチに戻せる。${miss.length?'<br><span style="color:#C8553D">データにない矢印：'+miss.map(esc).join('，')+'</span>':''}</div>`;
-    run();return {added:add.length,miss}}};
+    if(replace)st.cands=[];let nw=0;const idx=add.map(c=>{let i=st.cands.findIndex(o=>o[0]===c[0]&&o[1]===c[1]&&o[2]===c[2]);if(i<0){st.cands.push(c);i=st.cands.length-1;nw++}return i});st.sel=idx.length?idx[0]:0;st.mark=new Set(idx);st.title=title;
+    $('#cvbn').innerHTML=`<div class="card" style="border:2px solid #7B3FA0;background:#F6F1FB"><b>${esc(from||'ワークベンチの経路から開いた')}</b>：${esc(title||'')}<br>矢印 ${add.length} 本を下の表に並べた${replace?'（例題の候補は外した。戻すときはこのページを開き直す）':`（いまの候補に追加。新しく加えたのは ${nw} 本，ほかはすでにある候補）`}。届いた矢印の行は太字。行をクリックすると，その矢印の原因と結果のデータ（ライン×月）と判定が下に出る。「ワークベンチへ結果を返す」で判定をワークベンチに戻せる。${miss.length?'<br><span style="color:#C8553D">データにない矢印：'+miss.map(esc).join('，')+'</span>':''}</div>`;
+    run();return {added:add.length,nw,miss}}};
   run()}})();
  // dataset-meta（取り込んだデータにある変数の一覧。データそのものは含めない）
  APP.datasetMeta=()=>{const V=CV.build();return {name:APP.name,period:{from:MON[0],to:MON[NM-1],months:NM},lines:LINES.length,variables:Object.values(V).map(v=>({name:v.name,unit:v.unit,aliases:(CV_ALIAS[v.k]||[]).filter(a=>a!==v.name),note:v.note}))}};
@@ -1335,7 +1352,7 @@ function build(R,name){const t0=performance.now();
   SP:{cols:['month','product_group','forecast_qty','sales_plan_qty','production_plan_qty','actual_qty'],rows:SPr},FIN:{cols:[],rows:[]},ORD,SHP,PRD,INV,INVD,EQ,PLANT,LINES,DCS,RANKS,PROC,NDAY,MON,D0:MON[0]+'-01',AVAIL:AV,META};
  META.ms=performance.now()-t0;return DATA}
 // ---------- 反映
-function applyData(DATA,name,evi){APP.name=name||'自社データ';APP.evi=evi&&DATA.MON&&DATA.MON.includes(evi)?evi:null;BOOT(DATA,'user');showTab('ov');renderCur();toast(`読み込んだデータで表示している：${APP.name}`)}
+function applyData(DATA,name,evi){APP.name=name||'自社データ';APP.evi=evi&&DATA.MON&&DATA.MON.includes(evi)?evi:null;BOOT(DATA,'user');showTab('ov');renderCur();toast(`読み込んだデータで表示している：${APP.name}。概要の「ワークベンチに変数一覧を送る」で，ワークベンチの「データで確かめる」に使える変数を知らせられる`,8000)}
 function doApply(){ST.name=($('#ioname').value||'').trim()||ST.name||'自社データ';if(ST.dirty||!ST.report)validate();renderReport();const rp=ST.report;if(!rp.R){$('#iorep').scrollIntoView({behavior:'smooth'});toast('要修正の項目があるため取り込めない');return}
  const st=$('#iostat');st.textContent='集計中…';setTimeout(()=>{try{const D=build(rp.R,ST.name);st.textContent=`集計 ${(D.META.ms/1000).toFixed(1)}秒（注文行 ${D.ORD.reduce((a,r)=>a+r[4],0).toLocaleString()}）`;APP.lastBuild=D;applyData(D,ST.name,($('#ioevi')||{}).value)}catch(e){console.error(e);st.innerHTML=`<span class="err">集計できなかった：${esc(e.message)}</span>`}},30)}
 // ---------- 対応づけ（データは含まない）の保存・読み込み
@@ -1357,7 +1374,8 @@ function renderCur(){const h=$('#iocur');if(!h)return;const u=APP.mode==='user';
  h.innerHTML=`<div class="ctitle"><span>いま表示しているデータ：${u?esc(APP.name)+'（自社データ）':'サンプル（株式会社ブルーマウンテン）'}</span></div>${u?`<div class="note">期間 ${APP.MON[0]}〜${APP.MON[APP.MON.length-1]}　ライン ${APP.data.LINES.length}　SKU ${APP.data.SKU.rows.length}。元の明細はこのページを閉じると消える（保存されない）。</div>`:''}
  <div class="ctl" style="margin-top:6px"><button class="btn" id="iosaveagg" ${u?'':'disabled'}>集計済みデータを保存</button><button class="btn" id="iometa" ${u?'':'disabled'} title="変数の名前・単位の一覧だけを送る（データは含まない）">ワークベンチに変数一覧を送る</button><button class="btn" id="iosample" ${u?'':'disabled'}>サンプルデータに戻す</button></div>`;
  $('#iosaveagg').onclick=saveAgg;$('#iosample').onclick=()=>{APP.name='株式会社ブルーマウンテン（サンプル）';APP.evi='2024-04';BOOT(DATA,'sample');showTab('ov');renderCur();toast('サンプルデータに戻した')};
- $('#iometa').onclick=()=>{const pl=APP.datasetMeta();SCMIO.sendTo('workbench',SCMIO.envelope('dataset-meta','data',pl,APP.name),{done:r=>toast(r==='delivered'?'ワークベンチに変数一覧を送った':'ワークベンチに直接届かなかったため .scm.json を保存した（ワークベンチの「開く」で読み込む）')})}}
+ $('#iometa').onclick=APP.sendMeta}
+APP.sendMeta=()=>{const pl=APP.datasetMeta();SCMIO.sendTo('workbench',SCMIO.envelope('dataset-meta','data',pl,APP.name),{done:r=>toast(r==='delivered'?'ワークベンチに変数一覧を送った':'ワークベンチに直接届かなかったため .scm.json を保存した（ワークベンチの「開く」で読み込む）')})};
 // ---------- タブ
 function init(){const nav=$('#nav');const b=document.createElement('button');b.dataset.t='io';b.className='ionavbtn';b.textContent='データ読込';nav.appendChild(b);
  const sec=document.createElement('section');sec.id='io';$('main').appendChild(sec);

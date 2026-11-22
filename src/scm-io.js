@@ -67,8 +67,12 @@
   function colIndex(ref) { var m = /^([A-Z]+)(\d+)$/.exec(ref); if (!m) return null; var c = 0; for (var i = 0; i < m[1].length; i++) c = c * 26 + (m[1].charCodeAt(i) - 64); return { c: c - 1, r: +m[2] - 1 }; }
   var BUILTIN_DATE = { 14: 1, 15: 1, 16: 1, 17: 1, 18: 2, 19: 2, 20: 2, 21: 2, 22: 1, 27: 1, 28: 1, 29: 1, 30: 1, 31: 1, 32: 2, 33: 2, 34: 2, 35: 2, 36: 1, 45: 2, 46: 2, 47: 2, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1, 58: 1 };
   function isDateFmt(code) {
-    var s = code.replace(/"[^"]*"/g, '').replace(/\[(?!h\]|m\]|s\])[^\]]*\]/gi, '').replace(/\\./g, '');
-    return /[ymdhsge]/i.test(s) && !/^[#0.,%E+\- ]*$/.test(s) ? (/[ymdge]/i.test(s) ? 1 : 2) : 0;
+    // 書式コードから文字列・色指定・エスケープ・General・指数表記を除き，日付時刻の記号が残れば日付とみなす
+    var t = String(code).replace(/"[^"]*"/g, '').replace(/\\./g, '').replace(/_.|\*./g, '').replace(/General/gi, '')
+      .replace(/\[(h|hh|m|mm|s|ss)\]/gi, 'h').replace(/\[[^\]]*\]/g, '').replace(/[0#?.,]+E[+-]\d+/gi, '').replace(/AM\/PM|A\/P/gi, 'h');
+    if (!/[ymdhsge]/i.test(t)) return 0;
+    // y・d・年号があれば日付。m だけで h・s がなければ月（日付），h・s があれば時刻
+    return (/[ydge]/i.test(t) || (/m/i.test(t) && !/[hs]/i.test(t))) ? 1 : 2;
   }
   function serialToISO(v, kind, date1904) {
     var ms = Math.round((v + (date1904 ? 1462 : 0) - 25569) * 86400000);
@@ -76,6 +80,34 @@
     if (kind === 2 && v < 1) return iso.substr(11, 8);
     if (d.getUTCHours() === 0 && d.getUTCMinutes() === 0 && d.getUTCSeconds() === 0) return iso.substr(0, 10);
     return iso.substr(0, 10) + ' ' + iso.substr(11, 8);
+  }
+
+  /* シート XML を DOM を使わずに走査する（大きな表でも速い） */
+  function unesc(t) { return t.indexOf('&') < 0 ? t : t.replace(/&(lt|gt|amp|quot|apos|#x?[0-9a-fA-F]+);/g, function (m, e) { return e === 'lt' ? '<' : e === 'gt' ? '>' : e === 'amp' ? '&' : e === 'quot' ? '"' : e === 'apos' ? "'" : String.fromCodePoint(e[1] === 'x' ? parseInt(e.slice(2), 16) : +e.slice(1)); }); }
+  function attr(tag, name) { var m = new RegExp('\\s' + name + '="([^"]*)"').exec(tag); return m ? m[1] : null; }
+  function parseSheetXml(txt, sst, styleKind, date1904) {
+    var rows = [], i0 = txt.indexOf('<sheetData'), end = txt.indexOf('</sheetData>');
+    if (i0 < 0) return rows; if (end < 0) end = txt.length;
+    var re = /<(?:\w+:)?(row|c)\b([^>]*?)(\/?)>/g, m, row = null, rIdx = -1, cIdx = -1;
+    re.lastIndex = i0;
+    while ((m = re.exec(txt)) && m.index < end) {
+      if (m[1] === 'row') { var r = attr(m[2], 'r'); rIdx = r ? +r - 1 : rIdx + 1; row = rows[rIdx] = []; cIdx = -1; continue; }
+      var ref = attr(m[2], 'r'), pos = ref ? colIndex(ref) : null; cIdx = pos ? pos.c : cIdx + 1;
+      if (!row) { rIdx++; row = rows[rIdx] = []; }
+      if (m[3] === '/') { row[cIdx] = null; continue; }
+      var close = txt.indexOf('</c>', re.lastIndex); if (close < 0) close = txt.indexOf('/c>', re.lastIndex);
+      var inner = txt.slice(re.lastIndex, close); re.lastIndex = close + 4;
+      var t = attr(m[2], 't') || 'n', vm = /<(?:\w+:)?v>([\s\S]*?)<\/(?:\w+:)?v>/.exec(inner), v = vm ? unesc(vm[1]) : null, val = null;
+      if (t === 's') val = v == null ? null : sst[+v];
+      else if (t === 'inlineStr') { val = ''; inner.replace(/<(?:\w+:)?rPh\b[\s\S]*?<\/(?:\w+:)?rPh>/g, '').replace(/<(?:\w+:)?t\b[^>]*>([\s\S]*?)<\/(?:\w+:)?t>/g, function (_, x) { val += unesc(x); }); }
+      else if (t === 'str') val = v;
+      else if (t === 'b') val = v === '1';
+      else if (t === 'e') val = null;
+      else if (t === 'd') val = v;
+      else if (v != null && v !== '') { val = +v; var kind = styleKind[+(attr(m[2], 's') || 0)]; if (kind) val = serialToISO(val, kind, date1904); }
+      row[cIdx] = val;
+    }
+    return rows;
   }
 
   async function readXlsx(buf) {
@@ -100,25 +132,7 @@
       var target = rels[rid] || ''; target = target.replace(/^\/?xl\//, '').replace(/^\//, '');
       var path = 'xl/' + target, txt = await z.text(path);
       if (!txt) continue;
-      var doc = xml(txt), rows = [];
-      all(doc, 'row').forEach(function (rEl, ri) {
-        var rIdx = rEl.getAttribute('r') ? +rEl.getAttribute('r') - 1 : ri, row = rows[rIdx] = [];
-        kids(rEl, 'c').forEach(function (c, ci) {
-          var pos = c.getAttribute('r') ? colIndex(c.getAttribute('r')) : { c: ci };
-          var t = c.getAttribute('t') || 'n', vEl = kids(c, 'v')[0], v = vEl ? vEl.textContent : null, val = null;
-          if (t === 's') val = v == null ? null : sst[+v];
-          else if (t === 'inlineStr') { var is = kids(c, 'is')[0]; val = is ? textOf(is) : ''; }
-          else if (t === 'str') val = v;
-          else if (t === 'b') val = v === '1';
-          else if (t === 'e') val = null;
-          else if (t === 'd') val = v;
-          else if (v != null && v !== '') {
-            val = +v; var kind = styleKind[+(c.getAttribute('s') || 0)];
-            if (kind) val = serialToISO(val, kind, date1904);
-          }
-          row[pos.c] = val;
-        });
-      });
+      var rows = parseSheetXml(txt, sst, styleKind, date1904);
       for (var i = 0; i < rows.length; i++) { if (!rows[i]) rows[i] = []; for (var j = 0; j < rows[i].length; j++) if (rows[i][j] === undefined) rows[i][j] = null; }
       sheets.push({ name: s.getAttribute('name'), rows: rows });
     }
