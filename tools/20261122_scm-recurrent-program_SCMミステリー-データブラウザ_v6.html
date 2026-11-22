@@ -59,7 +59,7 @@ nav .ionavbtn{color:var(--teal)!important;font-weight:bold}
 .iodrop{border:2px dashed var(--line);border-radius:10px;padding:16px;text-align:center;color:var(--gray);margin-top:6px}.iodrop.on{border-color:var(--teal);background:#E6F2F3}.iodrop input{margin-bottom:6px;max-width:100%}
 .err{color:var(--red)}.req{display:inline-block;background:var(--red);color:#fff;border-radius:4px;padding:0 5px;font-size:11px}tr.miss td{background:#FCEBD3}
 .lv{display:inline-block;border-radius:4px;padding:0 6px;font-size:11px;color:#fff;background:var(--amber)}.lv.e{background:var(--red)}.lv.i{background:var(--gray)}
-#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:8px 16px;border-radius:8px;z-index:80;display:none;max-width:90vw;font-size:13px}
+#toast{pointer-events:none;position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:8px 16px;border-radius:8px;z-index:80;display:none;max-width:90vw;font-size:13px}
 .umonly{display:none}body.usermode .umonly{display:block}body.usermode #rx .rxgrid{opacity:.45;pointer-events:none}body.usermode #rxguide{display:none!important}
 .nodata{color:#4A5A63;background:#F5F7F8}.btn[disabled]{opacity:.45;cursor:default}
 @media(max-width:600px){main{padding:12px 16px}header{padding:12px 16px}.ctl select,.ctl input[type=search]{max-width:100%}.hctl{margin-left:0}}
@@ -1074,6 +1074,7 @@ nb.onclick=()=>{$$('nav button,main>section').forEach(x=>x.classList.remove('on'
 (function(){
 const SKUA=['品番','SKU','品目コード','品目番号','製品コード','製品番号','商品コード','品目','item','itemcode','itemno','productcode','productid','sku_id','型番'];
 const LINEA=['生産ライン','ライン','ライン名','ラインコード','製造ライン','line','lineid','linename','workcenter','ワークセンタ','ワークセンター'];
+const OIDA=['受注番号','注文番号','オーダー番号','オーダーNo','オーダーNO','受注No','注文No','受注伝票番号','伝票番号','受注コード','orderid','orderno','ordernumber','order','sono','salesorder'];
 const DCA=['担当DC','DC','出荷DC','出荷倉庫','倉庫','物流センター','出荷拠点','dc','warehouse','拠点'];
 const MONEY={base:'円',opts:{'円':1,'千円':1000,'万円':10000}},HOURS={base:'時間',opts:{'時間':1,'分':1/60}};
 const f=(key,label,type,o)=>Object.assign({key,label,type},o||{});
@@ -1089,7 +1090,7 @@ const TABLES=[
   f('plant','工場','text',{aliases:['工場','plant','製造拠点','事業所'],desc:'',ex:['本社工場','本社工場','第2工場']}),
   f('production_lt_days','生産リードタイム（日）','num',{aliases:['生産LT','生産リードタイム','製造リードタイム','productionltdays'],desc:'',ex:[5,5,10]})]},
  {k:'orders',t:'受注',need:true,kw:['受注','注文','order'],desc:'受注明細（1行＝受注番号×品番）。OTIF・初回充足率・取消・欠品の分母',f:[
-  f('order_id','受注番号','id',{req:1,aliases:['受注番号','注文番号','オーダー番号','受注No','注文No','受注伝票番号','伝票番号','orderid','orderno','ordernumber','sono'],desc:'納品・出荷と結びつけるキー',ex:['SO-0001','SO-0001','SO-0002']}),
+  f('order_id','受注番号','id',{req:1,aliases:OIDA,desc:'納品・出荷と結びつけるキー',ex:['SO-0001','SO-0001','SO-0002']}),
   f('order_date','受注日','date',{req:1,aliases:['受注日','注文日','受付日','受注年月日','orderdate'],desc:'',ex:['2024-04-01','2024-04-01','2024-04-02']}),
   f('sku','品番','id',{req:1,aliases:SKUA,desc:'',ex:['A-100','B-300','A-200']}),
   f('qty','受注数量','num',{req:1,aliases:['受注数量','受注数','注文数量','注文数','数量','qty','quantity','orderqty'],desc:'',ex:[120,10,300]}),
@@ -1103,7 +1104,7 @@ const TABLES=[
   f('delivered_date','納品日（納品表がないとき）','date',{aliases:['納品日','納入日','実納品日','着荷日','delivereddate','deliverydate'],desc:'納品表がないときの1回納品の日',ex:['','','']}),
   f('delivered_qty','納品数量（納品表がないとき）','num',{aliases:['納品数量','納品数','納入数','納入数量','deliveredqty'],desc:'空欄なら受注数量を全量納品とみなす',ex:['','','']})]},
  {k:'deliveries',t:'納品',kw:['納品','納入','着荷','deliver'],desc:'顧客への納品の記録（1行＝1回の納品。分納は複数行）',f:[
-  f('order_id','受注番号','id',{req:1,aliases:['受注番号','注文番号','オーダー番号','受注No','注文No','伝票番号','orderid','orderno'],desc:'',ex:['SO-0001','SO-0001','SO-0002']}),
+  f('order_id','受注番号','id',{req:1,aliases:OIDA,desc:'',ex:['SO-0001','SO-0001','SO-0002']}),
   f('sku','品番','id',{req:1,aliases:SKUA,desc:'',ex:['A-100','B-300','A-200']}),
   f('delivery_date','納品日','date',{req:1,aliases:['納品日','納入日','着荷日','実納品日','deliverydate','delivereddate','日付','date'],desc:'',ex:['2024-04-07','2024-04-16','2024-04-09']}),
   f('delivered_qty','納品数量','num',{req:1,aliases:['納品数量','納品数','納入数量','納入数','数量','deliveredqty','qty'],desc:'',ex:[120,10,300]}),
@@ -1112,7 +1113,7 @@ const TABLES=[
   f('ship_date','出荷日','date',{req:1,aliases:['出荷日','出庫日','shipdate','日付','date'],desc:'',ex:['2024-04-05','2024-04-12','2024-04-08']}),
   f('sku','品番','id',{req:1,aliases:SKUA,desc:'',ex:['A-100','B-300','A-200']}),
   f('qty','出荷数量','num',{req:1,aliases:['出荷数量','出荷数','出庫数','数量','qty','shippedqty'],desc:'',ex:[120,10,300]}),
-  f('order_id','受注番号','id',{aliases:['受注番号','注文番号','オーダー番号','受注No','伝票番号','orderid','orderno'],desc:'あれば「受注→出荷」「出荷→納品」の日数が出る',ex:['SO-0001','SO-0001','SO-0002']}),
+  f('order_id','受注番号','id',{aliases:OIDA,desc:'あれば「受注→出荷」「出荷→納品」の日数が出る',ex:['SO-0001','SO-0001','SO-0002']}),
   f('dc','出荷DC・倉庫','text',{aliases:DCA,desc:'',ex:['東日本DC','東日本DC','西日本DC']}),
   f('express','特急便','flag',{aliases:['特急','特急便','特急フラグ','輸送区分','配送方法','輸送手段','便種','express','transportmode'],desc:'1・TRUE・「特急」「航空」なら特急',ex:[0,1,0]}),
   f('freight','運賃','num',{unit:MONEY,aliases:['運賃','送料','輸送費','物流費','freight','freightcost'],desc:'',ex:[3000,12000,5000]})]},
@@ -1186,10 +1187,11 @@ async function addFiles(files){const st=$('#iostat');for(const file of files){if
 // ---------- 画面
 function render(){renderSheets();renderMaps();renderActions()}
 function renderSheets(){const h=$('#iosheets');if(!ST.sheets.length){h.innerHTML='<div class="note">まだファイルを読み込んでいない。</div>';return}
- h.innerHTML=`<div class="ctitle"><span>2. シートを表に割り当てる（見出しから自動で推定。違っていれば選び直す）</span></div><div class="tw"><table class="t"><tr><th class="l">ファイル</th><th class="l">シート</th><th>行数</th><th class="l">見出し（先頭）</th><th class="l">割り当て</th><th></th></tr>${ST.sheets.map(s=>`<tr><td class="l">${esc(s.file)}</td><td class="l">${esc(s.name)}</td><td>${s.rows.length.toLocaleString()}</td><td class="l" style="white-space:normal;max-width:420px">${esc(s.columns.slice(0,10).join('，'))}${s.columns.length>10?' …':''}</td><td class="l"><select data-sh="${s.id}"><option value="">（使わない）</option>${TABLES.map(T=>`<option value="${T.k}" ${ST.assign[s.id]===T.k?'selected':''}>${T.t}${T.need?'（必須）':''}</option>`).join('')}</select></td><td><button class="btn" data-rm="${s.id}">外す</button></td></tr>`).join('')}</table></div>
+ h.innerHTML=`<div class="ctitle"><span>2. シートを表に割り当てる（見出しから自動で推定。違っていれば選び直す）</span></div><div class="tw"><table class="t"><tr><th class="l">ファイル</th><th class="l">シート</th><th>行数</th><th class="l">見出し（先頭）</th><th class="l">割り当て</th><th class="l">見出しの一致</th><th></th></tr>${ST.sheets.map(s=>`<tr><td class="l">${esc(s.file)}</td><td class="l">${esc(s.name)}</td><td>${s.rows.length.toLocaleString()}</td><td class="l" style="white-space:normal;max-width:420px">${esc(s.columns.slice(0,10).join('，'))}${s.columns.length>10?' …':''}</td><td class="l"><select data-sh="${s.id}"><option value="">（使わない）</option>${TABLES.map(T=>`<option value="${T.k}" ${ST.assign[s.id]===T.k?'selected':''}>${T.t}${T.need?'（必須）':''}</option>`).join('')}</select></td><td class="l" style="white-space:normal;max-width:300px">${hint(s)}</td><td><button class="btn" data-rm="${s.id}">外す</button></td></tr>`).join('')}</table></div>
  <div class="note">同じ表に複数のシート（例：月ごとのファイル）を割り当てると，つなげて1つの表として読む（列の名前をそろえる）。必須：製品マスタ・受注（＋納品，または受注表の納品日の列）。</div>`;
  h.querySelectorAll('select[data-sh]').forEach(s=>s.onchange=()=>{const old=ST.assign[s.dataset.sh];ST.assign[s.dataset.sh]=s.value;[old,s.value].forEach(k=>{if(k)delete ST.maps[k]});ST.dirty=true;render()});
  h.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{const id=b.dataset.rm;const k=ST.assign[id];ST.sheets=ST.sheets.filter(s=>s.id!==id);delete ST.assign[id];if(k)delete ST.maps[k];ST.dirty=true;render()})}
+function hint(sh){const k=ST.assign[sh.id];const best=k?TB[k]:TABLES.map(T=>[T,scoreSheet(sh,T)]).sort((a,b)=>b[1].rq/b[1].rqn-a[1].rq/a[1].rqn||b[1].s-a[1].s)[0][0];const r=scoreSheet(sh,best);const miss=best.f.filter(f=>f.req&&!r.map[f.key]).map(f=>f.label);return k?(miss.length?`<span class="err">必須の見出しが見つからない：${miss.join('，')}（下の対応づけで選ぶ）</span>`:'必須の見出しはそろっている'):`近いのは「${best.t}」（必須 ${r.rq}/${r.rqn}${miss.length?'，ない：'+miss.join('，'):''}）`}
 function sampleVals(tk,fl){const sh=ST.sheets.filter(s=>ST.assign[s.id]===tk);const col=ST.maps[tk][fl.key];if(!col)return '';const out=[];let bad=0,seen=0;const fac=fl.unit?fl.unit.opts[(ST.units[tk]||{})[fl.key]||fl.unit.base]:1;
  for(const s of sh){for(const r of s.rows){const raw=r[col];if(raw==null||raw==='')continue;seen++;const v=conv(fl,raw,fac);if(v==null)bad++;if(out.length<3)out.push(v==null?`<span class="err">×${esc(raw)}</span>`:esc(fl.type==='num'?(+v.toFixed(4)):v));if(seen>=200)break}if(seen>=200)break}
  return out.join('，')+(bad?`　<span class="err">先頭${seen}件中 ${bad}件 読めない</span>`:'')}
@@ -1379,7 +1381,7 @@ function init(){const nav=$('#nav');const b=document.createElement('button');b.d
 init();
 // ヘッダの「介入日」
 const ev=document.getElementById('evi');if(ev)ev.onchange=()=>{const cur=(document.querySelector('nav button.on')||{dataset:{}}).dataset.t||'ov';APP.evi=ev.value||null;BOOT(APP.data,APP.mode);showTab(cur==='io'?'ov':cur);if(cur==='io')showTab('io')};
-window.SCMDB_IMPORT={ST,TABLES,validate,build,applyMapping,mappingJson,template};
+window.SCMDB_IMPORT={ST,TABLES,addFiles,validate,build,applyMapping,mappingJson,template};
 })();
 </script><script>
 // ===== ほかのツールから届いた矢印を「矢印の検証」に並べる（URL の #cv= と，SCMIO の封筒 kind:'arrows'）=====
