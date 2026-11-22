@@ -971,7 +971,7 @@ function simGeneric(C){const dt=0.25,N=Math.round(G.T/dt);const V=C.V,T=C.T;cons
 const GEN_LIMIT=1e6;
 // ---- InsightMaker へ（式は「1＋強さ×効き方×（原因−1）」の足し算）
 function termOf(e){const s=G.str[e.c+'>'+e.e]??1;return `${e.p==='-'?'-':'+'} ${s!==1?s+' * ':''}[効き方] * ([${e.c}] - 1)`;}
-function buildGeneric(C){const m=IMWriter(G.title+'（CLDから作ったSDモデル）',G.T,0.25,'Days');const P=G.pos;const X=p=>Math.round((p[0]-60)*1.5+260),Y=p=>Math.round((p[1]-20)*1.5+120);
+function buildGeneric(C){if(C.V.some(v=>!G.pos[v]))layoutMissing(C.V);const m=IMWriter(G.title+'（CLDから作ったSDモデル）',G.T,0.25,'Days');const P=G.pos;const X=p=>Math.round((p[0]-60)*1.5+260),Y=p=>Math.round((p[1]-20)*1.5+120);
   m.txt(G.title+'：CLDから作ったSDモデル（どの変数も基準値＝1）',20,0,700);
   m.v('効き方',G.elas,20,80,'原因が基準から1ずれたとき，結果がどれだけずれるか（すべての矢印に共通の倍率）',[0,2,0.1]);
   m.v('ショックの大きさ',G.shockSize/100,20,160,'10日目に「'+(G.shock||'')+'」をどれだけ変えるか（0.2＝20％増）',[-0.5,0.5,0.05]);
@@ -2147,8 +2147,9 @@ function dpSaveSeries(){const R=DP.res;if(!R||R.t.length<3||!DP.vals.length){lab
   const r=serSave();DP.msg=(r.ok?`<span class="pos">${names.length}つの系列を保存した</span>：${names.map(esc).join('，')}`:`<span class="warn">${r.msg}</span>`);
   // まだ割り当てがなければ，名前から割り当てる
   if(!BIND.dem)dpAutoBind(names);render();}
-function dpAutoBind(names){names=names||Object.keys(SER);const g=SCMIO.guessMapping(names.map(n=>n.split('：').pop()),DFIELDS.slice(1));let k=0;
-  Object.entries(g).forEach(([f,col])=>{const nm=names.find(n=>n.split('：').pop()===col);if(nm&&(!BIND[f]||!SER[BIND[f].s])){BIND[f]={s:nm,conv:'auto'};k++;}});bindSave();return k;}
+function dpAutoBind(names){names=names||Object.keys(SER);const nz=x=>String(x||'').toLowerCase().replace(/[\s_\-・()（）［］\[\]／/.]/g,'');const used=new Set(Object.values(BIND).filter(x=>x&&x.s).map(x=>x.s));let k=0;
+  ['bo','inv','setup','down','plan','prod','dem'].forEach(f=>{if(BIND[f]&&SER[BIND[f].s])return;const F=DFIELDS.find(x=>x.key===f);const al=[F.label].concat(F.aliases).map(nz).filter(a=>a.length>=2).sort((x,y)=>y.length-x.length);
+    const nm=names.find(n=>{if(used.has(n))return false;const c=nz(String(n).split('：').pop().replace(/[（(][^）)]*[）)]\s*$/,''));if(f==='dem'&&/残/.test(c))return false;return al.some(a=>c.includes(a));});if(nm){BIND[f]={s:nm,conv:'auto'};used.add(nm);k++;}});bindSave();return k;}
 // ---- ④のデータセットを作る
 function convMode(f,S,mode){const rate=(BFIELDS.find(b=>b[0]===f)||[])[2]==='rate';if(mode==='raw'||mode==='perday')return mode;if(!rate||S.perDay||S.period==='day')return 'raw';return S.agg==='sum'?'perday':'raw';}
 function fillGaps(a){const v=a.slice();const idx=v.map((x,i)=>x!=null&&isFinite(x)?i:-1).filter(i=>i>=0);if(!idx.length)return v;let n=0;
