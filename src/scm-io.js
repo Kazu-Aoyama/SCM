@@ -3,7 +3,7 @@
  * ・CSV の読み込み（UTF-8／Shift_JIS 自動判定）・書き出し
  * ・ツール間の受け渡し（同じブラウザ内：localStorage／開いたウィンドウ：postMessage）
  * データは端末の外へ一切送らない。
- * このファイルは src/scm-io.js が原本。build.py が各ツールの <!-- SCMIO:BEGIN --> 〜 <!-- SCMIO:END --> に埋め込む。
+ * このファイルは src/scm-io.js が原本。build.py が各ツールの SCMIO の目印のあいだに埋め込む（ツール側で直接直さない）。
  */
 (function (root) {
   'use strict';
@@ -300,9 +300,11 @@
     try { if (window.opener && window.opener !== window) window.opener.postMessage({ scmReady: tool }, '*'); } catch (e) { }
   }
   function toolHref(tool) {
-    // 1) 同じフォルダにある，いまの版のファイル名  2) このブラウザで最後に開いた場所
-    var here = location.href.split('#')[0].split('?')[0];
-    if (TOOL_FILES[tool]) return here.replace(/[^\/]*$/, '') + encodeURIComponent(TOOL_FILES[tool]);
+    // TOOL_FILES は tools/ フォルダから見た相対パス（索引だけは ../）。いまのページの場所から解決する
+    var here = location.href.split('#')[0].split('?')[0], file = decodeURIComponent(here.replace(/^.*\//, ''));
+    var base = here;
+    if (TOOL_FILES.index && TOOL_FILES.index.replace(/^\.\.\//, '') === file && TOOL_FILES.index.indexOf('../') === 0) base = here.replace(/[^\/]*$/, '') + 'tools/x';
+    if (TOOL_FILES[tool]) { try { return new URL(TOOL_FILES[tool].split('/').map(encodeURIComponent).join('/').replace(/^\.\./, '..'), base).href; } catch (e) { } }
     try { var reg = JSON.parse(localStorage.getItem('scm.tools') || '{}'); if (reg[tool]) return reg[tool].href; } catch (e) { }
     return null;
   }
