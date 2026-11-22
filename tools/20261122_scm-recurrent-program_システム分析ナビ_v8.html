@@ -154,7 +154,32 @@ details summary{cursor:pointer;color:#5F6E76;margin-top:10px}
 #svstBar{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin:2px 0 4px;font-size:12.5px}#svstBar .svl{color:#5F6E76}#svstBar button{border:1px solid #9AA8AF;background:#fff;border-radius:12px;padding:1px 9px;cursor:pointer;font-size:12px}#svstBar button.on{background:#0F7C8C;color:#fff;border-color:#0F7C8C}#svstBar button.big{border-color:#E8A33D;color:#B7791F}#svstBar .svd{flex-basis:100%;color:#5F6E76;font-size:12px}
 #svstOv{position:fixed;inset:0;background:rgba(20,30,35,.45);display:none;align-items:center;justify-content:center;z-index:60}#svstOv .box{background:#fff;border-radius:12px;width:96vw;height:92vh;display:flex;flex-direction:column;overflow:hidden}#svstOv .hd{display:flex;gap:6px;align-items:center;padding:8px 12px;background:#1B3A4B;color:#fff}#svstOv .hd button{border:1px solid #9AA8AF;background:#fff;border-radius:12px;padding:2px 10px;cursor:pointer}#svstOv .hd button.on{background:#E8A33D;border-color:#E8A33D;color:#fff}#svstOv .sp{flex:1}#svstOv .bd{flex:1;display:flex;min-height:0}#svstOv svg{flex:1;min-width:0;height:100%}#svstOv .side{width:340px;overflow:auto;padding:8px 12px;border-left:1px solid #E3E9EC;font-size:12.5px}#svstOv .side table{border-collapse:collapse;width:100%}#svstOv .side td{border-bottom:1px solid #EEF2F4;padding:3px 4px;vertical-align:top}#svstOv .inf{background:#FFF8E6;border:1px solid #F0D9A6;border-radius:8px;padding:6px 8px;margin-bottom:8px;line-height:1.6}#svstOv h4{margin:10px 0 4px;color:#1B3A4B}
 
-#bEdit,#bOpen,#bSave{display:none!important}.navisub{font-size:12px;font-weight:normal;margin-left:10px;color:#C9D7DE}.nextt{font-size:12px;color:#DCE7EC;margin-right:8px}.nextt b{color:#fff}
+
+header .go{background:#0F7C8C;border-color:#0F7C8C;font-weight:bold}
+#exSel{max-width:330px}#editor h2{font-size:17px;margin:0 0 6px;color:var(--navy)}#editor h2 small{font-size:12px;font-weight:normal;color:#5F6E76;margin-left:6px}#editor .ed>.row:last-child{position:sticky;bottom:-14px;background:#fff;padding:6px 0;margin-bottom:-6px;border-top:1px solid var(--line)}.stepbar{position:sticky;top:0;z-index:15}
+#todo{font-size:13px;color:#7A4F0E;margin-top:4px;line-height:1.6}#todo:empty{display:none}#todo button{font-size:12px;padding:2px 8px;margin-left:4px}
+#eLint{margin-top:8px;font-size:12.5px;max-height:190px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:#FAFBFB;line-height:1.55}
+#eLint .li{cursor:pointer;padding:2px 4px;border-radius:4px}#eLint .li:hover{background:#EEF5F6}
+#eLint .err b.lv{color:#C8553D}#eLint .warn b.lv{color:#B7791F}#eLint .info b.lv{color:#5F6E76}#eLint b.lv{display:inline-block;min-width:4.5em}
+#eLint code,#help code{background:#EEF2F4;border-radius:4px;padding:0 4px;font-size:12px;word-break:break-all}
+@keyframes jmp{0%{box-shadow:0 0 0 3px #F2B33D}100%{box-shadow:0 0 0 0 transparent}}textarea.jump{animation:jmp 1.2s}
+.ovl{position:fixed;inset:0;background:rgba(20,35,45,.55);z-index:70;display:flex;align-items:center;justify-content:center}
+.ovbox{background:#fff;border-radius:12px;padding:16px 20px;max-height:90vh;overflow:auto;line-height:1.6;max-width:96vw}
+.xs{border:1px solid var(--line);border-radius:8px;padding:8px;margin:6px 0}.xs pre{background:#F6F8F9;font-size:12px;padding:6px;border-radius:6px;max-height:170px;overflow:auto;white-space:pre-wrap;margin:4px 0}
+.xmap{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12.5px;margin:4px 0}.xmap select{font-size:12px;max-width:150px}
+@media (max-width:700px){
+ header{padding:6px 8px;gap:5px}header h1{font-size:15px;margin-right:2px}header h1 small{display:none}
+ header button,header select{padding:4px 7px;font-size:12px}#exSel{max-width:100%;flex:1 1 100%}header .sp{display:none}
+ .stepbar{padding:6px 8px;position:sticky;top:0;z-index:15}
+ #steps{flex-wrap:wrap;gap:4px}#steps button{font-size:12.5px;padding:4px 7px;white-space:nowrap}#steps .sp{display:none}#steps #next{margin-left:auto}
+ #stepTxt{font-size:13px}#grid{padding:6px;gap:6px}.panel svg{height:280px}
+ .cols{grid-template-columns:1fr}.cols textarea{height:140px}
+ #editor .ed{padding:10px 12px;width:100vw;max-height:100vh;border-radius:0}
+ .hybody,.zbody{flex-direction:column;overflow:auto}.hyright,.zright{min-width:0;max-width:none;border-left:none;min-height:60vh}.hyleft{min-height:440px}.hyhead{flex-wrap:wrap}
+ #zSplit{display:none}.zbox.large,.zbox.mid{min-width:0;width:96vw}.zbox.full{inset:4px}.hybox{inset:4px}
+ #info{margin:0 6px 10px}#help .box{padding:12px 14px}
+}
+.navisub{font-size:12px;font-weight:normal;margin-left:10px;color:#C9D7DE}.nextt{font-size:12px;color:#DCE7EC;margin-right:8px}.nextt b{color:#fff}
 </style><!-- SCMIO:BEGIN -->
 <script>
 /* SCMIO — SCMリカレント教育ツール共通の入出力モジュール
@@ -527,9 +552,9 @@ details summary{cursor:pointer;color:#5F6E76;margin-top:10px}
 </head><body>
 <header><h1>システム分析ナビ<small class="navisub">SVN・認知マップ・CLDをたどる</small></h1>
 <select id="exSel"></select>
-<button id="bEdit">自分の問題を書く</button><button id="bOpen">開く</button><button id="bSave">保存</button><input type="file" id="fOpen" accept=".json" style="display:none"><button id="bDxOut" title="SVN・人の話・CLDをdraw.ioのファイルにする">draw.io に書き出す</button><button id="bDxIn" title="draw.io で描いた・直した図（.drawio）を読み込む。ファイルを画面に落としてもよい">draw.io から読み込む</button><input type="file" id="fDx" accept=".drawio,.xml,.svg" style="display:none">
-<span class="sp"></span><span class="nextt" title="自分で描く・分析するときはワークベンチ，SDにして動かすときはラボ（どちらも別のファイル）">次へ：<b>ワークベンチ</b>（描く）／<b>ラボ</b>（SDで動かす）</span><button id="bHelp">使い方</button></header>
-<div class="stepbar"><div id="steps"></div><div id="stepTxt"></div></div>
+<button id="bEdit" title="自分の問題（部門のあいだの流れ・聞き取りの話）を文で書く。Excel の表を貼り付けてもよい">自分の問題を書く</button><button id="bOpen" title="保存したファイル（.json）・Excel（.xlsx）・CSV・ほかのツールから届いた .scm.json・draw.io を開く。ファイルを画面に落としてもよい">開く</button><button id="bSave" title="いまの問題を .json に保存する（このナビとワークベンチで開ける）">保存</button><input type="file" id="fOpen" accept=".json,.scm.json,.xlsx,.xlsm,.csv,.tsv,.drawio,.xml,.svg" style="display:none"><button id="bDxOut" title="SVN・人の話・CLDをdraw.ioのファイルにする">draw.io に書き出す</button><button id="bDxIn" title="draw.io で描いた・直した図（.drawio）を読み込む。ファイルを画面に落としてもよい">draw.io から読み込む</button><input type="file" id="fDx" accept=".drawio,.xml,.svg" style="display:none">
+<span class="sp"></span><button id="bToWb" class="go" title="いまの問題（SVN・人の話・言葉・補う矢印）をシステム分析ワークベンチに渡して開く">ワークベンチで描く ▶</button><button id="bToLab" class="go" title="いまの CLD（補う矢印を含む・言葉をそろえた後）をシステム分析ラボに渡して開く">ラボで動かす ▶</button><button id="bHelp">使い方</button></header>
+<div class="stepbar"><div id="steps"></div><div id="stepTxt"></div><div id="todo"></div></div>
 <div id="grid">
 <section class="panel" id="pSvn"><h2>SVN<small>誰が誰に何を渡すか</small><button class="zbtn" data-z="svn" title="拡大ツールで開く">⤢ 拡大</button></h2><svg id="svSvn"></svg>
 <div class="leg"><span><i style="background:#1F6FB2"></i>製品</span><span><i style="background:#55656F"></i>情報</span><span><i style="background:#2E8B57"></i>お金</span><span><i style="background:#7B3FA0"></i>方針</span><span>💬 話し手</span></div></section>
@@ -538,27 +563,38 @@ details summary{cursor:pointer;color:#5F6E76;margin-top:10px}
 </div>
 <div id="info"></div>
 <div id="editor"><div class="ed">
-<h2>自分の問題を書く <small>1行に1つ。書いたら「図にする」</small></h2>
+<h2>自分の問題を書く <small>1行に1つ。書いたら「図にする」。Excel でコピーした表を欄に貼り付けると，文に直して入る</small></h2>
+<div class="row" style="margin-top:0"><label class="hint" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">問題の名前 <input id="eTitle" style="width:min(420px,70vw);font-size:13px;padding:3px 6px"></label></div>
 <div class="cols">
-<label>① SVN：誰が誰に何を渡すか<textarea id="eSvn" placeholder="店舗 → 本部：発注（情報）"></textarea><span class="hint">形：送り手 → 受け手：中身（製品／情報／お金／方針）</span></label>
-<label>② 人の話（認知マップ）<textarea id="eDocs" placeholder="## 店長の話 @店舗&#10;話の文章…&#10;欠品 → 発注量 +"></textarea><span class="hint">「## 話の名前 @話し手」で始め，文章と矢印「原因 → 結果 +／−」（遅れは最後に ‖）を書く</span></label>
-<label>③ 同じもの（言葉をそろえる）<textarea id="eSame" placeholder="店からの発注 = 発注量"></textarea><span class="hint">形：別の言い方 = そろえる名前</span></label>
-<label>④ 補う矢印（誰も書いていない矢印）<textarea id="eBridge" placeholder="配送の遅れ → 欠品 + @ 物流センター → 店舗：配送"></textarea><span class="hint">形：原因 → 結果 +／− @ 乗っているSVNの流れ（立場の中の因果なら @ は不要）</span></label>
-</div><div class="row"><button id="bApply" class="primary">図にする</button><span id="eMsg" class="hint"></span><span class="sp"></span><button onclick="document.getElementById('editor').classList.remove('open')">閉じる</button></div></div></div>
+<label>① SVN：誰が誰に何を渡すか<textarea id="eSvn" data-box="svn" spellcheck="false" placeholder="店舗 → 本部：発注（情報）"></textarea><span class="hint">形：送り手 → 受け手：中身（製品／情報／お金／方針／欠落）。種類を省くと情報</span></label>
+<label>② 人の話（認知マップ）<textarea id="eDocs" data-box="docs" spellcheck="false" placeholder="## 店長の話 @店舗&#10;話の文章…&#10;欠品 → 発注量 +"></textarea><span class="hint">「## 話の名前 @話し手」で始め，文章と矢印「原因 → 結果 +」を書く。極性は ＋／−（s／o，同／逆でも可），分からなければ ?，遅れは最後に ‖</span></label>
+<label>③ 同じもの（言葉をそろえる）<textarea id="eSame" data-box="same" spellcheck="false" placeholder="店からの発注 = 発注量"></textarea><span class="hint">形：別の言い方 = そろえる名前</span></label>
+<label>④ 補う矢印（誰も書いていない矢印）<textarea id="eBridge" data-box="bridge" spellcheck="false" placeholder="配送の遅れ → 欠品 + @ 物流センター → 店舗：配送"></textarea><span class="hint">形：原因 → 結果 + @ 乗っているSVNの流れ（立場の中の因果なら @ は不要）。話の矢印を CLD から外すときは「原因 → 結果 ×」</span></label>
+</div>
+<div id="eLint"></div>
+<div class="row" style="flex-wrap:wrap"><button id="bApply" class="primary">図にする</button><button id="bXlIn" title="Excel（.xlsx）・CSV の表（SVNの流れ・人の話・言葉・補う矢印）を読んで文に直す">Excel・CSV を読む</button><button id="bXlTpl" title="列の名前・記入例・説明の入った Excel を保存する">テンプレート（Excel）を保存</button><button id="bXlOut" title="いまの問題を，テンプレートと同じ形の Excel にする">Excel に書き出す</button><input type="file" id="fXl" accept=".xlsx,.xlsm,.csv,.tsv,.txt" style="display:none"><span id="eMsg" class="hint"></span><span class="sp"></span><button id="eClose">閉じる</button></div></div></div>
 <div id="help"><div class="box"><h2>使い方</h2>
 <p>この道具は，3つの図のつながりを見るためのものです。</p>
 <ul><li><b>SVN</b>：利害関係者（立場）を箱，価値の流れ（製品・情報・お金・方針）を矢印で描く。会社全体の「つながり」の地図。</li>
 <li><b>認知マップ</b>：1人（1つの資料）が考えている「何が何に効くか」を矢印で描く。部分的で，たいていループにならない。</li>
 <li><b>CLD（因果ループ図）</b>：認知マップを重ね，誰も書いていない部門のあいだの矢印を<b>SVNの流れに乗せて</b>補う。するとループが現れる。</li></ul>
 <p>上の①〜⑤を順に進みます（「次へ」）。図の立場・流れ・変数・矢印・ループは，どれもクリックすると，ほかの図の関係するものが光ります。箱や変数はドラッグで動かせます。</p>
-<p>作業（どこまで進めたか，配置）はブラウザに自動で残ります。<b>自分の問題を描く・保存する</b>ときは，システム分析ワークベンチを使います。</p>
+<p>作業（どこまで進めたか，配置，⑦の議論）はブラウザに自動で残ります。</p>
+<h3 style="margin:10px 0 2px;font-size:15px;color:#17384A">自分の問題を書く</h3>
+<p>例題の一覧の「＋ 白紙から書く」か「自分の問題を書く」で，<b>自分の職場の問題</b>を4つの欄に1行ずつ書き，「図にする」を押す。例題を直して「図にする」と，それが自分の問題になる。自分の問題は例題とは別にブラウザに残り，例題に切り替えても消えない（一覧の 📥 で戻せる。別の問題で置き換えるときは確かめる）。ファイルに残すときは「保存」（.json）か「Excel に書き出す」。</p>
+<ul class="rules"><li>① SVN：<code>送り手 → 受け手：中身（製品／情報／お金／方針／欠落）</code>（種類を省くと情報）</li>
+<li>② 人の話：<code>## 話の名前 @話し手</code> の下に，聞き取りの文章と矢印 <code>原因 → 結果 +</code>。極性は ＋／−（s／o，同／逆，ー でもよい），<b>分からなければ ?</b>（図では灰色の ?。分かったら直す），遅れは最後に ‖</li>
+<li>③ 同じもの：<code>別の言い方 = そろえる名前</code>　④ 補う矢印：<code>原因 → 結果 + @ 送り手 → 受け手：中身</code>。話の矢印を CLD から外すときは <code>原因 → 結果 ×</code></li></ul>
+<p>欄の下の<b>書き方の確認</b>に，読めなかった行（SVN にならない行，極性のない矢印，SVN にない流れ，SVN にいない話し手など）が出る。クリックするとその行へ移る。</p>
+<p><b>Excel から</b>：部門のあいだの流れや聞き取りのメモが Excel にあるときは，「テンプレート（Excel）を保存」で列の形を見て，「開く」（またはファイルを画面に落とす）か「Excel・CSV を読む」で読み込む。シートは1行目の列の名前（SVN：送り手・受け手・種類・中身，人の話：資料・話し手・原因・結果・極性・遅れ・理由，言葉：別の言い方・そろえる名前，補う矢印：原因・結果・極性・流れ）で見分け，読み込む前に列の対応を直せる。Excel で範囲をコピーして欄に貼り付けても文に直る。読み込んだ中身は文として欄に入るので，そのまま確かめて直せる。ファイルの中身はブラウザの中だけで読み，外へは送らない。</p>
+<p><b>次へ</b>：書いた問題は「ワークベンチで描く ▶」でシステム分析ワークベンチに渡して，マトリクス・関与度・仮説の検証・データとの照合に進める。「ラボで動かす ▶」は，いまの CLD（補う矢印を含む，言葉をそろえた後）をシステム分析ラボに渡して SD にする。相手が開けないときは受け渡しのファイル（.scm.json）が保存されるので，相手の「開く」で読み込む。</p>
 <p><b>例題</b>：一覧の一番上の「ブルーマウンテン社（演習の簡略版）」が演習（P2・P3）で使う例題で，最初に開きます。「スーパーの欠品」は仕組みをつかむための小さな練習，「地域の路線バス」は自分の職場に当てはめる練習（G 一般化），「システム原型」の4つは，よく出てくるループの形（問題のすり替わり・うまくいかない解決策・エスカレーション・共有地の悲劇）です。</p>
 <p><b>次は SD へ</b>：ループが見えたら，どの変数が「たまるもの（在庫・人数・赤字の累計）」で，どれが「流れ（1日あたりの補充・採用・離職）」かを考えると，SD（シミュレーションできるモデル）に進めます。‖ の付いた矢印（遅れ）は，SDでは時間のかかる流れになります。</p>
 <p><b>⑥ 変換の解説</b>：①〜⑤の右の「⑥ 変換の解説」を押すと，SVN → 認知マップ → CLD → SVN-2 の3つの変換だけを見る画面が開く。上の段階バーか右上の3つのボタンで変換を選び，図の上で再生・変換カード・「その人の目」を使う。</p>
 <p><b>拡大ツール</b>：各図の「⤢ 拡大」か，図の余白（何も選んでいないとき）をクリックすると開く。SVN では<b>立場の視点</b>（届いている情報・判断に必要な情報）・<b>上流へたどる</b>・流れとCLD，認知マップでは<b>話と矢印</b>・<b>見えている範囲・近道</b>，CLD では<b>ループと出どころ</b>・<b>影響の予測</b>（変数を↑↓にしたときの伝わり方。矢印をクリックで外すと「能力に余裕がない」場合も試せる）を使える。図はホイールで拡大・縮小，余白のドラッグで移動する。立場・変数（ノード）と，流れの名前・矢印の極性の印（リンクのラベル）はドラッグで置き直せる（「配置を戻す」で元に戻る）。図の上の「この CLD（SVN・話）を draw.io に書き出す」で，いま表示している図だけを配置ごと .drawio にできる。ホイールの速さは右上の「ホイール：止める／弱／中／強」で選ぶ（トラックパッドで効きすぎるときは「弱」，ボタンの ＋／− だけで操作するときは「止める」）。上の「情報の変換」ボタンで，SVN → 認知マップ → CLD → 認知マップ・SVN の各段階で何が付け加わり，何が失われ，何が分かるかを見られる。</p>
 <p><b>⑦ 原因の仮説</b>：SVNを顧客から上流へたどって原因の仮説を導き（ブルーマウンテン社では原先生のH1〜H6と追加のH8・H9），CLDの上の経路で確かめる。予測表で「どの観測で仮説が見分けられるか」を調べ，一次判定・確信度・影響・手間から確かめる順を議論して，Markdownに保存する。</p>
-<p><b>draw.io</b>：「draw.io に書き出す」でSVN・人の話・CLDを1つのファイル（ページ別）にする。draw.io（app.diagrams.net）で清書して，説明や提案の資料に使う。<b>「draw.io から読み込む」</b>（またはファイルを画面に落とす）で，draw.io で直した図や自分で描いた図をナビに戻せる。ページの名前で中身を見分ける：「SVN」で始まるページ → SVN（矢印のラベルは「中身（製品／情報／お金／方針）」），「話：名前 @話し手」→ 人の話，それ以外 → CLD（矢印のラベルは ＋／−，遅れは ‖，点線は補う矢印）。読み込む前に，中身と「新しい問題として開く／いまの図に入れる」を選ぶ。</p>
-<p class="hint">このナビは例題を読んでつながりをつかむためのもの。<b>システム分析ワークベンチ</b>では，SVN・認知マップ・CLDを自分で描き，資料ごとの認知マップの統合，マトリクス・関与度，仮説の検証（予測の固定），データとの照合ができる（詳細版のブルーマウンテン社 SVN-0／1／2 もワークベンチの例題）。CLDをSDにして動かすのは<b>システム分析ラボ</b>。</p>
+<p><b>draw.io</b>：「draw.io に書き出す」でSVN・人の話・CLDを1つのファイル（ページ別）にする。draw.io（app.diagrams.net）で清書して，説明や提案の資料に使う。<b>「draw.io から読み込む」</b>（またはファイルを画面に落とす）で，draw.io で直した図や自分で描いた図をナビに戻せる。ページの名前で中身を見分ける：「SVN」で始まるページ → SVN（矢印のラベルは「中身（製品／情報／お金／方針）」），「話：名前 @話し手」→ 人の話，それ以外は中身で見分ける：ラベルが ＋／−（s／o）の図 → CLD（遅れは ‖，点線は補う矢印，× は外す矢印），ラベルのない矢印で箱をつないだ図・ラベルが言葉の図 → SVN。スイムレーンの中の矢印は，そのレーン（部門）の人の話になる。読み込む前に，ページごとに「SVN／CLD／人の話／読まない」を選び直せる。書き出したファイルには「ナビの情報」のページ（題名・解説・⑦の議論）が入り，読み戻すと元どおりになる。</p>
+<p class="hint">このナビは，例題や自分の問題で3つの図のつながりをつかむ入口。<b>システム分析ワークベンチ</b>では，SVN・認知マップ・CLDを自分で描き，資料ごとの認知マップの統合，マトリクス・関与度，仮説の検証（予測の固定），データとの照合ができる（詳細版のブルーマウンテン社 SVN-0／1／2 もワークベンチの例題）。CLDをSDにして動かすのは<b>システム分析ラボ</b>。</p>
 
 <button id="hClose">閉じる</button></div></div>
 
@@ -767,7 +803,6 @@ B課の利用 → 全体の利用 + @ 開発B課 → 設備管理：予約
 pos:{svn:{},cld:{}}},
 {id:'blank',grp:'自分の問題',title:'白紙（自分の問題）',svn:'',docs:'',same:'',bridge:'',pos:{svn:{},cld:{}}}];
 
-EXAMPLES.splice(EXAMPLES.findIndex(e=>e.id==='blank'),1);
 
 const BMDATA={"mon":["2023-01","2023-02","2023-03","2023-04","2023-05","2023-06","2023-07","2023-08","2023-09","2023-10","2023-11","2023-12","2024-01","2024-02","2024-03","2024-04","2024-05","2024-06","2024-07","2024-08","2024-09","2024-10","2024-11","2024-12","2025-01","2025-02","2025-03","2025-04","2025-05","2025-06","2025-07","2025-08","2025-09","2025-10","2025-11","2025-12"],"lines":{"LINE-1":{"inv":[71822,71329,64626,59710,50706,45724,46630,47317,44241,45529,43461,42480,43050,46894,36876,43238,43139,46474,42695,41224,43395,44990,42827,44763,47016,47724,46209,45269,41235,36558,39090,43375,44051,42432,46670,46009],"oo":[6824,4336,7151,7875,10787,11392,10908,8714,9027,8484,9471,8034,8002,5784,11592,11431,10388,9781,11443,10586,9802,9712,11064,9414,8489,8058,8936,8569,11662,13862,12759,11753,10521,10855,8601,9630],"bo":[0,1,5,1,283,231,128,15,0,365,690,188,0,36,126,159,250,35,99,141,142,86,245,88,0,19,0,75,57,384,658,411,0,17,2,17],"out":[1499,812,1466,1600,1872,2226,1868,1693,1513,1405,1860,1285,1555,1187,2198,2082,2147,1728,2099,2033,1691,1822,1977,1671,1414,1614,1656,1619,2266,2551,2568,1943,1934,2093,1687,1862],"setup":[1.65,1.99,1.64,1.56,1.62,1.87,1.72,1.71,1.61,1.88,1.73,1.65,1.59,1.81,1.83,1.93,1.76,1.86,1.57,1.88,1.81,1.89,1.76,1.87,1.82,1.61,1.8,1.84,1.76,1.49,1.53,1.61,1.78,1.66,1.76,1.75],"util":[87.9,84.8,87.0,87.3,86.1,85.6,87.2,87.3,85.8,86.3,86.3,87.7,88.6,86.2,86.4,85.0,87.4,86.1,88.8,85.4,85.7,86.5,85.8,86.3,84.2,88.3,86.6,86.7,85.6,87.4,89.0,88.0,87.1,86.9,85.9,87.4],"wd":[4.6,5.3,4.9,4.9,5.8,5.1,5.8,5.1,6.0,6.0,5.1,6.3,5.1,4.9,5.3,5.5,4.8,5.7,5.5,5.2,5.8,5.3,5.6,5.6,6.0,5.0,5.4,5.3,5.1,5.4,5.0,6.1,5.4,5.2,5.1,5.2]},"LINE-2":{"inv":[42288,44929,44913,42178,39739,34946,34733,35883,36194,39586,35945,36663,39037,38219,32118,37999,38932,38585,38792,37903,41533,41317,37306,38052,42219,38057,35658,38775,35069,31846,29349,34192,37844,35580,34987,39314],"oo":[6080,7445,6606,7241,7698,9813,9777,6988,9426,7073,6620,8668,6128,5839,9516,9453,7708,9422,8821,9181,7788,6731,7963,9755,5464,6050,9055,9279,9263,10064,11451,9222,9004,8792,8269,8643],"bo":[32,9,36,17,129,2268,908,44,153,15,68,301,0,3,664,317,41,65,22,161,394,41,16,290,2,1,54,166,311,850,1789,253,69,102,107,50],"out":[1012,1043,1057,1076,1096,1634,1423,1144,1329,1028,1069,1200,964,959,1454,1386,1229,1424,1298,1485,1159,1052,1291,1353,870,914,1403,1333,1364,1531,1695,1364,1307,1501,1144,1279],"setup":[1.84,1.92,1.81,1.66,1.61,1.76,1.86,1.72,1.63,1.5,1.71,1.83,1.42,1.55,1.68,1.94,1.89,1.84,1.69,1.86,1.57,1.83,1.66,1.75,1.58,1.6,1.79,1.59,1.65,1.69,1.6,1.68,1.78,1.97,1.44,1.81],"util":[84.2,86.0,83.8,85.2,86.9,87.3,84.0,86.8,86.3,88.5,86.6,86.3,86.7,86.8,86.2,85.4,83.0,86.2,85.4,85.5,88.5,85.3,85.6,85.7,87.1,88.4,86.6,88.5,86.8,83.5,87.7,85.5,85.9,83.9,89.2,87.0],"wd":[6.0,7.1,6.2,6.7,7.0,6.0,6.9,6.1,7.1,6.9,6.2,7.2,6.4,6.1,6.5,6.8,6.3,6.6,6.8,6.2,6.7,6.4,6.2,7.2,6.3,6.6,6.5,7.0,6.8,6.6,6.8,6.8,6.9,5.9,7.2,6.8]},"LINE-3":{"inv":[67122,74917,69672,63394,61592,55707,42306,41205,40798,44886,49744,53282,59590,60505,48447,44080,39333,36963,35287,36284,35708,40915,47987,47857,58710,69236,66521,60568,53349,34341,26238,27623,23703,17148,17841,17367],"oo":[8152,6850,7037,9516,9772,9576,10186,9601,10279,10677,10118,9797,8089,8247,9026,9978,10349,9887,10197,10367,9955,9927,9535,9700,9486,9741,8059,9226,10724,10000,10040,9309,9787,10061,8980,10105],"bo":[138,4,5,348,110,1375,4490,5340,5584,1352,498,45,10,4,1059,3203,4933,13399,14121,13144,11658,7602,1883,2185,89,91,14,177,2061,14757,29622,33105,34815,42060,49073,46355],"out":[1972,1691,1891,2258,2316,2329,2230,2328,2229,2355,2327,2102,1879,1836,2307,2325,2337,2264,2345,2301,2213,2431,2243,2274,2320,2145,1985,2299,2306,2304,2313,2292,2396,2369,2263,2416],"setup":[1.75,1.75,1.75,1.77,1.55,1.83,1.71,1.68,1.71,1.53,1.81,1.79,1.79,1.68,1.5,1.77,1.72,1.56,1.72,1.56,1.75,1.66,1.9,1.69,1.73,1.56,1.48,1.82,1.79,1.77,1.85,1.76,1.58,1.63,1.62,1.74],"util":[83.6,87.3,81.9,86.0,86.4,84.8,83.9,84.4,82.8,87.0,84.7,82.5,83.5,86.0,86.8,84.7,84.7,85.7,85.0,84.9,82.2,88.1,83.3,84.0,84.1,85.1,84.9,83.7,85.2,85.5,83.8,86.3,87.3,85.8,85.7,87.5],"wd":[4.1,4.1,3.7,4.2,4.2,4.1,4.6,4.1,4.6,4.5,4.3,4.7,4.3,4.5,3.9,4.3,4.4,4.4,4.3,4.5,4.5,4.1,4.3,4.3,4.1,4.5,4.1,4.0,4.6,4.3,4.3,4.1,4.1,4.2,4.0,4.2]},"LINE-4":{"inv":[16356,17866,15933,16695,15360,13612,14378,13779,15009,14825,13714,14281,15257,14038,12455,14367,14830,13536,13782,14135,14367,15205,13338,14152,14643,13824,14304,13902,13195,12373,12259,12015,13586,12518,14044,12376],"oo":[2334,1856,2983,1984,2548,4471,2698,3844,2425,1786,3027,2958,2076,1910,4043,2742,3420,3527,3941,2275,2950,2113,3374,2863,2430,2743,3126,3032,3436,3899,3807,4153,3221,3480,2755,3669],"bo":[0,0,0,0,17,96,198,8,12,0,17,0,0,4,66,0,13,0,19,0,0,0,0,2,0,1,0,0,1,18,70,4,16,9,0,0],"out":[552,383,537,519,558,931,602,692,531,469,682,531,405,535,676,641,684,689,833,591,621,498,689,536,554,533,627,687,771,935,757,817,705,773,527,649],"setup":[1.63,1.59,1.42,1.72,1.6,1.69,2.04,1.65,1.7,1.61,1.56,1.79,1.8,1.68,1.79,1.54,1.56,1.75,1.89,1.86,1.67,1.66,1.73,1.68,1.71,1.65,1.66,1.75,1.79,1.64,1.58,1.48,1.57,1.68,1.96,1.73],"util":[86.7,86.9,89.8,84.2,87.6,86.0,84.8,88.1,86.6,88.3,88.8,86.7,85.7,86.7,84.4,87.2,88.8,84.5,82.1,86.4,87.7,88.1,83.0,87.7,86.1,88.0,86.2,87.4,86.9,87.9,88.6,88.5,88.0,84.5,85.3,86.7],"wd":[4.2,4.8,5.6,3.8,4.6,4.8,4.5,5.6,4.6,3.8,4.4,5.6,5.1,3.6,6.0,4.3,5.0,5.1,4.7,3.8,4.8,4.2,4.9,5.3,4.4,5.1,5.0,4.4,4.5,4.2,5.0,5.1,4.6,4.5,5.2,5.7]},"LINE-5":{"inv":[207605,206244,181557,178842,164628,142330,140846,142625,144502,148761,147456,142369,148238,151388,128153,134214,146539,132439,138001,124402,114488,133341,137580,140036,139768,132274,128805,128461,123521,94041,89565,111581,120983,111822,127184,131433],"oo":[23825,15309,27008,19679,25770,33205,32285,34198,25723,23146,24804,26905,17112,17888,25448,33082,29046,33146,27825,28667,28546,27172,26906,22249,23738,23130,29826,33808,26460,34071,35360,34820,31219,35329,30004,22736],"bo":[0,0,0,389,8,1321,1042,1459,30,76,78,452,18,52,372,540,57,169,26,1508,6682,78,55,21,5,72,17,56,710,7757,2782,503,70,1217,618,12],"out":[3529,3235,3939,3065,4440,5477,4972,5634,4379,3175,4493,3712,3020,3338,4077,5429,4919,5576,4938,4207,5098,4458,4210,3494,3934,4095,4424,5320,4655,5619,5896,5527,4992,5694,4400,3557],"setup":[1.61,1.69,1.65,1.76,1.47,1.81,1.66,1.66,1.62,1.7,1.65,1.68,1.51,1.84,1.9,1.66,1.79,1.81,1.69,1.75,1.64,1.84,1.74,1.78,1.74,1.7,1.55,1.57,1.92,1.85,1.55,1.71,1.74,1.51,1.82,1.85],"util":[88.2,86.3,88.1,84.4,87.9,85.4,87.7,87.2,88.1,86.5,88.1,86.1,89.2,86.7,84.5,88.0,85.5,85.8,86.5,87.2,87.9,86.8,86.7,85.5,86.1,86.7,87.2,88.7,85.4,84.0,86.0,85.6,86.7,87.2,84.7,85.9],"wd":[6.8,4.7,6.9,6.4,5.8,6.1,6.5,6.1,5.9,7.3,5.5,7.2,5.7,5.4,6.2,6.1,5.9,5.9,5.6,6.8,5.6,6.1,6.4,6.4,6.0,5.6,6.7,6.4,5.7,6.1,6.0,6.3,6.3,6.2,6.8,6.4]}},"spr":[117.8,115.5,125.0,109.5,114.8,104.7,106.6,98.5,111.1,104.8,110.4,112.8,102.3,121.1,103.3,116.9,112.8,103.0,103.2,114.6,115.6,106.3,102.9,120.8,104.7,112.0,109.6,105.5,103.0,114.3,117.0,113.9,113.0,115.0,109.3,108.9],"fce":[4.4,4.0,8.5,2.2,5.5,4.6,6.0,6.0,0.4,6.1,1.4,0.4,5.5,8.4,6.5,4.7,1.3,5.6,5.2,1.0,1.2,0.0,5.4,6.8,5.3,0.8,0.2,7.0,11.1,6.1,2.2,5.9,0.6,4.4,5.1,3.0],"logi":[55.5,58.8,74.6,78.3,85.0,112.1,101.4,93.1,83.4,73.0,83.1,76.1,63.1,65.1,99.4,88.3,100.0,97.8,98.2,102.8,89.3,82.9,93.7,81.6,69.7,66.2,80.0,89.3,102.5,125.3,120.9,104.2,89.8,112.7,82.8,89.0],"capex":[0.0,0.0,0.0,0.0,0.0,420.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,280.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,510.0,0.0,0.0,0.0,0.0,0.0,0.0],"invv":[25.28,25.67,23.08,21.93,20.02,17.75,16.62,16.82,16.24,16.62,16.63,16.17,16.91,17.07,14.47,15.1,15.54,14.66,14.59,13.94,13.78,15.22,15.04,15.4,16.31,16.5,15.76,15.52,14.44,11.67,11.07,12.69,12.98,12.07,13.41,13.02],"rev":[17.8,16.9,23.3,21.9,26.4,33.7,25.4,27.0,21.6,20.8,24.3,19.4,19.3,18.8,28.6,24.7,28.7,27.1,28.7,27.3,23.2,21.7,27.3,23.0,20.3,20.5,23.8,27.3,31.3,38.3,30.1,25.9,27.9,31.9,20.7,25.1],"ss":[18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24]};
 
@@ -786,20 +821,31 @@ const STEPS=[
  ['④ 補う','誰も書いていない「部門のあいだの矢印」を，SVNの流れに乗せて補う。するとループが閉じる。'],
  ['⑤ ループを読む','ループをクリックすると，SVNのどの立場と流れを通っているかが分かる。どの人の話にも全体は書かれていない。']];
 // ---- 文法の読み取り
-const NORMP=p=>{p=(p||'').trim().replace('＋','+').replace(/[－−ー‐–]/,'-');return p==='+'||p==='-'?p:/^[×xX]$/.test(p)?'x':'?';};
-const ARW=/^(.+?)\s*(?:→|->|⇒)\s*(.+?)\s+([+\-＋－−×xX])\s*(‖|\|\||遅れ)?\s*$/;
+// 極性：+ ＋ s 同 → '+'，- − － ー o 逆 → '-'，× x → 'x'（外す），? ？ → '?'（まだ分からない）
+const NORMP=p=>{p=(p||'').trim();if(/^[+＋sS]$|^同$/.test(p))return'+';if(/^[\-－−ー‐–oO]$|^逆$/.test(p))return'-';if(/^[×xX✕]$/.test(p))return'x';return'?';};
+// 矢印の行：「原因 → 結果 極性 （‖）」。記号の極性は前の空白がなくてもよい（特急便+）。s／o／同／逆／x は前に空白が要る
+const ARW=/^(.+?)\s*(?:→|->|⇒|=>)\s*(.+?)(?:\s*([+＋\-－−ー‐–×✕?？])|\s+([sSoOxX]|同|逆))\s*(‖|\|\||遅れ)?\s*$/;
+const SVNRE=/^(.+?)\s*(?:→|->|⇒|=>)\s*(.+?)\s*[：:]\s*(.+?)\s*(?:[（(](製品|情報|お金|方針|欠落)[）)])?\s*$/;
+const HEADRE=/^[#＃]{2}\s*(.+?)(?:\s*[@＠]\s*(.*))?$/;
+const FLOWRE=/^(.+?)\s*(?:→|->|⇒|=>)\s*(.+?)\s*[：:]\s*(.+?)\s*(?:[（(](製品|情報|お金|方針|欠落)[）)])?\s*$/;
+// 1行を矢印として読む。読めなければ null。「メーカー」のような語末の「ー」は極性と読まない
+function arw(t){const a=String(t||'').trim().match(ARW);if(!a)return null;const ps=a[3]||a[4];
+  if(a[3]&&/^[ー‐–]$/.test(a[3])){const q=String(t).trim().match(/(\S)[ー‐–]\s*(‖|\|\||遅れ)?\s*$/);if(q&&/[ァ-ヶー]/.test(q[1]))return null;}
+  return{c:a[1].trim(),e:a[2].trim(),p:NORMP(ps),d:!!a[5]};}
+function findFlow(M,fl){const m=String(fl||'').trim().match(FLOWRE);if(!m)return null;const lb=m[3].trim();
+  return M.flows.find(x=>x.f===m[1].trim()&&x.t===m[2].trim()&&(x.lb===lb||x.lb.includes(lb)||lb.includes(x.lb)))||null;}
 function parse(src){
-  const M={actors:[],flows:[],docs:[],same:{},bridges:[],cuts:[]};const A=n=>{n=n.trim();if(n&&!M.actors.includes(n))M.actors.push(n);return n;};
-  (src.svn||'').split(/\r?\n/).forEach(l=>{l=l.trim();if(!l)return;const m=l.match(/^(.+?)\s*(?:→|->)\s*(.+?)\s*[：:]\s*(.+?)\s*(?:[（(](製品|情報|お金|方針|欠落)[）)])?\s*$/);if(!m)return;
+  const M={actors:[],flows:[],docs:[],same:{},bridges:[],cuts:[],bad:[]};const A=n=>{n=n.trim();if(n&&!M.actors.includes(n))M.actors.push(n);return n;};
+  (src.svn||'').split(/\r?\n/).forEach(l=>{l=l.trim();if(!l||/^[#＃]/.test(l))return;const m=l.match(SVNRE);if(!m)return;
     M.flows.push({id:'f'+M.flows.length,f:A(m[1]),t:A(m[2]),lb:m[3].trim(),ty:m[4]||'情報'});});
   let cur=null;(src.docs||'').split(/\r?\n/).forEach(l=>{const t=l.trim();if(!t)return;
-    const h=t.match(/^##\s*(.+?)(?:\s*@\s*(.+))?$/);if(h){cur={id:'d'+M.docs.length,name:h[1].trim(),who:h[2]?A(h[2]):'',text:'',arrows:[]};M.docs.push(cur);return;}
+    const h=t.match(HEADRE);if(h){cur={id:'d'+M.docs.length,name:h[1].trim(),who:h[2]&&h[2].trim()?A(h[2]):'',text:'',arrows:[]};M.docs.push(cur);return;}
     if(!cur){cur={id:'d0',name:'話',who:'',text:'',arrows:[]};M.docs.push(cur);}
-    const a=t.match(ARW);if(a){cur.arrows.push({c:a[1].trim(),e:a[2].trim(),p:NORMP(a[3]),d:!!a[4]});return;}cur.text+=(cur.text?'\n':'')+t;});
+    const a=arw(t);if(a){if(a.p==='x'){M.bad.push({box:'docs',line:t,why:'x'});return;}cur.arrows.push(a);return;}cur.text+=(cur.text?'\n':'')+t;});
   (src.same||'').split(/\r?\n/).forEach(l=>{const m=l.split(/[=＝]/);if(m.length===2&&m[0].trim()&&m[1].trim())M.same[m[0].trim()]=m[1].trim();});
-  (src.bridge||'').split(/\r?\n/).forEach(l=>{l=l.trim();if(!l)return;const [ar,fl]=l.split(/\s*[@＠]\s*/);const a=(ar||'').match(ARW);if(!a)return;if(NORMP(a[3])==='x'){M.cuts.push({c:a[1].trim(),e:a[2].trim()});return;}
-    let flow='';if(fl){const m=fl.match(/^(.+?)\s*(?:→|->)\s*(.+?)\s*[：:]\s*(.+)$/);if(m){const f=M.flows.find(x=>x.f===m[1].trim()&&x.t===m[2].trim()&&(x.lb===m[3].trim()||x.lb.includes(m[3].trim())));flow=f?f.id:'?'+fl.trim();}else flow='?'+fl.trim();}
-    M.bridges.push({c:a[1].trim(),e:a[2].trim(),p:NORMP(a[3]),d:!!a[4],flow});});
+  (src.bridge||'').split(/\r?\n/).forEach(l=>{l=l.trim();if(!l)return;const k=l.search(/[@＠]/);const ar=k>=0?l.slice(0,k):l,fl=k>=0?l.slice(k+1).trim():'';const a=arw(ar);if(!a)return;if(a.p==='x'){M.cuts.push({c:a.c,e:a.e});return;}
+    let flow='';if(fl){const f=findFlow(M,fl);flow=f?f.id:'?'+fl;}
+    M.bridges.push({c:a.c,e:a.e,p:a.p,d:a.d,flow});});
   return M;}
 // ---- 状態
 let POS0={svn:{},cld:{}},SRC=null,M=null,STEP=0,MAXSTEP=0,SEL=null,DOC=0,POS={svn:{},cld:{}};
@@ -876,7 +922,7 @@ function render(){LOOPS=null;const H=hi();
   const E=STEP>=2?cldEdges(STEP>=3):[];drawCld($('svCld'),E,H,'cld',e=>e.src<0?BCOL:DCOL[e.src%DCOL.length]);
   $('legend').innerHTML=STEP>=2?M.docs.map((d,i)=>`<span><i style="background:${DCOL[i%DCOL.length]}"></i>${esc(d.name)}</span>`).join('')+(STEP>=3?`<span><i class="br"></i>補った矢印（SVNの流れに乗せる）</span>`:''):'';
   const Ls=STEP>=2?curLoops():[];const prev=STEP>=3?loops(cldEdges(false)).map(L=>L.edges.map(e=>e.id).sort().join()):[];
-  $('loops').innerHTML=(STEP>=4&&SRC.note?`<div class="note">${SRC.note}</div>`:'')+(STEP<2?'':(Ls.length?`<div class="lh">ループ ${Ls.length}本（クリックで通り道を見る）</div>`+Ls.map((L,i)=>{const docs=[...new Set(L.edges.filter(e=>e.src>=0).map(e=>e.src))],br=L.edges.filter(e=>e.src<0).length;const nw=STEP>=3&&!prev.includes(L.edges.map(e=>e.id).sort().join());
+  $('loops').innerHTML=(STEP>=4&&SRC.note?`<div class="note">${noteHtml()}</div>`:'')+(STEP<2?'':(Ls.length?`<div class="lh">ループ ${Ls.length}本（クリックで通り道を見る）</div>`+Ls.map((L,i)=>{const docs=[...new Set(L.edges.filter(e=>e.src>=0).map(e=>e.src))],br=L.edges.filter(e=>e.src<0).length;const nw=STEP>=3&&!prev.includes(L.edges.map(e=>e.id).sort().join());
     return `<div class="lp${SEL&&SEL.k==='loop'&&SEL.key===lkey(L)?' on':''}" data-l="${i}"><b class="${L.type}">${L.type}</b>${nw?'<span class="new">補って閉じた</span>':''} ${esc(L.vars.join(' → '))} → ${esc(L.vars[0])}${L.delay?' ‖':''}<div class="lsub">${docs.map(x=>`<span class="dc" style="background:${DCOL[x%DCOL.length]}">${esc(M.docs[x].name)}</span>`).join('')}${br?`<span class="dc" style="background:${BCOL}">補った矢印 ${br}本</span>`:''}</div></div>`;}).join(''):`<div class="lh">ループはまだない。${STEP===2?'④で部門のあいだの矢印を補うと閉じる。':''}</div>`));
   info(H);save();if(typeof Z!=='undefined'&&Z.open)zRender();}
 function info(H){let t='';const E=cldEdges(STEP>=3);
@@ -893,14 +939,13 @@ function selPath(es){if(!es||!es.length)return;SEL={k:'path',key:'p'+es.map(e=>e
 function mapH(H){if(!H.on)return H;const d=M.docs[DOC];const ce=new Set([...H.cedge].filter(x=>x.startsWith(`a${DOC}_`)));const cv=new Set();
   if(d)d.arrows.forEach((a,ai)=>{if(ce.has(`a${DOC}_${ai}`)){cv.add(a.c);cv.add(a.e);}[a.c,a.e].forEach(x=>{if(H.cvar.has(uni(x))&&SEL&&SEL.k==='cvar'&&uni(x)===SEL.id)cv.add(x);});});
   return Object.assign({},H,{cedge:ce,cvar:cv});}
-function save(){try{localStorage.setItem('sysnavi',JSON.stringify({SRC,STEP,MAXSTEP,DOC,POS,POS0}));}catch(e){}}
-function load(ex){SRC={svn:ex.svn,docs:ex.docs,same:ex.same,bridge:ex.bridge,title:ex.title,note:ex.note||'',data:ex.data||null};POS=JSON.parse(JSON.stringify(ex.pos||{svn:{},cld:{}}));POS0=JSON.parse(JSON.stringify(POS));M=parse(SRC);SEL=null;DOC=0;STEP=0;MAXSTEP=0;fillEditor();render();}
-function fillEditor(){$('eSvn').value=SRC.svn;$('eDocs').value=SRC.docs;$('eSame').value=SRC.same;$('eBridge').value=SRC.bridge;}
+function save(){try{localStorage.setItem('sysnavi',JSON.stringify({SRC,STEP,MAXSTEP,DOC,POS,POS0}));}catch(e){}if(typeof userPut==='function')userPut();}
+function load(ex){SRC={svn:ex.svn,docs:ex.docs,same:ex.same,bridge:ex.bridge,title:ex.title,note:ex.note||'',data:ex.data||null,own:false};POS=JSON.parse(JSON.stringify(ex.pos||{svn:{},cld:{}}));POS0=JSON.parse(JSON.stringify(POS));M=parse(SRC);SEL=null;DOC=0;STEP=0;MAXSTEP=0;fillEditor();render();}
+function fillEditor(){$('eSvn').value=SRC.svn||'';$('eDocs').value=SRC.docs||'';$('eSame').value=SRC.same||'';$('eBridge').value=SRC.bridge||'';$('eTitle').value=SRC.title||'';if(typeof lintShow==='function')lintShow();}
 // ---- 操作
 function bind(){
-  {const gs=[];EXAMPLES.forEach(e=>{let g=gs.find(x=>x.n===e.grp);if(!g){g={n:e.grp,es:[]};gs.push(g);}g.es.push(e);});
-   $('exSel').innerHTML=gs.map(g=>`<optgroup label="${esc(g.n||'')}">${g.es.map(e=>`<option value="${e.id}">${esc(e.title)}</option>`).join('')}</optgroup>`).join('');}
-  $('exSel').onchange=()=>load(EXAMPLES.find(e=>e.id===$('exSel').value));
+  buildExSel();
+  $('exSel').onchange=()=>selectProblem($('exSel').value);
   $('steps').onclick=ev=>{const b=ev.target.closest('button');if(!b)return;if(b.id==='convBtn'){zOpenConv();return;}if(b.id==='hypBtn'){hypOpen();return;}if(b.id==='next'){STEP=Math.min(4,STEP+1);}else STEP=+b.dataset.s;MAXSTEP=Math.max(MAXSTEP,STEP);SEL=null;render();};
   $('docTabs').onclick=ev=>{const b=ev.target.closest('button');if(!b)return;DOC=+b.dataset.d;if(STEP<1){STEP=1;MAXSTEP=Math.max(MAXSTEP,1);}render();};
   $('loops').onclick=ev=>{const l=ev.target.closest('[data-l]');if(!l)return;const L=curLoops()[+l.dataset.l];selLoop(L);};
@@ -913,23 +958,21 @@ function bind(){
       const g=ev.target.closest('.ac,.cv,.fl,.ce');if(!g){if(SEL){SEL=null;render();}else zOpen(id==='svSvn'?'svn':id==='svMap'?'map':'cld');return;}
       const k=g.classList.contains('ac')?'act':g.classList.contains('cv')?'cvar':g.classList.contains('fl')?'flow':'cedge';const v=k==='cvar'?uni(g.dataset.id):g.dataset.id;
       SEL=SEL&&SEL.k===k&&SEL.id===v?null:{k,id:v};render();});});
-  $('bEdit').onclick=()=>{$('editor').classList.toggle('open');};
-  $('bApply').onclick=()=>{SRC={svn:$('eSvn').value,docs:$('eDocs').value,same:$('eSame').value,bridge:$('eBridge').value,title:SRC.title,note:SRC.note,data:SRC.data};M=parse(SRC);SEL=null;DOC=Math.min(DOC,Math.max(0,M.docs.length-1));
-    const miss=M.bridges.filter(b=>b.flow&&b.flow.startsWith('?'));$('eMsg').innerHTML=`立場 ${M.actors.length}・流れ ${M.flows.length}・人の話 ${M.docs.length}（矢印 ${M.docs.reduce((k,d)=>k+d.arrows.length,0)}）・補う矢印 ${M.bridges.length}`+(miss.length?`<br><span style="color:#C8553D">SVNにない流れ：${miss.map(b=>esc(b.flow.slice(1))).join('，')}（SVNに描き足すか，書き方をそろえる）</span>`:'');render();};
-  $('bSave').onclick=()=>{const b=new Blob([JSON.stringify({kind:'svn-intro',src:SRC,pos:POS},null,1)],{type:'application/json'});const a=document.createElement('a');const d=new Date(),p=x=>String(x).padStart(2,'0');a.href=URL.createObjectURL(b);a.download=`${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}_scm-recurrent-program_SVN-認知マップ-CLD_v1.json`;document.body.appendChild(a);a.click();a.remove();};
+  $('bEdit').onclick=()=>openEditor();
+  $('bApply').onclick=()=>applyEditor();
+  $('bSave').onclick=()=>saveJson();
   $('bOpen').onclick=()=>$('fOpen').click();
+  $('fOpen').onchange=ev=>{const f=ev.target.files[0];ev.target.value='';if(f)openFile(f);};
   $('bDxOut').onclick=()=>exportDrawio();$('bDxIn').onclick=()=>$('fDx').click();
-  $('fDx').onchange=ev=>{const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=async()=>{try{const x=await importDrawio(r.result);
-    SRC=Object.assign({},SRC,{svn:x.svn??SRC.svn,docs:x.docs.length?x.docs.join('\n\n'):SRC.docs,bridge:x.bridge.length?x.bridge.join('\n'):SRC.bridge,title:SRC.title+'（draw.ioから）'});
-    Object.assign(POS.svn,x.posS);Object.assign(POS.cld,x.posC);M=parse(SRC);SEL=null;DOC=0;fillEditor();render();
-    $('info').innerHTML=`draw.io から読み込んだ：SVN ${x.svn?'あり':'なし'}・人の話 ${x.docs.length}・補う矢印 ${x.bridge.length}。「自分の問題を書く」で中身を確かめられる。`;}catch(e){$('info').textContent='読み込めませんでした：'+e.message;}};r.readAsText(f);ev.target.value='';};
-  $('fOpen').onchange=ev=>{const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);SRC=o.src;POS=o.pos||{svn:{},cld:{}};POS0=JSON.parse(JSON.stringify(POS));M=parse(SRC);STEP=0;MAXSTEP=0;SEL=null;DOC=0;fillEditor();render();}catch(e){alert('読み込めませんでした：'+e.message);}};r.readAsText(f);ev.target.value='';};
   $('bHelp').onclick=()=>$('help').classList.toggle('open');
   $('help').onclick=ev=>{if(ev.target.id==='help'||ev.target.id==='hClose')$('help').classList.remove('open');};
 }
-window.addEventListener('DOMContentLoaded',()=>{bind();let ok=false;try{const s=JSON.parse(localStorage.getItem('sysnavi')||'null');if(s&&s.SRC){SRC=s.SRC;POS=s.POS;POS0=s.POS0||JSON.parse(JSON.stringify(s.POS||{svn:{},cld:{}}));STEP=s.STEP||0;MAXSTEP=s.MAXSTEP||0;DOC=s.DOC||0;M=parse(SRC);fillEditor();render();ok=true;}}catch(e){}
+window.addEventListener('DOMContentLoaded',()=>{bind();let ok=false;try{const s=JSON.parse(localStorage.getItem('sysnavi')||'null');if(s&&s.SRC&&typeof s.SRC==='object'){SRC=s.SRC;
+    // v7 までに draw.io から読み込んだ問題は「自分の問題」として扱う
+    if(!SRC.own&&!EXAMPLES.some(e=>e.title===SRC.title))SRC.own=true;
+    POS=s.POS||{svn:{},cld:{}};POS.svn=POS.svn||{};POS.cld=POS.cld||{};POS0=s.POS0||JSON.parse(JSON.stringify(POS));STEP=s.STEP||0;MAXSTEP=s.MAXSTEP||0;DOC=s.DOC||0;M=parse(SRC);fillEditor();render();ok=true;}}catch(e){}
   if(!ok)load(EXAMPLES[0]);
-  {const e=EXAMPLES.find(x=>SRC&&SRC.title&&SRC.title.startsWith(x.title));if(e)$('exSel').value=e.id;}});
+  buildExSel();});
 
 // ===== 拡大ツール（ブラウザ付き） =====
 const Z={open:false,view:'svn',tab:'',k:1,px:0,py:0,mode:'svn2map',br:null,cut:new Set(),cutMode:false,imp:null,dir:1,actor:null,upFrom:null,showData:false,ser:'short',line:'LINE-3',lines:null,ov:true,detLine:null,mx:'all'};
@@ -1412,11 +1455,11 @@ function dxPage(name,cells){return `<diagram name="${DXq(name)}" id="${'p'+Math.
 function dxVertex(id,label,x,y,w,h,style){return `<mxCell id="${id}" value="${DXq(label)}" style="${style}" vertex="1" parent="1"><mxGeometry x="${Math.round(x)}" y="${Math.round(y)}" width="${w}" height="${h}" as="geometry"/></mxCell>`;}
 function dxEdge(id,label,s,t,style,attrs){const c=`<mxCell id="${id}" ${attrs?'':`value="${DXq(label)}" `}style="${style}" edge="1" parent="1" source="${s}" target="${t}"><mxGeometry relative="1" as="geometry"/></mxCell>`;
   return attrs?`<UserObject label="${DXq(label)}" ${Object.entries(attrs).map(([k,v])=>`${k}="${DXq(v)}"`).join(' ')} id="${id}">${c.replace(` id="${id}"`,'')}</UserObject>`:c;}
-const DXC={'製品':'#1F6FB2','情報':'#55656F','お金':'#2E8B57','方針':'#7B3FA0'};
+const DXC={'製品':'#1F6FB2','情報':'#55656F','お金':'#2E8B57','方針':'#7B3FA0','欠落':'#C8553D'};
 function exportDrawio(){const pages=[];const S=1.5;
   // SVN
   const PS=POS.svn;let i=0;const vid={};const cs=M.actors.map(a=>{vid[a]='a'+(i++);const p=PS[a]||[100,100];const w=Math.max(110,tw(a)+30);return dxVertex(vid[a],a,p[0]*S-w/2,p[1]*S-22,w,44,'rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F2F3;strokeColor=#0F7C8C;strokeWidth=2;fontStyle=1;fontSize=14;');});
-  M.flows.forEach((f,k)=>cs.push(dxEdge('f'+k,`${f.lb}（${f.ty}）`,vid[f.f],vid[f.t],`endArrow=block;endFill=1;html=1;curved=1;strokeWidth=${f.ty==='製品'?3:2};strokeColor=${DXC[f.ty]};fontColor=${DXC[f.ty]};fontSize=12;labelBackgroundColor=#ffffff;`)));
+  M.flows.forEach((f,k)=>cs.push(dxEdge('f'+k,`${f.lb}（${f.ty}）`,vid[f.f],vid[f.t],`endArrow=block;endFill=1;html=1;curved=1;strokeWidth=${f.ty==='製品'?3:2};strokeColor=${DXC[f.ty]};fontColor=${DXC[f.ty]};fontSize=12;labelBackgroundColor=#ffffff;${f.ty==='欠落'?'dashed=1;':''}`)));
   pages.push(dxPage('SVN',cs));
   if(false)[1,2,3].forEach(k=>{const S=SVSTD.stages[k-1];const vi={};const cc=S.acts.map((a,j)=>{vi[a]='s'+k+'a'+j;const p=SVSTD.pos[a];const w=Math.max(120,tw(a)+30);const nw=S.newact.includes(a);return dxVertex(vi[a],(nw?'＋ ':'')+a+(S.sub[a]?'\n'+S.sub[a]:''),p[0]*0.8-w/2,p[1]*0.9+20,w,50,`rounded=1;whiteSpace=wrap;html=1;fillColor=${nw?'#FFF4E0':'#E6F2F3'};strokeColor=${nw?'#E8A33D':'#0F7C8C'};strokeWidth=2;fontStyle=1;fontSize=13;`);});
     S.flows.forEach((f,j)=>{const c=f.ty==='欠落'?'#C8553D':DXC[f.ty];cc.push(dxEdge('s'+k+'f'+j,`${f.st==='new'?'＋ ':f.st==='chg'?'△ ':''}${f.lb}（${f.ty==='欠落'?'情報':f.ty}）`,vi[f.f],vi[f.t],`endArrow=block;endFill=1;html=1;curved=1;strokeWidth=${f.st?3:2};strokeColor=${c};fontColor=${c};fontSize=11;labelBackgroundColor=#ffffff;${f.ty==='欠落'?'dashed=1;':''}`));});
@@ -1428,30 +1471,22 @@ function exportDrawio(){const pages=[];const S=1.5;
     c.push(dxVertex('t',d.text,20,20,520,Math.max(60,Math.ceil(d.text.length/36)*20),'text;html=1;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=12;fillColor=#F6F8F9;'));
     pages.push(dxPage(`話：${d.name}${d.who?' @'+d.who:''}`,c));});
   // CLD（補った矢印は流れの情報を持つ）
-  const E=cldEdges(true);const V=[...new Set(E.flatMap(e=>[e.c,e.e]))];const id={};const P=POS.cld;
+  const E=cldEdges(true);const CUTS=(M.cuts||[]).map(x=>({c:uni(x.c),e:uni(x.e)})).filter(x=>x.c!==x.e);const V=[...new Set(E.flatMap(e=>[e.c,e.e]).concat(CUTS.flatMap(x=>[x.c,x.e])))];const id={};const P=POS.cld;
   const c=V.map((v,j)=>{id[v]='v'+j;const p=P[v]||[100+j*120,100];return dxVertex(id[v],v,p[0]*S-60,p[1]*S-18,Math.max(110,tw(v)+24),36,'rounded=1;arcSize=50;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#5F6E76;fontSize=13;');});
   E.forEach((e,k)=>{const lab=(e.p==='-'?'−':e.p)+(e.d?' ‖':'');const st=`endArrow=block;endFill=1;html=1;curved=1;strokeWidth=2;strokeColor=${e.src<0?BCOL:DCOL[e.src%DCOL.length]};fontColor=${e.p==='-'?'#C8553D':'#0F7C8C'};fontStyle=1;fontSize=15;labelBackgroundColor=#ffffff;${e.src<0?'dashed=1;':''}`;
     c.push(e.src<0?dxEdge('e'+k,lab,id[e.c],id[e.e],st,{kind:'補う矢印',flow:e.flow&&!e.flow.startsWith('?')?flowTxt(flowOf(e.flow)):(e.flow?e.flow.slice(1):'')}):dxEdge('e'+k,lab,id[e.c],id[e.e],st,{kind:'話の矢印',doc:M.docs[e.src].name}));});
+  // 外す矢印（×）：話にあるが CLD から外した矢印。赤の点線・ラベル ×
+  CUTS.forEach((x,k)=>c.push(dxEdge('x'+k,'×',id[x.c],id[x.e],'endArrow=block;endFill=1;html=1;curved=1;strokeWidth=2;strokeColor=#C8553D;fontColor=#C8553D;fontStyle=1;fontSize=15;labelBackgroundColor=#ffffff;dashed=1;dashPattern=2 4;',{kind:'外す矢印'})));
   pages.push(dxPage('CLD',c));
   if(Object.keys(M.same).length)pages.push(dxPage('言葉をそろえる',[dxVertex('same',Object.entries(M.same).map(([a,b])=>a+' = '+b).join('\n'),20,20,520,40+22*Object.keys(M.same).length,'text;html=1;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=13;')]));
-  const xml=`<mxfile host="app.diagrams.net" agent="SVN-認知マップ-CLD入門">${pages.join('')}</mxfile>`;
-  const d=new Date(),p=x=>String(x).padStart(2,'0');const b=new Blob([xml],{type:'application/xml'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}_scm-recurrent-program_SVN-認知マップ-CLD_v1.drawio`;document.body.appendChild(a);a.click();a.remove();}
+  // ナビの情報（題名・解説・データの手がかり・仮説の議論・ラベルの位置）。ナビに読み戻すと元どおりになる
+  {const hy=(HY.forTitle===SRC.title?{score:HY.score,picked:HY.picked,sym:HY.sym,sel:HY.sel,tab:HY.tab}:null)||(typeof hyStoreAll==='function'?hyStoreAll()[SRC.title]:null);
+   const at={navi:'v8',title:SRC.title||'',note:SRC.note||''};if(SRC.data)at.data=JSON.stringify(SRC.data);if(hy)at.hy=JSON.stringify(hy);if(POS.lab&&Object.keys(POS.lab).length)at.lab=JSON.stringify(POS.lab);
+   pages.push(dxPage('ナビの情報',[`<UserObject label="${DXq('このページは システム分析ナビ が読み戻すための情報（題名・解説・仮説の議論など）。消さない・名前を変えない。\n題名：'+(SRC.title||''))}" ${Object.entries(at).map(([k,v])=>`${k}="${DXq(v)}"`).join(' ')} id="navimeta"><mxCell style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=12;fontColor=#5F6E76;" vertex="1" parent="1"><mxGeometry x="20" y="20" width="560" height="60" as="geometry"/></mxCell></UserObject>`]));}
+  const xml=`<mxfile host="app.diagrams.net" agent="システム分析ナビ v8">${pages.join('')}</mxfile>`;
+  SCMIO.download(new Blob([xml],{type:'application/xml'}),`${SCMIO.stamp()}_scm-recurrent-program_ナビ-${typeof fnSafe==='function'?fnSafe(SRC.title):'SVN-認知マップ-CLD'}.drawio`);}
 async function dxInflate(txt){const bin=Uint8Array.from(atob(txt.trim()),c=>c.charCodeAt(0));const ds=new DecompressionStream('deflate-raw');const out=await new Response(new Blob([bin]).stream().pipeThrough(ds)).text();return decodeURIComponent(out);}
 const dxText=v=>{const d=document.createElement('div');d.innerHTML=(v||'').replace(/<br\s*\/?>/gi,'\n');return d.textContent.trim();};
-async function importDrawio(text){const doc=new DOMParser().parseFromString(text,'text/xml');const pages=[...doc.querySelectorAll('diagram')];const res={svn:null,docs:[],bridge:[],posS:{},posC:{},cld:null};
-  for(const pg of pages){let model=pg.querySelector('mxGraphModel');if(!model){const x=await dxInflate(pg.textContent);model=new DOMParser().parseFromString(x,'text/xml').querySelector('mxGraphModel');}if(!model)continue;
-    const name=pg.getAttribute('name')||'';if(/^参考/.test(name))continue;const cells=[...model.querySelectorAll('mxCell')];const lab={},geo={};
-    cells.forEach(c=>{const uo=c.parentElement&&c.parentElement.tagName==='UserObject'?c.parentElement:null;const id=uo?uo.getAttribute('id'):c.getAttribute('id');const v=uo?uo.getAttribute('label'):c.getAttribute('value');
-      if(c.getAttribute('vertex')==='1'){lab[id]=dxText(v);const g=c.querySelector('mxGeometry');if(g)geo[id]=[+g.getAttribute('x')+(+g.getAttribute('width')||0)/2,+g.getAttribute('y')+(+g.getAttribute('height')||0)/2];}});
-    const edges=cells.filter(c=>c.getAttribute('edge')==='1').map(c=>{const uo=c.parentElement&&c.parentElement.tagName==='UserObject'?c.parentElement:null;return{s:lab[c.getAttribute('source')],t:lab[c.getAttribute('target')],v:dxText(uo?uo.getAttribute('label'):c.getAttribute('value')),kind:uo&&uo.getAttribute('kind'),flow:uo&&uo.getAttribute('flow'),dashed:/dashed=1/.test(c.getAttribute('style')||'')};}).filter(e=>e.s&&e.t);
-    const isSvn=name==='SVN'||edges.some(e=>/[（(](製品|情報|お金|方針)[）)]/.test(e.v));
-    const pos={};Object.entries(lab).forEach(([id,n])=>{if(geo[id])pos[n]=[geo[id][0]/1.5,geo[id][1]/1.5];});
-    const pol=v=>{const m=(v||'').match(/[+＋−\-－]/);return m?NORMP(m[0]):'?';};const dl=v=>/‖|\|\||遅れ/.test(v||'');
-    if(isSvn){res.svn=edges.map(e=>{const m=e.v.match(/^(.*?)\s*[（(](製品|情報|お金|方針)[）)]\s*$/);return `${e.s} → ${e.t}：${m?m[1]:e.v||'（中身）'}（${m?m[2]:'情報'}）`;}).join('\n');Object.assign(res.posS,pos);}
-    else if(/^話[：:]/.test(name)){const h=name.replace(/^話[：:]\s*/,'');const tx=Object.entries(lab).find(([id,n])=>!edges.some(e=>e.s===n||e.t===n)&&n.length>8);res.docs.push(`## ${h}\n${tx?tx[1]:''}\n`+edges.map(e=>`${e.s} → ${e.t} ${pol(e.v)}${dl(e.v)?' ‖':''}`).join('\n'));Object.entries(pos).forEach(([n,p])=>{if(!res.posC[n])res.posC[n]=p;});}
-    else{res.cld=edges;Object.assign(res.posC,pos);edges.filter(e=>e.kind==='補う矢印'||(!e.kind&&e.dashed)).forEach(e=>res.bridge.push(`${e.s} → ${e.t} ${pol(e.v)}${dl(e.v)?' ‖':''}${e.flow?' @ '+e.flow:''}`));}}
-  if(!res.docs.length&&res.cld)res.docs.push('## draw.io のCLD\n'+res.cld.filter(e=>!(e.kind==='補う矢印'||(!e.kind&&e.dashed))).map(e=>`${e.s} → ${e.t} ${pol(e.v)}${dl(e.v)?' ‖':''}`).join('\n'));
-  return res;}
 
 const SVSTD={"stages": [{"acts": ["顧客", "営業部", "生産管理課", "SCM部", "工場", "物流センター", "サプライヤ"], "newact": [], "flows": [{"f": "顧客", "t": "営業部", "lb": "注文", "ty": "情報", "st": ""}, {"f": "顧客", "t": "営業部", "lb": "代金", "ty": "お金", "st": ""}, {"f": "営業部", "t": "顧客", "lb": "納期回答", "ty": "情報", "st": ""}, {"f": "営業部", "t": "生産管理課", "lb": "販売計画", "ty": "情報", "st": ""}, {"f": "生産管理課", "t": "工場", "lb": "生産計画・日別の指示", "ty": "情報", "st": ""}, {"f": "工場", "t": "生産管理課", "lb": "生産実績", "ty": "情報", "st": ""}, {"f": "サプライヤ", "t": "工場", "lb": "部品", "ty": "製品", "st": ""}, {"f": "工場", "t": "物流センター", "lb": "製品", "ty": "製品", "st": ""}, {"f": "物流センター", "t": "SCM部", "lb": "在庫・欠品（データ）", "ty": "情報", "st": ""}, {"f": "営業部", "t": "物流センター", "lb": "受注（在庫の引当）", "ty": "情報", "st": ""}, {"f": "物流センター", "t": "顧客", "lb": "出荷・納品", "ty": "製品", "st": ""}], "sub": {"顧客": "220社", "営業部": "", "生産管理課": "", "SCM部": "受注・在庫・生産・配送のデータを見る", "工場": "2工場・生産ライン5本", "物流センター": "DC1〜3", "サプライヤ": "24社"}}, {"acts": ["顧客", "営業部", "生産管理課", "SCM部", "経営", "物流部", "工場 第3ライン", "工場 他のライン", "物流センター", "サプライヤ", "運送会社"], "newact": ["経営", "物流部", "工場 第3ライン", "工場 他のライン", "運送会社"], "flows": [{"f": "顧客", "t": "営業部", "lb": "注文・苦情（取引見直しの示唆）［資料2］", "ty": "情報", "st": "chg"}, {"f": "顧客", "t": "営業部", "lb": "代金", "ty": "お金", "st": ""}, {"f": "営業部", "t": "顧客", "lb": "納期回答", "ty": "情報", "st": ""}, {"f": "営業部", "t": "生産管理課", "lb": "販売計画（余裕を上乗せ）［資料2］", "ty": "情報", "st": "chg"}, {"f": "生産管理課", "t": "営業部", "lb": "「計画が過大」［資料2］", "ty": "情報", "st": "new"}, {"f": "生産管理課", "t": "工場 第3ライン", "lb": "生産計画・生産指示", "ty": "情報", "st": "chg"}, {"f": "生産管理課", "t": "工場 他のライン", "lb": "生産計画・生産指示", "ty": "情報", "st": "new"}, {"f": "SCM部", "t": "工場 第3ライン", "lb": "補充指示［資料3］", "ty": "情報", "st": "new"}, {"f": "SCM部", "t": "工場 他のライン", "lb": "補充指示", "ty": "情報", "st": "new"}, {"f": "工場 第3ライン", "t": "生産管理課", "lb": "生産実績／段取り月50時間・補充が2週間以上［資料3］", "ty": "情報", "st": "chg"}, {"f": "工場 他のライン", "t": "生産管理課", "lb": "生産実績／稼働の余裕［資料3］", "ty": "情報", "st": "new"}, {"f": "SCM部", "t": "経営", "lb": "安全在庫引き上げの稟議［資料1］", "ty": "情報", "st": "new"}, {"f": "経営", "t": "SCM部", "lb": "決裁：A・B区分 18→24日［資料1］", "ty": "方針", "st": "new"}, {"f": "生産管理課", "t": "経営", "lb": "設備増設の稟議（稼働率84％）［資料3］", "ty": "情報", "st": "new"}, {"f": "経営", "t": "生産管理課", "lb": "差し戻し「まだ2割の余裕」［資料3］", "ty": "方針", "st": "new"}, {"f": "サプライヤ", "t": "工場 第3ライン", "lb": "部品", "ty": "製品", "st": ""}, {"f": "サプライヤ", "t": "工場 他のライン", "lb": "部品", "ty": "製品", "st": "new"}, {"f": "工場 第3ライン", "t": "物流センター", "lb": "製品", "ty": "製品", "st": ""}, {"f": "工場 他のライン", "t": "物流センター", "lb": "製品", "ty": "製品", "st": "new"}, {"f": "物流センター", "t": "SCM部", "lb": "在庫・欠品（データ）", "ty": "情報", "st": ""}, {"f": "営業部", "t": "物流センター", "lb": "受注（在庫の引当）", "ty": "情報", "st": ""}, {"f": "物流センター", "t": "運送会社", "lb": "出荷（通常便・特急便）", "ty": "製品", "st": "new"}, {"f": "運送会社", "t": "顧客", "lb": "配送", "ty": "製品", "st": "new"}, {"f": "SCM部", "t": "物流部", "lb": "欠品分の追加出荷［資料4］", "ty": "情報", "st": "new"}, {"f": "物流部", "t": "運送会社", "lb": "輸送依頼", "ty": "情報", "st": "new"}, {"f": "物流部", "t": "運送会社", "lb": "運賃（特急便は約3倍）［資料4］", "ty": "お金", "st": "new"}, {"f": "運送会社", "t": "物流部", "lb": "値上げの申し入れ［資料4］", "ty": "情報", "st": "new"}, {"f": "物流部", "t": "経営", "lb": "物流費の予算超過［資料4］", "ty": "情報", "st": "new"}, {"f": "経営", "t": "物流部", "lb": "物流費の予算", "ty": "方針", "st": "new"}], "sub": {"顧客": "220社", "営業部": "", "生産管理課": "", "SCM部": "受注・在庫・生産・配送のデータを見る", "経営": "", "物流部": "", "工場 第3ライン": "資料3", "工場 他のライン": "4本・第4ラインは半分程度の稼働", "物流センター": "DC1〜3", "サプライヤ": "24社", "運送会社": ""}}, {"acts": ["顧客", "営業部", "生産管理課", "SCM部", "経営", "物流部", "工場 第3ライン", "工場 他のライン", "購買", "物流センター", "サプライヤ", "運送会社"], "newact": ["購買"], "flows": [{"f": "顧客", "t": "営業部", "lb": "注文・苦情（取引見直しの示唆）［資料2］", "ty": "情報", "st": ""}, {"f": "顧客", "t": "営業部", "lb": "代金", "ty": "お金", "st": ""}, {"f": "営業部", "t": "顧客", "lb": "納期回答", "ty": "情報", "st": ""}, {"f": "営業部", "t": "生産管理課", "lb": "需要予測・販売計画（余裕を上乗せ）［資料2］", "ty": "情報", "st": "chg"}, {"f": "生産管理課", "t": "営業部", "lb": "「計画が過大」［資料2］", "ty": "情報", "st": ""}, {"f": "生産管理課", "t": "工場 第3ライン", "lb": "生産計画・生産指示", "ty": "情報", "st": ""}, {"f": "生産管理課", "t": "工場 他のライン", "lb": "生産計画・生産指示", "ty": "情報", "st": ""}, {"f": "SCM部", "t": "工場 第3ライン", "lb": "補充指示［資料3］", "ty": "情報", "st": ""}, {"f": "SCM部", "t": "工場 他のライン", "lb": "補充指示", "ty": "情報", "st": ""}, {"f": "工場 第3ライン", "t": "生産管理課", "lb": "生産実績／段取り月50時間・補充が2週間以上［資料3］", "ty": "情報", "st": ""}, {"f": "工場 他のライン", "t": "生産管理課", "lb": "生産実績／稼働の余裕［資料3］", "ty": "情報", "st": ""}, {"f": "SCM部", "t": "経営", "lb": "安全在庫引き上げの稟議［資料1］", "ty": "情報", "st": ""}, {"f": "経営", "t": "SCM部", "lb": "決裁：A・B区分 18→24日［資料1］", "ty": "方針", "st": ""}, {"f": "生産管理課", "t": "経営", "lb": "設備増設の稟議（稼働率84％）［資料3］", "ty": "情報", "st": ""}, {"f": "経営", "t": "生産管理課", "lb": "差し戻し「まだ2割の余裕」［資料3］", "ty": "方針", "st": ""}, {"f": "サプライヤ", "t": "工場 第3ライン", "lb": "部品", "ty": "製品", "st": ""}, {"f": "サプライヤ", "t": "工場 他のライン", "lb": "部品", "ty": "製品", "st": ""}, {"f": "生産管理課", "t": "購買", "lb": "部品の所要（生産計画）", "ty": "情報", "st": "new"}, {"f": "購買", "t": "サプライヤ", "lb": "部品の発注", "ty": "情報", "st": "new"}, {"f": "サプライヤ", "t": "購買", "lb": "納期回答・入荷", "ty": "情報", "st": "new"}, {"f": "購買", "t": "サプライヤ", "lb": "部品代", "ty": "お金", "st": "new"}, {"f": "工場 第3ライン", "t": "物流センター", "lb": "製品", "ty": "製品", "st": ""}, {"f": "工場 他のライン", "t": "物流センター", "lb": "製品", "ty": "製品", "st": ""}, {"f": "物流センター", "t": "SCM部", "lb": "在庫・欠品（データ）", "ty": "情報", "st": ""}, {"f": "営業部", "t": "物流センター", "lb": "受注（在庫の引当）", "ty": "情報", "st": ""}, {"f": "物流センター", "t": "運送会社", "lb": "出荷（通常便・特急便）", "ty": "製品", "st": ""}, {"f": "運送会社", "t": "顧客", "lb": "配送", "ty": "製品", "st": ""}, {"f": "SCM部", "t": "物流部", "lb": "欠品分の追加出荷［資料4］", "ty": "情報", "st": ""}, {"f": "物流部", "t": "物流センター", "lb": "出荷指示（特急便）", "ty": "情報", "st": "new"}, {"f": "物流部", "t": "運送会社", "lb": "輸送依頼", "ty": "情報", "st": ""}, {"f": "物流部", "t": "運送会社", "lb": "運賃（特急便は約3倍）［資料4］", "ty": "お金", "st": ""}, {"f": "運送会社", "t": "物流部", "lb": "値上げの申し入れ［資料4］", "ty": "情報", "st": ""}, {"f": "物流部", "t": "経営", "lb": "物流費の予算超過［資料4］", "ty": "情報", "st": ""}, {"f": "経営", "t": "物流部", "lb": "物流費の予算", "ty": "方針", "st": ""}, {"f": "生産管理課", "t": "SCM部", "lb": "✕ 第3ラインの能力・負荷の情報", "ty": "欠落", "st": "new"}, {"f": "生産管理課", "t": "営業部", "lb": "✕ 約束できる納期（能力の余裕）", "ty": "欠落", "st": "new"}], "sub": {"顧客": "220社", "営業部": "", "生産管理課": "", "SCM部": "受注・在庫・生産・配送のデータを見る", "経営": "", "物流部": "", "工場 第3ライン": "資料3", "工場 他のライン": "4本・第4ラインは半分程度の稼働", "購買": "p.11", "物流センター": "DC1〜3", "サプライヤ": "24社", "運送会社": ""}}], "pos": {"顧客": [28.5, 411.32], "営業部": [414.5, 346.32], "生産管理課": [853.5, 286.32], "SCM部": [1875.5, 515.32], "工場": [1387.0, 166.32], "物流センター": [853.5, 455.32], "サプライヤ": [1875.5, 106.32], "経営": [1387.0, 575.32], "物流部": [853.5, 640.32], "工場 第3ライン": [1387.0, 166.32], "工場 他のライン": [1387.0, 284.32], "運送会社": [414.5, 580.32], "購買": [1387.0, 46.321]}};
 
@@ -1621,97 +1656,389 @@ async function dxReadPages(text){
     if(model)out.push({name:(pg.getAttribute('name')||'').trim(),model});}
   return out;}
 const dxClean=s=>dxText(s).replace(/\s*\n\s*/g,' ').trim();
-const DXPOL=/^\s*([+＋−\-－?？])\s*(‖|\|\||遅れ)?\s*$/;
-function dxCells(model){const cells=[...model.querySelectorAll('mxCell')];const V={},E=[];let noST=0;
-  cells.forEach(c=>{const uo=c.parentElement&&/^(UserObject|object)$/.test(c.parentElement.tagName)?c.parentElement:null;const id=uo?uo.getAttribute('id'):c.getAttribute('id');const v=uo?uo.getAttribute('label'):c.getAttribute('value');const st=c.getAttribute('style')||'';
-    if(c.getAttribute('vertex')==='1'){const g=c.querySelector('mxGeometry');V[id]={lab:dxClean(v),raw:dxText(v),st,xy:g?[+g.getAttribute('x')+(+g.getAttribute('width')||0)/2,+g.getAttribute('y')+(+g.getAttribute('height')||0)/2]:null};}
+// 極性のラベル：＋／−（s／o，同／逆も），?，×（外す），遅れ ‖
+const DXPOL=/^\s*([+＋−\-－ー?？sSoO×✕xX]|同|逆)\s*(‖|\|\||遅れ)?\s*$/;
+const dxPol=v=>{v=v||'';const m=v.match(DXPOL);if(m)return NORMP(m[1]);if(/^\s*[×✕]/.test(v))return'x';const k=v.match(/[+＋−\-－]/);return k?NORMP(k[0]):'?';};
+const dxDl=v=>/‖|\|\||遅れ/.test(v||'');
+function dxCells(model){const cells=[...model.querySelectorAll('mxCell')];const V={},E=[],G={};let noST=0;
+  cells.forEach(c=>{const uo=c.parentElement&&/^(UserObject|object)$/.test(c.parentElement.tagName)?c.parentElement:null;const id=uo?uo.getAttribute('id'):c.getAttribute('id');const v=uo?uo.getAttribute('label'):c.getAttribute('value');const st=c.getAttribute('style')||'';const par=c.getAttribute('parent');
+    if(c.getAttribute('vertex')==='1'){const g=c.querySelector('mxGeometry');G[id]=g?{x:+g.getAttribute('x')||0,y:+g.getAttribute('y')||0,w:+g.getAttribute('width')||0,h:+g.getAttribute('height')||0,rel:g.getAttribute('relative')==='1'}:null;
+      V[id]={lab:dxClean(v),raw:dxText(v),st,par,lane:/(^|;)swimlane|shape=swimlane/.test(st),xy:null};}
     else if(c.getAttribute('edge')==='1'){const s=c.getAttribute('source'),t=c.getAttribute('target');if(!s||!t){noST++;return;}
-      E.push({id,s,t,v:dxClean(v),st,kind:uo&&uo.getAttribute('kind'),flow:uo&&uo.getAttribute('flow'),dashed:/dashed=1/.test(st),col:((st.match(/strokeColor=(#[0-9A-Fa-f]{6})/)||[])[1]||'').toUpperCase()});}});
+      E.push({id,s,t,par,v:dxClean(v),st,kind:uo&&uo.getAttribute('kind'),flow:uo&&uo.getAttribute('flow'),dashed:/dashed=1/.test(st),col:((st.match(/strokeColor=(#[0-9A-Fa-f]{6})/)||[])[1]||'').toUpperCase()});}});
   // 辺のラベルが子セル（edgeLabel）になっている場合
-  cells.forEach(c=>{const p=c.getAttribute('parent');const e=E.find(x=>x.id===p);if(e&&!e.v&&c.getAttribute('value'))e.v=dxClean(c.getAttribute('value'));});
+  const EI={};E.forEach(e=>EI[e.id]=e);
+  Object.entries(V).forEach(([id,v])=>{if(EI[v.par]){v.elab=true;if(!EI[v.par].v&&v.lab)EI[v.par].v=v.lab;}});
+  // スイムレーン・グループの中の箱は親からの相対座標 → 絶対座標にする
+  Object.entries(V).forEach(([id,v])=>{const g=G[id];if(!g||v.elab)return;let x=g.x+g.w/2,y=g.y+g.h/2,p=v.par,n=0;while(p&&V[p]&&G[p]&&n++<30){x+=G[p].x;y+=G[p].y;p=V[p].par;}v.xy=[x,y];});
+  const laneOf=id=>{let p=V[id]&&V[id].par,n=0;while(p&&V[p]&&n++<30){if(V[p].lane)return p;p=V[p].par;}return null;};
   const es=E.filter(e=>V[e.s]&&V[e.t]&&V[e.s].lab&&V[e.t].lab&&e.s!==e.t);
+  es.forEach(e=>{const a=laneOf(e.s),b=laneOf(e.t);e.lane=a&&a===b&&V[a].lab?a:null;});
   return{V,E:es,noST:noST+(E.length-es.length)};}
-function dxKind(name,C){if(/^参考/.test(name))return'skip';if(/^話\s*[：:]/.test(name))return'doc';if(/^言葉をそろえる/.test(name))return'same';if(/^SVN/i.test(name))return'svn';
-  const st=Object.values(C.V).map(v=>v.st);if(st.some(s=>/shape=process|shape=mxgraph\.(?:sd|flowchart)/.test(s))&&st.some(s=>/^ellipse|;ellipse/.test(s)))return'sd';
-  const lab=C.E.filter(e=>e.v);if(!C.E.length)return'none';const pol=lab.filter(e=>DXPOL.test(e.v)).length;
-  if(lab.length&&pol/lab.length<0.5)return'svn';return'cld';}
-async function dxAnalyze(text,fname){const pages=await dxReadPages(text);const R={fname,svn:[],doc:[],cld:[],same:'',skip:[]};
-  pages.forEach((pg,i)=>{const C=dxCells(pg.model);const k=dxKind(pg.name,C);const name=pg.name||('ページ'+(i+1));
-    const pos={};Object.values(C.V).forEach(v=>{if(v.xy&&v.lab)pos[v.lab]=[v.xy[0]/1.5,v.xy[1]/1.5];});
-    if(k==='skip'||k==='none'){R.skip.push(name+(k==='none'?'（矢印がない）':'（参考のページ）'));return;}
-    if(k==='sd'){R.skip.push(name+'（SD の図。システム分析ラボで読む）');return;}
-    if(k==='same'){R.same=Object.values(C.V).map(v=>v.raw).join('\n').split('\n').filter(l=>/[=＝]/.test(l)).join('\n');return;}
-    if(k==='svn'){const lines=C.E.map(e=>{let lb=e.v||'（中身）',ty='';const m=lb.match(/^(.*?)\s*[（(](製品|情報|お金|方針|欠落)[）)]\s*$/);if(m){lb=m[1];ty=m[2];}
+function dxKind(name,C){if(/^参考/.test(name))return'skip';if(/^話\s*[：:]/.test(name))return'doc';if(/^言葉をそろえる/.test(name))return'same';if(/^SVN/i.test(name))return'svn';if(/^CLD/i.test(name))return'cld';
+  const vs=Object.values(C.V).filter(v=>v.lab&&!v.elab&&!v.lane),st=vs.map(v=>v.st);
+  if(st.some(s=>/shape=process|shape=mxgraph\.(?:sd|flowchart)/.test(s))&&st.some(s=>/^ellipse|;ellipse/.test(s)))return'sd';
+  if(!C.E.length)return Object.values(C.V).some(v=>/[=＝]/.test(v.raw))?'same':'none';
+  const lab=C.E.filter(e=>e.v);
+  // ラベルのない矢印だけの図（部門の箱を矢印でつないだスケッチ）は SVN。丸い箱ばかりなら CLD
+  if(!lab.length){const round=vs.filter(v=>/(^|;)ellipse|arcSize=50/.test(v.st)).length;return vs.length&&round>vs.length/2?'cld':'svn';}
+  const pol=lab.filter(e=>DXPOL.test(e.v)).length;return pol/lab.length<0.5?'svn':'cld';}
+const DXKL={svn:'SVN',cld:'CLD',doc:'人の話',same:'言葉をそろえる',skip:'読まない',sd:'読まない（SD の図）',none:'読まない（矢印がない）'};
+async function dxAnalyze(text,fname){const pages=await dxReadPages(text);const R={fname,pages:[],meta:null};
+  pages.forEach((pg,i)=>{const name=pg.name||('ページ'+(i+1));if(/^ナビの情報/.test(name)){R.meta=dxMetaRead(pg.model);return;}
+    const C=dxCells(pg.model);const auto=dxKind(pg.name,C);R.pages.push({name,C,auto,kind:auto});});
+  dxBuild(R);return R;}
+function dxMetaRead(model){const el=model.querySelector('[navi]');if(!el)return null;const J=k=>{try{const v=el.getAttribute(k);return v?JSON.parse(v):null;}catch(e){return null;}};
+  return{title:el.getAttribute('title')||'',note:el.getAttribute('note')||'',data:J('data'),hy:J('hy'),lab:J('lab')};}
+function dxBuild(R){Object.assign(R,{svn:[],doc:[],cld:[],same:'',skip:[]});
+  R.pages.forEach(P=>{const C=P.C,name=P.name,k=P.kind;
+    const pos={};Object.values(C.V).forEach(v=>{if(v.xy&&v.lab&&!v.elab&&!v.lane)pos[v.lab]=[v.xy[0]/1.5,v.xy[1]/1.5];});
+    if(k==='skip'||k==='none'||k==='sd'){R.skip.push(name+'（'+({skip:'読まない',sd:'SD の図。システム分析ラボで読む',none:'矢印がない'})[k]+'）');return;}
+    if(k==='same'){R.same=(R.same?R.same+'\n':'')+Object.values(C.V).map(v=>v.raw).join('\n').split('\n').filter(l=>/[=＝]/.test(l)).join('\n');return;}
+    if(k==='svn'){const lines=C.E.map(e=>{let lb=e.v||'（中身）',ty='';const m=lb.match(/^(.*?)\s*[（(](製品|情報|お金|方針|欠落)[）)]\s*$/);if(m){lb=m[1]||'（中身）';ty=m[2];}
         if(!ty)ty=/^✕/.test(lb)||(e.dashed&&e.col==='#C8553D')?'欠落':(DXTYPE[e.col]||'情報');
-        return `${C.V[e.s].lab} → ${C.V[e.t].lab}：${lb.replace(/[（(](製品|情報|お金|方針)[）)]$/,'')}（${ty}）`;});
-      R.svn.push({name,text:lines.join('\n'),nA:new Set(C.E.flatMap(e=>[C.V[e.s].lab,C.V[e.t].lab])).size,nF:lines.length,noST:C.noST,pos});return;}
-    const pol=v=>{const m=(v||'').match(/[+＋−\-－]/);return m?NORMP(m[0]):'?';},dl=v=>/‖|\|\||遅れ/.test(v||'');
-    const arr=e=>`${C.V[e.s].lab} → ${C.V[e.t].lab} ${pol(e.v)}${dl(e.v)?' ‖':''}`;
-    if(k==='doc'){const h=name.replace(/^話\s*[：:]\s*/,'');const used=new Set(C.E.flatMap(e=>[e.s,e.t]));const tx=Object.entries(C.V).filter(([id,v])=>!used.has(id)&&v.raw.length>8).map(([id,v])=>v.raw).join('\n');
-      R.doc.push({name:h,text:`## ${h}\n${tx}\n`+C.E.map(arr).join('\n'),nE:C.E.length,noST:C.noST,pos});return;}
-    const br=C.E.filter(e=>e.kind==='補う矢印'||(!e.kind&&e.dashed)),own=C.E.filter(e=>!br.includes(e));
-    R.cld.push({name,nE:C.E.length,nV:new Set(C.E.flatMap(e=>[e.s,e.t])).size,unk:C.E.filter(e=>pol(e.v)==='?').length,noST:C.noST,pos,
-      own:own.map(arr),bridge:br.map(e=>arr(e)+(e.flow?' @ '+e.flow:''))});});
+        return `${C.V[e.s].lab} → ${C.V[e.t].lab}：${lb}（${ty}）`;});
+      const ps={};Object.entries(pos).forEach(([n,p])=>ps[n]=p);
+      R.svn.push({name,text:lines.join('\n'),nA:new Set(C.E.flatMap(e=>[C.V[e.s].lab,C.V[e.t].lab])).size,nF:lines.length,noST:C.noST,pos:ps,unl:C.E.filter(e=>!e.v).length});return;}
+    const arr=e=>`${C.V[e.s].lab} → ${C.V[e.t].lab} ${dxPol(e.v)}${dxDl(e.v)?' ‖':''}`;
+    // スイムレーンの中の矢印は，そのレーン（部門）の話「## レーン @レーン」にする
+    const lanes={};C.E.filter(e=>e.lane).forEach(e=>(lanes[e.lane]=lanes[e.lane]||[]).push(e));
+    const laneDocs=Object.entries(lanes).map(([id,es])=>{const ln=C.V[id].lab;return{name:ln,text:`## ${ln} @${ln}\n`+es.map(arr).join('\n'),nE:es.length,noST:0,pos,lane:true};});
+    const rest=C.E.filter(e=>!e.lane);
+    if(k==='doc'){const h=name.replace(/^話\s*[：:]\s*/,'');const used=new Set(C.E.flatMap(e=>[e.s,e.t]));const tx=Object.entries(C.V).filter(([id,v])=>!used.has(id)&&!v.lane&&!v.elab&&v.raw.length>8).map(([id,v])=>v.raw).join('\n');
+      if(rest.length||!laneDocs.length)R.doc.push({name:h,text:`## ${h}\n${tx}${tx?'\n':''}`+rest.map(arr).join('\n'),nE:rest.length,noST:C.noST,pos});
+      laneDocs.forEach(x=>R.doc.push(x));return;}
+    const isCut=e=>e.kind==='外す矢印'||dxPol(e.v)==='x';
+    const cut=rest.filter(isCut),br=rest.filter(e=>!isCut(e)&&(e.kind==='補う矢印'||(!e.kind&&e.dashed))),own=rest.filter(e=>!cut.includes(e)&&!br.includes(e));
+    laneDocs.forEach(x=>R.doc.push(x));
+    R.cld.push({name,nE:C.E.length,nV:new Set(C.E.flatMap(e=>[e.s,e.t])).size,unk:C.E.filter(e=>dxPol(e.v)==='?').length,noST:C.noST,pos,nLane:laneDocs.length,
+      own:own.map(arr),bridge:br.map(e=>arr(e)+(e.flow?' @ '+e.flow:'')).concat(cut.map(e=>`${C.V[e.s].lab} → ${C.V[e.t].lab} ×`)),nCut:cut.length});});
   // CLD のページで足した実線の矢印（どの話にもない矢印）を見つける
   if(R.doc.length&&R.cld.length){const same={};(R.same||'').split('\n').forEach(l=>{const m=l.split(/[=＝]/);if(m.length===2)same[m[0].trim()]=m[1].trim();});const u=n=>{let k=0;while(same[n]&&k++<9)n=same[n];return n;};
-    const have=new Set();R.doc.forEach(x=>x.text.split('\n').forEach(l=>{const m=l.match(ARW);if(m)have.add(u(m[1].trim())+'>'+u(m[2].trim()));}));
-    R.cld.forEach(c=>{c.extra=c.own.filter(l=>{const m=l.match(ARW);return m&&!have.has(u(m[1].trim())+'>'+u(m[2].trim()));});});}
+    const have=new Set();R.doc.forEach(x=>x.text.split('\n').forEach(l=>{const m=arw(l);if(m)have.add(u(m.c)+'>'+u(m.e));}));
+    R.cld.forEach(c=>{c.extra=c.own.filter(l=>{const m=arw(l);return m&&!have.has(u(m.c)+'>'+u(m.e));});});}
   return R;}
 function dxDefaultCld(R){if(!R.cld.length)return -1;const i=R.cld.findIndex(c=>c.name==='CLD');if(i>=0)return i;let b=0;R.cld.forEach((c,j)=>{if(c.nE>R.cld[b].nE)b=j;});return b;}
-// ---- 読み込む前の確認画面
-function dxDialog(R,ci0,mode0){let d=$('dxImp');if(d)d.remove();d=document.createElement('div');d.id='dxImp';
-  d.style.cssText='position:fixed;inset:0;background:rgba(20,35,45,.55);z-index:70;display:flex;align-items:center;justify-content:center';
-  const ci=ci0!=null?ci0:dxDefaultCld(R);const sv=R.svn[0];
+// ---- 読み込む前の確認画面（ページごとに「何の図として読むか」を選び直せる）
+function dxDialog(R,ci0,mode0){let d=$('dxImp');if(d)d.remove();d=document.createElement('div');d.id='dxImp';d.className='ovl';
+  const ci=ci0!=null&&ci0<R.cld.length?ci0:dxDefaultCld(R);const sv=R.svn[0];
   const row=(ok,t,s)=>`<tr><td style="padding:3px 8px;color:${ok?'#2E8B57':'#9AA8AF'}">${ok?'✓':'—'}</td><td style="padding:3px 8px;white-space:nowrap"><b>${t}</b></td><td style="padding:3px 8px">${s}</td></tr>`;
   const cldSel=R.cld.length>1?`<div style="margin:6px 0 0 28px">CLD のページ：${R.cld.map((c,i)=>`<label style="margin-right:10px;white-space:nowrap"><input type="radio" name="dxC" value="${i}" ${i===ci?'checked':''}> ${esc(c.name)}（変数 ${c.nV}・矢印 ${c.nE}）</label>`).join('')}</div>`:'';
-  const noST=(sv?sv.noST:0)+R.doc.reduce((k,x)=>k+x.noST,0)+R.cld.reduce((k,x)=>k+x.noST,0);
-  const unk=R.cld.reduce((k,x)=>k+x.unk,0);
-  d.innerHTML=`<div style="background:#fff;border-radius:12px;padding:16px 20px;width:min(720px,94vw);max-height:90vh;overflow:auto;line-height:1.6">
-   <h3 style="margin:0 0 6px;color:#17384A">draw.io から読み込む</h3><p class="hint" style="margin:0 0 8px">${esc(R.fname)}</p>
-   <table style="border-collapse:collapse;font-size:13.5px">
+  const noST=R.svn.reduce((k,x)=>k+x.noST,0)+R.doc.reduce((k,x)=>k+x.noST,0)+R.cld.reduce((k,x)=>k+x.noST,0);
+  const unk=R.cld.reduce((k,x)=>k+x.unk,0)+R.doc.reduce((k,x)=>k+(x.text.match(/ \?( ‖)?$/gm)||[]).length,0);
+  const unl=sv?sv.unl:0;const nothing=!sv&&!R.doc.length&&ci<0&&!R.same;
+  const pg=R.pages.map((p,i)=>{const opts=['svn','cld','doc','skip'].concat(p.auto==='same'||p.kind==='same'?['same']:[]);
+    return `<tr><td style="padding:2px 8px">${esc(p.name)}</td><td style="padding:2px 8px"><select data-pg="${i}">${opts.map(k=>`<option value="${k}" ${p.kind===k||(k==='skip'&&/^(sd|none)$/.test(p.kind))?'selected':''}>${DXKL[k]}</option>`).join('')}</select></td><td class="hint" style="padding:2px 8px">${p.kind===p.auto?'自動の判定':'選び直した（自動：'+DXKL[p.auto]+'）'}・矢印 ${p.C.E.length}${p.C.E.some(e=>e.lane)?'・レーンの中の矢印 '+p.C.E.filter(e=>e.lane).length:''}</td></tr>`;}).join('');
+  d.innerHTML=`<div class="ovbox" style="width:min(760px,96vw)">
+   <h3 style="margin:0 0 6px;color:#17384A">draw.io から読み込む</h3><p class="hint" style="margin:0 0 8px">${esc(R.fname)}${R.meta?`　<b>ナビの情報</b>：題名「${esc(R.meta.title)}」${R.meta.hy?'・仮説の議論':''}を戻す`:''}</p>
+   <h4 style="margin:6px 0 2px;color:#17384A">ページ（何の図として読むか）</h4><div style="overflow-x:auto"><table style="border-collapse:collapse;font-size:13px">${pg}</table></div>
+   <h4 style="margin:10px 0 2px;color:#17384A">読み込む中身</h4><div style="overflow-x:auto"><table style="border-collapse:collapse;font-size:13.5px">
    ${row(!!sv,'SVN',sv?`「${esc(sv.name)}」 立場 ${sv.nA}・流れ ${sv.nF}${R.svn.length>1?`（SVN のページが ${R.svn.length} 枚。最初のページを使う）`:''}`:'なし')}
-   ${row(R.doc.length>0,'人の話（認知マップ）',R.doc.length?R.doc.map(x=>`${esc(x.name)}（矢印 ${x.nE}）`).join('，'):'なし')}
-   ${row(ci>=0,'CLD',ci>=0?(R.doc.length?`「${esc(R.cld[ci].name)}」の点線の矢印を「補う矢印」にする（${R.cld[ci].bridge.length}本）${(R.cld[ci].extra||[]).length?`。どの話にもない実線の矢印 ${R.cld[ci].extra.length}本は，人の話「draw.io の CLD で足した矢印」にする`:''}`:`「${esc(R.cld[ci].name)}」 変数 ${R.cld[ci].nV}・矢印 ${R.cld[ci].nE}（実線は1つの話，点線は補う矢印として読む）`):'なし')}
+   ${row(R.doc.length>0,'人の話（認知マップ）',R.doc.length?R.doc.map(x=>`${esc(x.name)}${x.lane?'（レーン）':''}（矢印 ${x.nE}）`).join('，'):'なし')}
+   ${row(ci>=0,'CLD',ci>=0?(R.doc.length?`「${esc(R.cld[ci].name)}」の点線の矢印を「補う矢印」にする（${R.cld[ci].bridge.length-R.cld[ci].nCut}本${R.cld[ci].nCut?`，外す矢印 × ${R.cld[ci].nCut}本`:''}）${(R.cld[ci].extra||[]).length?`。どの話にもない実線の矢印 ${R.cld[ci].extra.length}本は，人の話「draw.io の CLD で足した矢印」にする`:''}`:`「${esc(R.cld[ci].name)}」 変数 ${R.cld[ci].nV}・矢印 ${R.cld[ci].nE}（実線は1つの話，点線は補う矢印として読む）`):'なし')}
    ${row(!!R.same,'言葉をそろえる',R.same?esc(R.same.split('\n').join('，')):'なし')}
-   </table>${cldSel}
+   </table></div>${cldSel}
    ${R.skip.length?`<p class="hint" style="margin:8px 0 0">読まないページ：${R.skip.map(esc).join('，')}</p>`:''}
    ${noST?`<p class="warn" style="margin:4px 0 0;font-size:13px">箱につながっていない矢印 ${noST}本は読まない（draw.io で矢印の両端を箱につなぐと読める）。</p>`:''}
-   ${unk?`<p class="warn" style="margin:4px 0 0;font-size:13px">極性（＋／−）のラベルがない矢印が ${unk}本ある。「?」として読む（ループの型が決まらない）。</p>`:''}
-   ${!sv&&!R.doc.length&&ci<0?'<p class="warn">読み込める図がない。</p>':''}
+   ${unl?`<p class="warn" style="margin:4px 0 0;font-size:13px">SVN の矢印のうち ${unl}本はラベルがない。中身を「（中身）」，種類を線の色（なければ情報）として読む。読み込んだ後「自分の問題を書く」で直す。</p>`:''}
+   ${unk?`<p class="warn" style="margin:4px 0 0;font-size:13px">極性（＋／−）のラベルがない矢印が ${unk}本ある。「?」として読む（ループの型が決まらない）。分かったら「自分の問題を書く」で ＋／− に直す。</p>`:''}
+   ${nothing?'<p class="warn">読み込める図がない。上の表で，ページを何の図として読むかを選び直す。</p>':''}
    <h4 style="margin:12px 0 4px;color:#17384A">読み込み方</h4>
-   <label style="display:block"><input type="radio" name="dxM" value="new" ${mode0!=='merge'?'checked':''}> <b>新しい問題として開く</b>：ファイルにないもの（SVN・話・補う矢印）は空にする</label>
+   <label style="display:block"><input type="radio" name="dxM" value="new" ${mode0!=='merge'?'checked':''}> <b>新しい問題として開く</b>：自分の問題になる。ファイルにないもの（SVN・話・補う矢印）は空にする</label>
    <label style="display:block"><input type="radio" name="dxM" value="merge" ${mode0==='merge'?'checked':''}> <b>いまの図に入れる</b>：ファイルにあるもの（SVN／人の話／補う矢印）だけを置き換え，ほかは「${esc(SRC.title||'')}」のまま残す</label>
-   <p style="text-align:right;margin:12px 0 0"><button id="dxImpNo">やめる</button> <button id="dxImpGo" class="primary" ${!sv&&!R.doc.length&&ci<0?'disabled':''}>読み込む</button></p></div>`;
+   <p style="text-align:right;margin:12px 0 0"><button id="dxImpNo">やめる</button> <button id="dxImpGo" class="primary" ${nothing?'disabled':''}>読み込む</button></p></div>`;
   document.body.appendChild(d);
-  d.onchange=ev=>{if(ev.target.name==='dxC')dxDialog(R,+ev.target.value,d.querySelector('input[name=dxM]:checked').value);};
-  d.onclick=ev=>{if(ev.target===d||ev.target.id==='dxImpNo'){d.remove();return;}if(ev.target.id==='dxImpGo'){const c=d.querySelector('input[name=dxC]:checked');const m=d.querySelector('input[name=dxM]:checked').value;d.remove();dxApply(R,c?+c.value:ci,m);}};}
-function dxApply(R,ci,mode){const sv=R.svn[0],C=ci>=0?R.cld[ci]:null;const merge=mode==='merge';
+  const mode=()=>d.querySelector('input[name=dxM]:checked').value;
+  d.onchange=ev=>{const t=ev.target;if(t.name==='dxC')dxDialog(R,+t.value,mode());else if(t.dataset.pg!=null){R.pages[+t.dataset.pg].kind=t.value;dxBuild(R);dxDialog(R,null,mode());}};
+  d.onclick=ev=>{if(ev.target===d||ev.target.id==='dxImpNo'){d.remove();return;}if(ev.target.id==='dxImpGo'){const c=d.querySelector('input[name=dxC]:checked');const m=mode();d.remove();dxApply(R,c?+c.value:ci,m);}};}
+function dxApply(R,ci,mode){const sv=R.svn[0],C=ci>=0?R.cld[ci]:null;const merge=mode==='merge';const meta=R.meta||{};
   let docs=R.doc.map(x=>x.text),bridge=[];
   if(C){if(R.doc.length){bridge=C.bridge;if((C.extra||[]).length)docs=docs.concat([`## draw.io の CLD で足した矢印\n`+C.extra.join('\n')]);}else{docs=[`## ${C.name}\n`+C.own.join('\n')];bridge=C.bridge;}}
   const base=merge?SRC:{svn:'',docs:'',same:'',bridge:''};
-  const title=merge?SRC.title:(R.fname.replace(/\.(drawio|xml|svg)$/i,'').replace(/^\d{8}_[^_]+_/,'').replace(/_v\d+$/,'')||'draw.io の図')+'（draw.io）';
-  SRC={svn:sv?sv.text:base.svn,docs:docs.length?docs.join('\n\n'):base.docs,same:R.same||(merge?base.same:''),bridge:C||R.doc.length?bridge.join('\n'):base.bridge,title,note:merge?SRC.note:'',data:merge?SRC.data:null};
-  if(!merge)POS={svn:{},cld:{}};POS.lab=merge?POS.lab:{};
-  if(sv)POS.svn=Object.assign(merge?POS.svn:{},sv.pos);
-  const pc={};R.doc.forEach(x=>Object.entries(x.pos).forEach(([n,p])=>{if(!pc[n])pc[n]=p;}));if(C)Object.assign(pc,C.pos);if(Object.keys(pc).length)POS.cld=Object.assign(merge?POS.cld:{},pc);
-  POS0=JSON.parse(JSON.stringify(POS));M=parse(SRC);SEL=null;DOC=0;LOOPS=null;
-  STEP=M.bridges.length?4:M.docs.length?2:0;MAXSTEP=Math.max(merge?MAXSTEP:0,STEP);fillEditor();
-  if(!merge){const s=$('exSel');let o=s.querySelector('option[value="__dx"]');if(!o){o=document.createElement('option');o.value='__dx';s.insertBefore(o,s.firstChild);}o.textContent='📥 '+title;s.value='__dx';}
-  if(Z&&Z.open)zClose();render();
+  const title=merge?SRC.title:(meta.title||((R.fname.replace(/\.(drawio|xml|svg)$/i,'').replace(/^\d{8}_[^_]+_/,'').replace(/_v\d+$/,'')||'draw.io の図')+'（draw.io）'));
+  const src={svn:sv?sv.text:base.svn,docs:docs.length?docs.join('\n\n'):base.docs,same:R.same||(merge?base.same:''),bridge:(C||R.doc.length)?bridge.join('\n'):base.bridge,title,note:merge?SRC.note:(meta.note||''),data:merge?SRC.data:(meta.data||null)};
+  const pos=merge?JSON.parse(JSON.stringify(POS)):{svn:{},cld:{}};pos.lab=merge?(POS.lab||{}):(meta.lab||{});
+  if(sv)pos.svn=Object.assign(merge?pos.svn:{},sv.pos);
+  const pc={};R.doc.forEach(x=>Object.entries(x.pos).forEach(([n,p])=>{if(!pc[n])pc[n]=p;}));if(C)Object.assign(pc,C.pos);if(Object.keys(pc).length)pos.cld=Object.assign(merge?pos.cld:{},pc);
+  if(!startOwn(src,pos,{autoStep:true,replaceSelf:merge,maxStep:merge?MAXSTEP:0}))return;
+  if(meta.hy&&!merge){hyStorePut(title,meta.hy);HY.forTitle=null;}
   const nA=M.docs.reduce((k,d)=>k+d.arrows.length,0);
   $('info').innerHTML=`<b>draw.io から読み込んだ</b>（${merge?'いまの図に入れた':'新しい問題として開いた'}）：立場 ${M.actors.length}・流れ ${M.flows.length}・人の話 ${M.docs.length}（矢印 ${nA}）・補う矢印 ${M.bridges.length}・ループ ${loops(cldEdges(true)).length}本。`+
-   (M.bridges.some(b=>b.flow&&b.flow.startsWith('?'))?' <span class="warn">補う矢印のうち，乗せる流れが SVN にないものがある（④でクリックすると分かる）。</span>':'')+' 中身は例題と同じように①〜⑦で見られる（作業はブラウザに残る）。';}
+   (M.bridges.some(b=>b.flow&&b.flow.startsWith('?'))?' <span class="warn">補う矢印のうち，乗せる流れが SVN にないものがある（④でクリックすると分かる）。</span>':'')+' 中身は「自分の問題を書く」で文として確かめ・直せる（作業はブラウザに残る）。';}
 async function dxImportText(text,fname){try{const R=await dxAnalyze(text,fname||'draw.io の図');dxDialog(R);}catch(e){$('info').innerHTML='<span class="warn">draw.io のファイルを読み込めなかった：'+esc(e.message)+'</span>';}}
 window.addEventListener('DOMContentLoaded',()=>{
-  {const s=$('exSel'),f=s.onchange;s.onchange=ev=>{if(s.value==='__dx')return;f(ev);};
-   if(SRC&&/（draw\.io）$/.test(SRC.title||'')&&!EXAMPLES.some(e=>e.title===SRC.title)){const o=document.createElement('option');o.value='__dx';o.textContent='📥 '+SRC.title;s.insertBefore(o,s.firstChild);s.value='__dx';}}
   $('fDx').setAttribute('accept','.drawio,.xml,.svg');
-  $('fDx').onchange=ev=>{const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>dxImportText(r.result,f.name);r.readAsText(f);ev.target.value='';};
-  // ファイルを画面に落としても読み込める
+  $('fDx').onchange=ev=>{const f=ev.target.files[0];ev.target.value='';if(f)openFile(f);};
+  // ファイルを画面に落としても読み込める（draw.io・Excel・CSV・保存したファイル・.scm.json）
   window.addEventListener('dragover',ev=>{if([...(ev.dataTransfer&&ev.dataTransfer.types||[])].includes('Files')){ev.preventDefault();ev.dataTransfer.dropEffect='copy';}});
-  window.addEventListener('drop',ev=>{const f=ev.dataTransfer&&ev.dataTransfer.files&&ev.dataTransfer.files[0];if(!f)return;ev.preventDefault();if(!/\.(drawio|xml|svg)$/i.test(f.name)){$('info').innerHTML='<span class="warn">読み込めるのは .drawio（.xml・draw.io の図の入った .svg）だけ。</span>';return;}const r=new FileReader();r.onload=()=>dxImportText(r.result,f.name);r.readAsText(f);});
+  window.addEventListener('drop',ev=>{const f=ev.dataTransfer&&ev.dataTransfer.files&&ev.dataTransfer.files[0];if(!f)return;ev.preventDefault();openFile(f);});
   // 拡大ツールにも「読み込む」ボタン
   const _zr=zRender;zRender=function(){_zr.apply(this,arguments);if(!Z.open||Z.conv)return;const s=$('zSub');if(!s||s.querySelector('#zDxIn'))return;s.insertAdjacentHTML('beforeend',` <button id="zDxIn" title="draw.io で描いた・直した図（.drawio）を読み込む">draw.io から読み込む</button>`);};
   $('zSub').addEventListener('click',ev=>{if(ev.target.id==='zDxIn')$('fDx').click();});
 });
-</script></body></html>
+</script>
+<script>
+// ===== v8：自分の問題（書く・確かめる・残す）／Excel・CSV／ほかのツールとの受け渡し =====
+'use strict';
+const USERKEY='sysnavi_user',HYKEY='sysnavi_hy';
+const BOXID={svn:'eSvn',docs:'eDocs',same:'eSame',bridge:'eBridge'};
+const BOXNAME={svn:'① SVN',docs:'② 人の話',same:'③ 同じもの',bridge:'④ 補う矢印'};
+let EDIRTY=false;
+// ---- 自分の問題の保存枠（例題に切り替えても消えない）
+function userGet(){try{const u=JSON.parse(localStorage.getItem(USERKEY)||'null');return u&&u.SRC&&typeof u.SRC==='object'?u:null;}catch(e){return null;}}
+function userPut(){if(!SRC||!SRC.own)return;try{localStorage.setItem(USERKEY,JSON.stringify({SRC,POS,POS0,STEP,MAXSTEP,DOC,saved:new Date().toISOString()}));}catch(e){}
+  const o=document.querySelector('#exSel option[value="__user"]');if(o){const t='📥 '+(SRC.title||'自分の問題');if(o.textContent!==t)o.textContent=t;}else buildExSel();}
+function buildExSel(){const s=$('exSel');if(!s)return;const u=userGet();const gs=[];
+  EXAMPLES.forEach(e=>{let g=gs.find(x=>x.n===e.grp);if(!g){g={n:e.grp,es:[]};gs.push(g);}g.es.push(e);});
+  gs.sort((a,b)=>(b.n==='自分の問題')-(a.n==='自分の問題'));
+  s.innerHTML=gs.map(g=>`<optgroup label="${esc(g.n||'')}">${g.n==='自分の問題'&&u?`<option value="__user">📥 ${esc(u.SRC.title||'自分の問題')}</option>`:''}${g.es.map(e=>`<option value="${e.id}">${esc(e.id==='blank'?'＋ 白紙から書く（自分の問題）':e.title)}</option>`).join('')}</optgroup>`).join('');
+  s.value=SRC&&SRC.own&&u?'__user':((EXAMPLES.find(e=>SRC&&e.title===SRC.title&&e.id!=='blank')||{}).id||EXAMPLES[0].id);}
+// 新しい「自分の問題」を始める。ブラウザに残っている自分の問題を置き換えるときは確かめる
+function startOwn(src,pos,opts){opts=opts||{};const u=userGet();
+  if(u&&!opts.noConfirm&&!(opts.replaceSelf&&SRC&&SRC.own)){
+    if(!confirm(`ブラウザに残っている「自分の問題」（${u.SRC.title||'無題'}）を置き換えます。よろしいですか？\n\n残したいときは「キャンセル」を押し，メニューの 📥 で自分の問題を開いて「保存」（.json）か「Excel に書き出す」でファイルにしてから，もう一度読み込む。`))return false;}
+  SRC=Object.assign({svn:'',docs:'',same:'',bridge:'',title:'自分の問題',note:'',data:null},src,{own:true});
+  ['svn','docs','same','bridge','title','note'].forEach(k=>{if(typeof SRC[k]!=='string')SRC[k]=SRC[k]==null?'':String(SRC[k]);});
+  const P=pos&&typeof pos==='object'?JSON.parse(JSON.stringify(pos)):{};POS={svn:P.svn&&typeof P.svn==='object'?P.svn:{},cld:P.cld&&typeof P.cld==='object'?P.cld:{}};if(P.lab)POS.lab=P.lab;POS0=JSON.parse(JSON.stringify(POS));
+  M=parse(SRC);SEL=null;DOC=0;LOOPS=null;STEP=opts.autoStep?(M.bridges.length?4:M.docs.length?2:0):(opts.step||0);MAXSTEP=Math.max(STEP,opts.maxStep||0);
+  if(typeof Z!=='undefined'&&Z.open)zClose();EDIRTY=false;fillEditor();render();buildExSel();return true;}
+function selectProblem(v){
+  if(v==='__user'){const u=userGet();if(!u){buildExSel();return;}SRC=Object.assign({},u.SRC,{own:true});POS=u.POS||{svn:{},cld:{}};POS.svn=POS.svn||{};POS.cld=POS.cld||{};POS0=u.POS0||JSON.parse(JSON.stringify(POS));
+    STEP=u.STEP||0;MAXSTEP=u.MAXSTEP||0;DOC=u.DOC||0;M=parse(SRC);SEL=null;LOOPS=null;if(Z.open)zClose();EDIRTY=false;fillEditor();render();buildExSel();
+    $('info').innerHTML=`自分の問題「${esc(SRC.title)}」を開いた。「自分の問題を書く」で直せる。`;return;}
+  if(v==='blank'){if(!startOwn({title:'自分の問題'},null)){buildExSel();return;}openEditor();
+    $('info').innerHTML='白紙から始める。「自分の問題を書く」の4つの欄に1行ずつ書く（Excel の表を貼り付けても，「Excel・CSV を読む」でもよい）。書いたら「図にする」。';return;}
+  const ex=EXAMPLES.find(e=>e.id===v);if(ex){if(Z.open)zClose();load(ex);EDIRTY=false;buildExSel();
+    if(userGet())$('info').innerHTML=`例題「${esc(ex.title)}」を開いた。自分の問題はメニューの 📥 で戻せる。`;}}
+// ---- 文の書き方を確かめる（読めなかった行の一覧）
+function lint(b){const out=[];const add=(box,ln,lvl,msg,line)=>out.push({box,ln,lvl,msg,line});
+  const M2=parse(b);const svnA=new Set(M2.flows.flatMap(f=>[f.f,f.t]));const u=n=>{let k=0;while(M2.same[n]&&k++<9)n=M2.same[n];return n;};
+  const vars=new Set();M2.docs.forEach(d=>d.arrows.forEach(a=>{vars.add(u(a.c));vars.add(u(a.e));}));
+  const rawVars=new Set();M2.docs.forEach(d=>d.arrows.forEach(a=>{rawVars.add(a.c);rawVars.add(a.e);}));M2.bridges.forEach(a=>{rawVars.add(a.c);rawVars.add(a.e);});
+  const lines=k=>String(b[k]||'').split(/\r?\n/);
+  lines('svn').forEach((l,i)=>{const t=l.trim();if(!t||/^[#＃]|^\/\//.test(t))return;const m=t.match(SVNRE);
+    if(!m){add('svn',i,'err',/→|->|⇒/.test(t)?'「：中身」がない（形：送り手 → 受け手：中身（種類））。この行は図にならない':'読めない行（形：送り手 → 受け手：中身（種類））。この行は図にならない',t);return;}
+    const q=m[3].match(/[（(]([^）)]*)[）)]\s*$/);if(q&&!m[4])add('svn',i,'warn',`種類「${q[1]}」は読めない（製品／情報／お金／方針／欠落）。中身の一部として読み，種類は情報にする`,t);});
+  let head=false;
+  lines('docs').forEach((l,i)=>{const t=l.trim();if(!t)return;const h=t.match(HEADRE);
+    if(h){head=true;const w=h[2]&&h[2].trim();if(w&&!svnA.has(w))add('docs',i,'warn',`話し手「${w}」が SVN にいない（SVN の立場と同じ名前にすると💬でつながる）`,t);else if(!w)add('docs',i,'info','話し手がない（「@ 立場」を書くと SVN の立場とつながる）',t);return;}
+    if(/^[#＃]/.test(t)){add('docs',i,'warn','見出しは「## 話の名前 @話し手」（# を2つ）。いまは文章として読む',t);return;}
+    const a=arw(t);
+    if(a){if(!head){add('docs',i,'info','見出し（## 話の名前 @話し手）より前の矢印は「話」という名前の話になる',t);head=true;}
+      if(a.p==='x')add('docs',i,'err','人の話の矢印に × は使えない（読まない）。CLD から外すときは ④補う矢印 の欄に「原因 → 結果 ×」と書く',t);
+      else if(a.p==='?')add('docs',i,'info','極性が「?」（まだ分からない）。分かったら ＋ か − に直す',t);
+      if(a.c===a.e)add('docs',i,'warn','原因と結果が同じ（CLD には出ない）',t);return;}
+    if(/→|->|⇒/.test(t))add('docs',i,'err','矢印に極性がない。行の最後に + か − を書く（分からなければ ?）。いまは文章として読む',t);});
+  lines('same').forEach((l,i)=>{const t=l.trim();if(!t)return;const p=t.split(/[=＝]/);
+    if(p.length!==2||!p[0].trim()||!p[1].trim()){add('same',i,'err','形：別の言い方 = そろえる名前（= は1つ）',t);return;}
+    if(!rawVars.has(p[0].trim()))add('same',i,'info',`「${p[0].trim()}」はどの矢印にも出てこない`,t);});
+  const bcnt={};M2.bridges.forEach(x=>[x.c,x.e].forEach(v=>{v=u(v);bcnt[v]=(bcnt[v]||0)+1;}));
+  lines('bridge').forEach((l,i)=>{const t=l.trim();if(!t)return;const k=t.search(/[@＠]/);const ar=k>=0?t.slice(0,k):t,fl=k>=0?t.slice(k+1).trim():'';const a=arw(ar);
+    if(!a){add('bridge',i,'err',/→|->|⇒/.test(ar)?'矢印に極性がない（+ か −。分からなければ ?。外すときは ×）。この行は図にならない':'読めない行（形：原因 → 結果 + @ 送り手 → 受け手：中身）',t);return;}
+    if(a.p==='x'){if(!vars.size||!M2.docs.some(d=>d.arrows.some(x=>u(x.c)===u(a.c)&&u(x.e)===u(a.e))))add('bridge',i,'warn','外す矢印（×）が人の話にない',t);return;}
+    if(a.p==='?')add('bridge',i,'info','極性が「?」（まだ分からない）。分かったら ＋ か − に直す',t);
+    if(fl){if(!FLOWRE.test(fl))add('bridge',i,'err','「@」の後は「送り手 → 受け手：中身」',t);else if(!findFlow(M2,fl))add('bridge',i,'warn',`SVN にない流れ「${fl}」（SVN に描き足すか，SVN と同じ書き方にそろえる）`,t);}
+    [a.c,a.e].forEach(v=>{if(vars.size&&!vars.has(u(v))&&(bcnt[u(v)]||0)<2)add('bridge',i,'info',`「${v}」はほかのどこにも出てこない（書き間違いなら直す）`,t);});});
+  return out;}
+let LINTC={k:'',v:[]};
+function lintOf(b){const k=[b.svn,b.docs,b.same,b.bridge].join('\u0001');if(LINTC.k!==k)LINTC={k,v:lint(b)};return LINTC.v;}
+const LVN={err:'読めない',warn:'注意',info:'確かめる'};
+function lintHtml(L){const ne=L.filter(x=>x.lvl==='err').length,nw=L.filter(x=>x.lvl==='warn').length,ni=L.filter(x=>x.lvl==='info').length;
+  if(!L.length)return '<b style="color:#2E8B57">✓ 書き方の確認：すべての行を読めた</b>';
+  return `<div><b>書き方の確認</b>：読めない行 <b class="red">${ne}</b>・注意 ${nw}・確かめる ${ni}（クリックでその行へ）</div>`+L.slice(0,200).map(x=>`<div class="li ${x.lvl}" data-box="${x.box}" data-ln="${x.ln}"><b class="lv">${LVN[x.lvl]}</b> ${BOXNAME[x.box]} ${x.ln+1}行目：${esc(x.msg)} <code>${esc(x.line.length>60?x.line.slice(0,60)+'…':x.line)}</code></div>`).join('');}
+function edBoxes(){return{svn:$('eSvn').value,docs:$('eDocs').value,same:$('eSame').value,bridge:$('eBridge').value};}
+function lintShow(){const el=$('eLint');if(!el)return;el.innerHTML=lintHtml(lintOf(edBoxes()));}
+function lintJump(box,ln){if(!$('editor').classList.contains('open'))openEditor();const ta=$(BOXID[box]);if(!ta)return;const ls=ta.value.split('\n');let st=0;for(let i=0;i<ln&&i<ls.length;i++)st+=ls[i].length+1;
+  ta.focus();ta.setSelectionRange(st,st+(ls[ln]||'').length);const lh=parseFloat(getComputedStyle(ta).lineHeight)||19;ta.scrollTop=Math.max(0,ln*lh-ta.clientHeight/2);
+  ta.classList.remove('jump');void ta.offsetWidth;ta.classList.add('jump');}
+function openEditor(){if(!EDIRTY)fillEditor();$('editor').classList.add('open');lintShow();}
+function applyEditor(){const b=edBoxes();const nsrc=Object.assign(b,{title:$('eTitle').value.trim()||SRC.title||'自分の問題',note:SRC.note||'',data:SRC.data||null});
+  if(SRC.own){Object.assign(SRC,nsrc);M=parse(SRC);SEL=null;LOOPS=null;DOC=Math.min(DOC,Math.max(0,M.docs.length-1));EDIRTY=false;render();buildExSel();}
+  else if(!startOwn(nsrc,POS,{step:STEP,maxStep:MAXSTEP}))return;
+  if(STEP===0&&M.docs.length&&!M.flows.length){STEP=1;MAXSTEP=Math.max(MAXSTEP,1);render();}
+  const L=lintOf(SRC),miss=M.bridges.filter(b=>b.flow&&b.flow.startsWith('?'));
+  $('eMsg').innerHTML=`図にした：立場 ${M.actors.length}・流れ ${M.flows.length}・人の話 ${M.docs.length}（矢印 ${M.docs.reduce((k,d)=>k+d.arrows.length,0)}）・補う矢印 ${M.bridges.length}`+(L.some(x=>x.lvl==='err')?`<br><span class="warn">読めない行が ${L.filter(x=>x.lvl==='err').length}行ある（下の一覧）</span>`:'')+(miss.length?`<br><span class="warn">SVNにない流れ ${miss.length}本</span>`:'');lintShow();}
+function noteHtml(){const n=SRC.note||'';return SRC.own?esc(n).replace(/&lt;(\/?)b&gt;/g,'<$1b>'):n;}
+// ---- 画面の上の「まだ分からない・読めない」の知らせ
+function todoShow(){const t=$('todo');if(!t||!SRC)return;const L=lintOf(SRC);const er=L.filter(x=>x.lvl!=='info').length;
+  const q=M.docs.reduce((k,d)=>k+d.arrows.filter(a=>a.p==='?').length,0)+M.bridges.filter(b=>b.p==='?').length;const parts=[];
+  if(q)parts.push(`<b>極性が「?」の矢印が ${q}本</b>ある（まだ分からない。通るループは型が決まらない）。分かったら ＋ か − に直す`);
+  if(er)parts.push(`<b>読めない・確かめたい行が ${er}行</b>ある`);
+  t.innerHTML=parts.length?`${parts.join('。')}。 <button id="todoGo">書き方を確かめる</button>`:'';}
+{const _r=render;render=function(){_r();todoShow();};}
+// ---- 保存・開く
+const fnSafe=s=>String(s||'').replace(/[\\\/:*?"<>|\s（）()]+/g,'').slice(0,40)||'問題';
+function saveJson(){const st=hyStoreAll()[SRC.title];const o={kind:'svn-intro',version:8,src:Object.assign({},SRC),pos:POS};delete o.src.own;if(st)o.hy=st;
+  SCMIO.download(JSON.stringify(o,null,1),`${SCMIO.stamp()}_scm-recurrent-program_ナビ-${fnSafe(SRC.title)}.json`,'application/json');}
+async function openFile(f){const n=(f.name||'').toLowerCase();
+  try{if(/\.(drawio|svg)$/.test(n)||(/\.xml$/.test(n))){return dxImportText(await f.text(),f.name);}
+    if(/\.(xlsx|xlsm|xls|csv|tsv)$/.test(n))return xlImportFile(f);
+    const t=await f.text();const env=SCMIO.envelopeFromText(t);if(env)return handleEnvelope(env);
+    let o=null;try{o=JSON.parse(t);}catch(e){}
+    if(o&&o.src&&typeof o.src==='object'&&['svn','docs','same','bridge'].some(k=>typeof o.src[k]==='string')){
+      if(startOwn(o.src,o.pos,{})){if(o.hy&&typeof o.hy==='object')hyStorePut(SRC.title,o.hy);HY.forTitle=null;$('info').innerHTML=`「${esc(f.name)}」を自分の問題として開いた。`;}return;}
+    if(/mxfile|mxGraphModel/.test(t))return dxImportText(t,f.name);
+    if(/\t/.test(t))return xlDialog({fname:f.name,sheets:xlSheets([{name:f.name.replace(/\.[^.]+$/,''),rows:SCMIO.parseCsv(t,'\t')}])});
+    alert(`「${f.name}」はナビの問題として読めませんでした。\n読めるもの：ナビで保存した .json，ほかのツールから届いた .scm.json，Excel（.xlsx）・CSV，draw.io（.drawio）。`);
+  }catch(e){$('info').innerHTML='<span class="warn">読み込めなかった：'+esc(e.message)+'</span>';}}
+// ---- ほかのツールとの受け渡し（SCMIO の封筒）
+function handleEnvelope(env){const P=env.payload||{};const from=(SCMIO.TOOL_LABEL||{})[env.from]||env.from||'ほかのツール';const u=userGet();
+  const warnU=u?`\n（ブラウザに残っている自分の問題「${u.SRC.title||'無題'}」は置き換わります）`:'';
+  if(env.kind==='problem'&&P.src&&typeof P.src==='object'){const s=P.src,t=String(s.title||env.title||'届いた問題');
+    if(!confirm(`${from}から問題「${t}」が届きました。このナビで開きますか？${warnU}`))return;
+    if(startOwn({svn:s.svn||'',docs:s.docs||'',same:s.same||'',bridge:s.bridge||'',title:t,note:s.note||'',data:s.data||null},P.pos,{noConfirm:true,autoStep:true}))
+      $('info').innerHTML=`<b>${esc(from)}から届いた問題「${esc(t)}」を開いた</b>（自分の問題になる）。①〜⑦で見られる。「自分の問題を書く」で直せる。`;return;}
+  if(env.kind==='cld'&&Array.isArray(P.arrows)){const t=String(P.title||env.title||'届いた CLD');
+    if(!confirm(`${from}から CLD「${t}」（矢印 ${P.arrows.length}本）が届きました。人の話の矢印として開きますか？${warnU}`))return;
+    const g={},order=[];P.arrows.forEach(a=>{if(!a||!a.c||!a.e)return;const k=a.src||a.who||'CLD';if(!g[k]){g[k]={who:a.who||'',ls:[]};order.push(k);}g[k].ls.push(`${a.c} → ${a.e} ${a.p==='+'||a.p==='-'?a.p:'?'}${a.d?' ‖':''}`);});
+    const docs=order.map(k=>`## ${k}${g[k].who?' @'+g[k].who:''}\n`+g[k].ls.join('\n')).join('\n\n');
+    if(startOwn({docs,title:t},{svn:{},cld:P.pos||{}},{noConfirm:true,autoStep:true}))$('info').innerHTML=`<b>${esc(from)}から届いた CLD を開いた</b>。SVN と補う矢印はない（「自分の問題を書く」で足せる）。`;return;}
+  $('info').innerHTML=`<span class="warn">${esc(from)}から届いたもの（${esc(env.kind)}）は，このナビでは開けない。</span>`;}
+function sendDone(to){return r=>{$('info').innerHTML=r==='delivered'?`${to}に渡した（開いたタブ・ウィンドウを見る）。`:`${to}に直接渡せなかったので，受け渡しのファイル（.scm.json）を保存した。${to}の「開く」でそのファイルを読み込む。`;};}
+function sendWb(){const src=Object.assign({},SRC);delete src.own;
+  SCMIO.sendTo('workbench',SCMIO.envelope('problem','navi',{src,pos:POS},SRC.title),{done:sendDone('ワークベンチ')});$('info').innerHTML='ワークベンチを開いて，いまの問題を渡している…';}
+function labArrows(){return cldEdges(true).filter(e=>e.p!=='x').map(e=>{const o={c:e.c,e:e.e,p:e.p==='+'||e.p==='-'?e.p:'?',d:!!e.d};if(e.src>=0){const d=M.docs[e.src];if(d.who)o.who=d.who;o.src=d.name;}else o.src='補う矢印';return o;});}
+function sendLab(){const arrows=labArrows();if(!arrows.length){alert('CLD の矢印がまだありません（②人の話か④補う矢印を書く）。');return;}
+  const pos={};arrows.forEach(a=>[a.c,a.e].forEach(n=>{if(POS.cld[n])pos[n]=POS.cld[n];}));
+  SCMIO.sendTo('lab',SCMIO.envelope('cld','navi',{title:SRC.title,arrows,pos},SRC.title),{done:sendDone('ラボ')});$('info').innerHTML=`ラボを開いて，いまの CLD（矢印 ${arrows.length}本）を渡している…`;}
+// ---- ⑦ 原因の仮説：問題ごとにブラウザに残す
+function hyStoreAll(){try{const o=JSON.parse(localStorage.getItem(HYKEY)||'{}');return o&&typeof o==='object'?o:{};}catch(e){return{};}}
+function hyStorePut(title,st){const a=hyStoreAll();a[title]=st;try{localStorage.setItem(HYKEY,JSON.stringify(a));}catch(e){}}
+function hySave(){if(!HY.forTitle)return;hyStorePut(HY.forTitle,{score:HY.score,picked:HY.picked,sym:HY.sym,sel:HY.sel,tab:HY.tab});}
+hypOpen=function(){if(HY.forTitle!==SRC.title){const st=hyStoreAll()[SRC.title]||{};Object.assign(HY,{tab:st.tab||'derive',sel:st.sel||null,sym:st.sym||null,score:st.score||{},picked:Array.isArray(st.picked)?st.picked:[]});HY.forTitle=SRC.title;}
+  HY.open=true;$('hypov').classList.add('open');hypRender();};
+{const _h=hypRender;hypRender=function(){_h();if(HY.open)hySave();};}
+function hypObs(D,EE){const hs=D.hyps.filter(h=>!D.curated||['H1','H2','H3','H4','H5','H6'].includes(h.id));let obs=D.obs;
+  if(!obs){const V=[...new Set(EE.flatMap(e=>[e.c,e.e]))];obs=V.map(v=>[v,hs.map(h=>{const src=h.path[0][0];if(v===src)return'↑（原因）';const r=hypReach(EE,src)[v];return r?(r.size>1?'±':[...r][0]==='+'?'↑':'↓'):'—';})]).filter(r=>new Set(r[1]).size>1);}
+  return{hs,obs};}
+const mdc=s=>String(s==null?'':s).replace(/\\/g,'\\\\').replace(/\|/g,'\\|').replace(/\r?\n/g,'<br>');
+hypMarkdown=function(){const D=hypSet();const EE=hypEdges(D);const hs=D.hyps;const jw={'合う':1.5,'判定できない':1,'疑わしい':0.5};
+  const pr=hs.map(h=>{const s=HY.score[h.id]||{j:'判定できない',c:0,imp:2,cost:2,memo:''};return{h,s,v:(+s.c)*(jw[s.j]||1)*s.imp/s.cost};}).sort((a,b)=>b.v-a.v);
+  const {hs:ph,obs}=hypObs(D,EE);const pk=HY.picked.filter(i=>i<obs.length);const groups=hypGroups(obs,pk,ph.length);
+  let md=`# 原因の仮説と確かめる順（${SRC.title}）\n\n${D.curated?'':`症状の変数：${D.symptom||'—'}\n\n`}## 優先順位\n\n| 順 | 仮説 | 一次判定 | 確信度 | 影響 | 手間 | 優先度 | 理由・メモ |\n|---|---|---|---|---|---|---|---|\n`+
+    pr.map((x,i)=>`| ${i+1} | ${mdc(x.h.id+' '+x.h.name+'：'+x.h.stmt)} | ${mdc(x.s.j)} | ${mdc(x.s.c)} | ${['','小','中','大'][x.s.imp]||''} | ${['','表1つ','表の結合','新たな調査'][x.s.cost]||''} | ${x.v.toFixed(0)} | ${mdc(x.s.memo)} |`).join('\n');
+  if(obs.length){md+=`\n\n## 予測表（データを見る前に書いた予測）\n\n| 観測 | ${ph.map(h=>mdc(h.id+' '+h.name)).join(' | ')} | 分かれる組 |\n|---|${ph.map(()=>'---').join('|')}|---|\n`+
+    obs.map((r,i)=>`| ${pk.includes(i)?`**${pk.indexOf(i)+1}** `:''}${mdc(r[0])} | ${r[1].map(mdc).join(' | ')} | ${new Set(r[1]).size} |`).join('\n');}
+  md+=`\n\n## 確かめる順\n\n`+(pk.length?pk.map((i,j)=>`${j+1}. ${obs[i][0].replace(/\n/g,' ')} → ${groups[j].length}組：${groups[j].map(g=>'{'+g.map(x=>ph[x].id).join('・')+'}').join(' ')}`).join('\n'):'（まだ選んでいない）');
+  md+=`\n\n## 仮説の経路（CLD）\n\n`+hs.map(h=>`- **${h.id} ${h.name}**：${h.path.map(p=>p[0]).join(' → ')} → ${h.path[h.path.length-1][1]}（SVN：${h.flow||'—'}）`).join('\n')+`\n`;return md;};
+// ===== Excel・CSV：組織の情報（SVN の流れ・人の話・言葉・補う矢印）の表 ↔ ナビの文 =====
+// 列の名前はワークベンチと同じ（SVN：送り手/受け手/種類/中身/段階/資料，人の話：資料/話し手/原因/結果/極性/遅れ/理由，言葉：別の言い方/そろえる名前）
+const F_C={key:'c',label:'原因',aliases:['原因の変数','cause']},F_E={key:'e',label:'結果',aliases:['結果の変数','effect']},F_P={key:'p',label:'極性',aliases:['符号','向き','polarity','sign']},F_D={key:'d',label:'遅れ',aliases:['遅延','delay']},F_W={key:'why',label:'理由',aliases:['根拠','説明']};
+const XK={
+ svn:{name:'SVN',label:'SVN の流れ',cols:['送り手','受け手','種類','中身','段階','資料'],need:['from','to'],fields:[{key:'from',label:'送り手',aliases:['送り元','出し手','差出人','送信元','from']},{key:'to',label:'受け手',aliases:['受け取り手','送り先','宛先','受信先','to']},{key:'type',label:'種類',aliases:['区分','タイプ','価値の種類','type']},{key:'what',label:'中身',aliases:['内容','渡すもの','流れの中身','what','label']},{key:'stage',label:'段階',aliases:['stage']},{key:'doc',label:'資料',aliases:['資料番号','出典']}]},
+ docs:{name:'人の話',label:'人の話（矢印・聞き取りのメモ）',cols:['資料','話し手','原因','結果','極性','遅れ','理由'],need:['c','e'],fields:[{key:'who',label:'話し手',aliases:['立場','発言者','部門','部署','担当']},{key:'doc',label:'資料',aliases:['話','話の名前','資料名','文書','出典','インタビュー']},F_C,F_E,F_P,F_D,F_W,{key:'text',label:'本文',aliases:['メモ','話の文章','文章','発言','記録','note','memo']}]},
+ same:{name:'言葉をそろえる',label:'言葉をそろえる',cols:['別の言い方','そろえる名前'],need:['a','b'],fields:[{key:'a',label:'別の言い方',aliases:['別名','言い換え','元の言葉','元の変数名']},{key:'b',label:'そろえる名前',aliases:['正式名','そろえた名前','統一名']}]},
+ bridge:{name:'補う矢印',label:'補う矢印',cols:['原因','結果','極性','遅れ','流れ','理由'],need:['c','e'],fields:[F_C,F_E,F_P,F_D,{key:'flow',label:'流れ',aliases:['乗せる流れ','SVNの流れ','乗っている流れ']},F_W]}};
+const XKL={svn:'SVN の流れ',docs:'人の話',same:'言葉をそろえる',bridge:'補う矢印',skip:'読まない'};
+const xstr=v=>v==null?'':String(v).trim();
+function xlType(v){v=xstr(v);if(!v)return['情報',0];if(/^(製品|情報|お金|方針|欠落)$/.test(v))return[v,0];if(/製品|もの|モノ|物|商品|部品|材料/.test(v))return['製品',0];if(/情報|データ|指示|報告|連絡|計画/.test(v))return['情報',0];if(/お金|金|代金|支払|費用|予算|円/.test(v))return['お金',0];if(/方針|決裁|ルール|規則|目標|承認/.test(v))return['方針',0];if(/欠落|届いていない/.test(v))return['欠落',0];return['情報',1];}
+function xlPol(v){if(typeof v==='number')return v>0?'+':v<0?'-':'?';v=xstr(v);if(!v)return'?';if(/^(正|プラス|同じ|同方向|増|＋|\+|\+1|s|S|同)$/.test(v))return'+';if(/^(負|マイナス|逆|逆方向|反対|減|−|－|-|ー|-1|o|O)$/.test(v))return'-';if(/^(×|✕|x|X|外す)$/.test(v))return'x';const p=NORMP(v);return p;}
+const xlDelay=v=>{if(v===true)return true;if(typeof v==='number')return v>0;const s=xstr(v);return !!s&&!/^(なし|無|無し|0|false|no|いいえ|-|ー|×|✕)$/i.test(s);};
+const xlProse=s=>xstr(s).split(/\r?\n/).map(l=>l.trim().replace(/^[#＃]+/,m=>'＃'.repeat(m.length))).filter(Boolean);
+// 見出しの行を探して，どの表か（SVN／人の話／言葉／補う矢印）を見分ける
+function xlClassify(rows,sname){for(let hr=0;hr<Math.min(10,rows.length);hr++){const r=rows[hr]||[];if(r.filter(v=>typeof v==='string'&&v.trim()).length<2)continue;
+    const cols=SCMIO.toObjects(rows,hr).columns;const mp=k=>SCMIO.guessMapping(cols,XK[k].fields);const ok=(k,m)=>XK[k].need.every(n=>m[n]);
+    const ms=mp('svn');if(ok('svn',ms))return{kind:'svn',hr,map:ms,cols};
+    const ma=mp('same');if(ok('same',ma))return{kind:'same',hr,map:ma,cols};
+    const md=mp('docs'),mb=mp('bridge');
+    if(ok('docs',md)){if(!md.doc&&!md.who&&(mb.flow||/補/.test(sname||'')))return{kind:'bridge',hr,map:mb,cols};return{kind:'docs',hr,map:md,cols};}
+    if(md.text&&(md.doc||md.who))return{kind:'docs',hr,map:md,cols};}
+  return null;}
+function xlSheets(book){return book.map(sh=>{const rows=(sh.rows||[]).map(r=>r||[]);const c=/^説明$/.test(sh.name)?null:xlClassify(rows,sh.name);
+  return{name:sh.name,rows,hr:c?c.hr:SCMIO.findHeaderRow(rows),cols:c?c.cols:SCMIO.toObjects(rows).columns,kind:c?c.kind:'skip',map:c?c.map:{},auto:c?c.kind:'skip'};});}
+// 表の行（{列名:値}）を文にする
+function xlConvert(kind,objs,map){const g=k=>o=>map[k]?xstr(o[map[k]]):'';const W=[];let n=0;const out=[];
+  if(kind==='svn'){let bad=0,unk=0,noW=0;objs.forEach(o=>{const f=g('from')(o),t=g('to')(o);if(!f||!t){if(f||t||g('what')(o))bad++;return;}const ty=xlType(g('type')(o));if(ty[1])unk++;let w=g('what')(o).replace(/\r?\n/g,' ');if(!w){w='（中身）';noW++;}out.push(`${f} → ${t}：${w}（${ty[0]}）`);n++;});
+    if(bad)W.push(`送り手か受け手がない行 ${bad}行は読まない`);if(unk)W.push(`種類が読めない行 ${unk}行は「情報」にした`);if(noW)W.push(`中身がない行 ${noW}行は「（中身）」にした`);return{text:out.join('\n'),n,warn:W};}
+  if(kind==='same'){objs.forEach(o=>{const a=g('a')(o),b=g('b')(o);if(a&&b&&a!==b){out.push(`${a} = ${b}`);n++;}});return{text:out.join('\n'),n,warn:W};}
+  if(kind==='bridge'){let unk=0,bad=0;objs.forEach(o=>{const c=g('c')(o),e=g('e')(o);if(!c||!e){if(c||e)bad++;return;}const p=xlPol(map.p?o[map.p]:'');if(p==='?')unk++;const fl=g('flow')(o).replace(/\r?\n/g,' ');
+      out.push(p==='x'?`${c} → ${e} ×`:`${c} → ${e} ${p}${xlDelay(map.d?o[map.d]:'')?' ‖':''}${fl?' @ '+fl:''}`);n++;});
+    if(unk)W.push(`極性がない矢印 ${unk}本は「?」にした`);if(bad)W.push(`原因か結果がない行 ${bad}行は読まない`);return{text:out.join('\n'),n,warn:W};}
+  // 人の話：資料（なければ話し手）ごとに1つの話にまとめる
+  const G={},order=[];let unk=0,cut=0,bad=0;
+  objs.forEach(o=>{const d=g('doc')(o),w=g('who')(o);const k=d||w||'話';if(!G[k]){G[k]={name:d||(w?w+'の話':'話'),who:w,ls:[]};order.push(k);}const Gk=G[k];if(!Gk.who&&w)Gk.who=w;
+    xlProse(map.text?o[map.text]:'').forEach(l=>Gk.ls.push(l));const c=g('c')(o),e=g('e')(o);xlProse(map.why?o[map.why]:'').forEach(l=>Gk.ls.push(l));
+    if(c&&e){const p=xlPol(map.p?o[map.p]:'');if(p==='x'){cut++;return;}if(p==='?')unk++;Gk.ls.push(`${c} → ${e} ${p}${xlDelay(map.d?o[map.d]:'')?' ‖':''}`);n++;}else if(c||e)bad++;});
+  if(unk)W.push(`極性がない矢印 ${unk}本は「?」にした（分かったら ＋／− に直す）`);if(cut)W.push(`極性が × の行 ${cut}行は人の話では読まない（補う矢印の表に書く）`);if(bad)W.push(`原因か結果の片方しかない行 ${bad}行は読まない`);
+  return{text:order.map(k=>`## ${G[k].name}${G[k].who?' @'+G[k].who:''}\n`+G[k].ls.join('\n')).join('\n\n'),n,warn:W,nDoc:order.length};}
+function xlSheetText(S){if(S.kind==='skip')return{text:'',n:0,warn:[]};const o=SCMIO.toObjects(S.rows,S.hr);return xlConvert(S.kind,o.rows,S.map);}
+async function xlImportFile(f){try{const book=await SCMIO.readFile(f);xlDialog({fname:f.name,sheets:xlSheets(book)});}
+  catch(e){$('info').innerHTML='<span class="warn">Excel・CSV を読み込めなかった：'+esc(e.message)+'</span>';alert('読み込めませんでした：'+e.message);}}
+function xlDialog(X,mode0){let d=$('xlImp');if(d)d.remove();d=document.createElement('div');d.id='xlImp';d.className='ovl';
+  const res=X.sheets.map(xlSheetText);const any=res.some(r=>r.n||r.text);
+  d.innerHTML=`<div class="ovbox" style="width:min(860px,96vw)"><h3 style="margin:0 0 4px;color:#17384A">Excel・CSV から読み込む</h3><p class="hint" style="margin:0 0 6px">${esc(X.fname)}　シートごとに，何の表として読むかと，列の対応を確かめる（1行目の列の名前から自動で選んだ）。</p>
+  ${X.sheets.map((S,i)=>{const r=res[i];const K=XK[S.kind];const lines=r.text?r.text.split('\n'):[];
+    return `<div class="xs"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b>${esc(S.name)}</b><select data-xk="${i}">${Object.entries(XKL).map(([k,t])=>`<option value="${k}" ${S.kind===k?'selected':''}>${t}</option>`).join('')}</select><span class="hint">${S.kind===S.auto?'自動の判定':'選び直した'}・${Math.max(0,S.rows.length-S.hr-1)}行${S.kind!=='skip'?`・見出し ${S.hr+1}行目`:''}</span></div>
+    ${K?`<div class="xmap">${K.fields.map(F=>`<label>${F.label}${K.need.includes(F.key)?'*':''} <select data-xm="${i}" data-f="${F.key}"><option value="">（なし）</option>${S.cols.map(c=>`<option ${S.map[F.key]===c?'selected':''}>${esc(c)}</option>`).join('')}</select></label>`).join('')}</div>
+    ${r.warn.length?`<div class="warn" style="font-size:12.5px">${r.warn.map(esc).join('。')}。</div>`:''}<div class="hint">→ ${BOXNAME[S.kind==='docs'?'docs':S.kind]} に ${r.n}${S.kind==='same'?'組':S.kind==='svn'?'本の流れ':'本の矢印'}${r.nDoc?`（話 ${r.nDoc}）`:''}</div><pre>${esc(lines.slice(0,12).join('\n'))}${lines.length>12?`\n…（ほか ${lines.length-12}行）`:''}</pre>`:'<div class="hint">読まない（説明や，ナビの表ではないシート）</div>'}</div>`;}).join('')}
+  <h4 style="margin:10px 0 4px;color:#17384A">読み込み方</h4>
+  <label style="display:block"><input type="radio" name="xlM" value="new" ${mode0!=='add'?'checked':''}> <b>新しい問題として開く</b>（自分の問題になる）</label>
+  <label style="display:block"><input type="radio" name="xlM" value="add" ${mode0==='add'?'checked':''}> <b>いまの問題「${esc(SRC.title||'')}」に書き足す</b>（各欄の最後に足す）</label>
+  <p style="text-align:right;margin:10px 0 0"><button id="xlNo">やめる</button> <button id="xlGo" class="primary" ${any?'':'disabled'}>読み込む</button></p></div>`;
+  document.body.appendChild(d);const mode=()=>d.querySelector('input[name=xlM]:checked').value;
+  d.onchange=ev=>{const t=ev.target;if(t.dataset.xk!=null){const S=X.sheets[+t.dataset.xk];S.kind=t.value;if(XK[S.kind]){if(S.kind===S.auto){const c=xlClassify(S.rows,S.name);if(c){S.map=c.map;S.hr=c.hr;S.cols=c.cols;}}else S.map=SCMIO.guessMapping(S.cols,XK[S.kind].fields);}xlDialog(X,mode());}
+    else if(t.dataset.xm!=null){const S=X.sheets[+t.dataset.xm];if(t.value)S.map[t.dataset.f]=t.value;else delete S.map[t.dataset.f];xlDialog(X,mode());}};
+  d.onclick=ev=>{if(ev.target===d||ev.target.id==='xlNo'){d.remove();return;}if(ev.target.id==='xlGo'){const m=mode();d.remove();xlApply(X,res,m);}};}
+function xlApply(X,res,mode){const add={svn:[],docs:[],same:[],bridge:[]};X.sheets.forEach((S,i)=>{if(S.kind!=='skip'&&res[i].text)add[S.kind].push(res[i].text);});
+  const join=(a,b)=>[a,b].filter(x=>x&&x.trim()).join(a&&/^\s*#/m.test(b)?'\n\n':'\n');
+  const title=X.fname.replace(/\.[^.]+$/,'').replace(/^\d{8}_[^_]+_/,'')||'Excel の問題';
+  let ok;if(mode==='add'){const b={svn:join(SRC.svn,add.svn.join('\n')),docs:join(SRC.docs,add.docs.join('\n\n')),same:join(SRC.same,add.same.join('\n')),bridge:join(SRC.bridge,add.bridge.join('\n'))};
+    if(SRC.own){Object.assign(SRC,b);M=parse(SRC);SEL=null;LOOPS=null;EDIRTY=false;fillEditor();render();ok=true;}else ok=startOwn(Object.assign({},SRC,b),POS,{step:STEP,maxStep:MAXSTEP});}
+  else ok=startOwn({svn:add.svn.join('\n'),docs:add.docs.join('\n\n'),same:add.same.join('\n'),bridge:add.bridge.join('\n'),title},null,{autoStep:true});
+  if(!ok)return;openEditor();const L=lintOf(SRC);
+  $('eMsg').innerHTML=`「${esc(X.fname)}」を文に直して入れた：流れ ${M.flows.length}・人の話 ${M.docs.length}（矢印 ${M.docs.reduce((k,d)=>k+d.arrows.length,0)}）・言葉 ${Object.keys(M.same).length}・補う矢印 ${M.bridges.length}${L.length?'。下の「書き方の確認」を見る':''}`;
+  $('info').innerHTML=`Excel・CSV「${esc(X.fname)}」を読み込んだ。中身は「自分の問題を書く」の欄に文として入っている（直してから「図にする」）。`;}
+// Excel でコピーした範囲（タブ区切り）を欄に貼り付けたとき：見出しがあれば列の名前で，なければ欄ごとの列の順で文にする
+function tsvConvert(rows,box){const c=xlClassify(rows,'');if(c){const o=SCMIO.toObjects(rows,c.hr);return Object.assign(xlConvert(c.kind,o.rows,c.map),{kind:c.kind,head:true});}
+  const ord={svn:['from','to','what','type'],docs:['c','e','p','d'],same:['a','b'],bridge:['c','e','p','d','flow']}[box];
+  if(box==='svn'&&rows.some(r=>r[2]!=null&&r[3]!=null)&&rows.every(r=>r[2]==null||/^(製品|情報|お金|方針|欠落)$/.test(xstr(r[2]))))ord.splice(2,2,'type','what');
+  if(box==='bridge'&&rows.some(r=>/→|->/.test(xstr(r[3]))))ord.splice(3,2,'flow');
+  const map={};ord.forEach(k=>map[k]=k);const objs=rows.map(r=>{const o={};ord.forEach((k,i)=>o[k]=r[i]);return o;});
+  return Object.assign(xlConvert(box,objs,map),{kind:box,head:false});}
+function insertAt(ta,text,atCursor){const v=ta.value;if(atCursor){const a=ta.selectionStart,b=ta.selectionEnd;const pre=v.slice(0,a),post=v.slice(b);const t=(pre&&!pre.endsWith('\n')?'\n':'')+text+(post&&!post.startsWith('\n')?'\n':'');ta.value=pre+t+post;const p=pre.length+t.length;ta.setSelectionRange(p,p);}
+  else ta.value=v+(v&&!v.endsWith('\n')?'\n':'')+text;}
+// ---- Excel の書き出し（テンプレート・いまの問題）
+const XHELP=[['項目','説明'],
+ ['このファイル','システム分析ナビ・ワークベンチで読める「組織の情報」の表。シートの名前は変えてよい（1行目の列の名前で中身を見分ける）。列の順は入れ替えてよい。'],
+ ['SVN','1行に1つの流れ。送り手・受け手は部門や立場の名前（人の話の「話し手」と同じ名前にする）。種類は 製品／情報／お金／方針（空欄は情報。届いていない流れは 欠落）。中身は渡すもの。段階・資料は空欄でよい。'],
+ ['人の話','1行に1つの矢印「原因 → 結果」。資料（話の名前）が同じ行は1つの話にまとまる。話し手は SVN の立場。極性は +（同じ向き）か −（逆向き）。Excel で + や - だけを打つと式になることがあるので，＋／−（全角）や 同／逆 でもよい。分からなければ空欄か ?。遅れがあれば遅れに ‖ か あり。'],
+ ['人の話（聞き取りのメモ）','原因・結果を空欄にして理由に文章を書くと，その話の文章（聞き取りのメモ）になる。矢印の行の理由も，その矢印の前の文章として入る。'],
+ ['言葉をそろえる','別の言い方 → そろえる名前（同じものを部門ごとに別の言葉で呼んでいるとき）。'],
+ ['補う矢印','誰の話にも書かれていないが，SVN の流れに乗ってつながる矢印。流れは「送り手 → 受け手：中身」（SVN の行と同じ書き方）。同じ立場の中の因果なら空欄。人の話の矢印を CLD から外すときは極性に ×。'],
+ ['読み込み方','システム分析ナビの「開く」（またはファイルを画面に落とす），か「自分の問題を書く → Excel・CSV を読む」。表を範囲選択してコピーし，ナビの欄に貼り付けてもよい。'],
+ ['データ','このファイルの中身は，ブラウザの中だけで読む（外へ送らない）。']];
+function xlBook(src,example){const M2=parse(src);const fl=b=>{if(!b.flow)return'';if(b.flow.startsWith('?'))return b.flow.slice(1);const f=M2.flows.find(x=>x.id===b.flow);return f?`${f.f} → ${f.t}：${f.lb}`:'';};
+  const svn=[XK.svn.cols].concat(M2.flows.map(f=>[f.f,f.t,f.ty,f.lb,'','']));
+  const docs=[XK.docs.cols];M2.docs.forEach(d=>{if(d.text)docs.push([d.name,d.who,'','','','',d.text]);d.arrows.forEach(a=>docs.push([d.name,d.who,a.c,a.e,a.p,a.d?'‖':'','']));});
+  const same=[XK.same.cols].concat(Object.entries(M2.same));
+  const br=[XK.bridge.cols].concat(M2.bridges.map(b=>[b.c,b.e,b.p,b.d?'‖':'',fl(b),'']),(M2.cuts||[]).map(x=>[x.c,x.e,'×','','','']));
+  const help=XHELP.concat(example?[]:[['問題の名前',src.title||'']]);
+  return SCMIO.writeXlsx([{name:'説明',rows:help,widths:[22,110]},{name:'SVN',rows:svn},{name:'人の話',rows:docs,widths:[24,14,18,18,6,6,60]},{name:'言葉をそろえる',rows:same},{name:'補う矢印',rows:br}]);}
+const XTPL={title:'組織の情報（記入例：スーパーの欠品）',svn:'店舗 → 本部：発注（情報）\n本部 → 物流センター：配送指示（情報）\nメーカー → 物流センター：商品（製品）\n物流センター → 店舗：配送（製品）\n客 → 店舗：代金（お金）',
+  docs:'## 店長の話 @店舗\n棚が空になると，お客さんが離れていく。だから欠品が出たら，次は多めに発注している。\n欠品 → 客離れ +\n欠品 → 発注量 +\n発注量 → 欠品 -\n\n## 物流センター長の話 @物流センター\n一度にたくさんの配送指示が来ると，仕分けが追いつかず，店への配送が遅れる。\n配送指示の量 → 仕分けの混雑 +\n仕分けの混雑 → 配送の遅れ + ‖',
+  same:'店からの発注 = 発注量',bridge:'配送の遅れ → 欠品 + @ 物流センター → 店舗：配送\n発注量 → 配送指示の量 + @ 本部 → 物流センター：配送指示'};
+function xlTemplate(){SCMIO.download(xlBook(XTPL,true),`${SCMIO.stamp()}_scm-recurrent-program_ナビ-組織の情報テンプレート.xlsx`);}
+function xlExport(){SCMIO.download(xlBook(SRC,false),`${SCMIO.stamp()}_scm-recurrent-program_ナビ-${fnSafe(SRC.title)}.xlsx`);
+  const L=lintOf(SRC).filter(x=>x.lvl==='err');if(L.length)$('eMsg').innerHTML=`<span class="warn">読めない行 ${L.length}行は Excel に入らない（下の一覧）</span>`;}
+// ---- つなぐ
+window.addEventListener('DOMContentLoaded',()=>{
+  $('eClose').onclick=()=>$('editor').classList.remove('open');
+  $('editor').addEventListener('click',ev=>{if(ev.target.id==='editor')$('editor').classList.remove('open');});
+  $('eLint').onclick=ev=>{const x=ev.target.closest('[data-ln]');if(x)lintJump(x.dataset.box,+x.dataset.ln);};
+  let tm=null;['eSvn','eDocs','eSame','eBridge','eTitle'].forEach(id=>$(id).addEventListener('input',()=>{EDIRTY=true;clearTimeout(tm);tm=setTimeout(lintShow,200);}));
+  ['eSvn','eDocs','eSame','eBridge'].forEach(id=>$(id).addEventListener('paste',ev=>{const t=(ev.clipboardData||window.clipboardData).getData('text/plain');if(!t||!/\t/.test(t))return;
+    const rows=SCMIO.parseCsv(t.replace(/\r?\n$/,''),'\t').filter(r=>r&&r.some(v=>v!=null&&v!==''));if(!rows.length)return;ev.preventDefault();
+    const box=$(id).dataset.box,r=tsvConvert(rows,box),ta=$(BOXID[r.kind]);insertAt(ta,r.text,ta===ev.target);EDIRTY=true;lintShow();
+    $('eMsg').innerHTML=`Excel の表（${rows.length}行）を文に直して ${BOXNAME[r.kind]} に入れた${r.head?'（見出しの列の名前で読んだ）':'（列の順：'+({svn:'送り手・受け手・中身・種類',docs:'原因・結果・極性・遅れ',same:'別の言い方・そろえる名前',bridge:'原因・結果・極性・遅れ・流れ'})[box]+'）'}${r.warn.length?'。'+esc(r.warn.join('。')):''}。`;}));
+  $('bXlIn').onclick=()=>$('fXl').click();$('fXl').onchange=ev=>{const f=ev.target.files[0];ev.target.value='';if(f)openFile(f);};
+  $('bXlTpl').onclick=xlTemplate;$('bXlOut').onclick=xlExport;
+  $('bToWb').onclick=sendWb;$('bToLab').onclick=sendLab;
+  $('todo').onclick=ev=>{if(ev.target.id!=='todoGo')return;openEditor();const L=lintOf(edBoxes());const x=L.find(y=>y.lvl!=='info')||L.find(y=>/「\?」/.test(y.msg))||L[0];if(x)lintJump(x.box,x.ln);};
+  $('hyPane').addEventListener('input',ev=>{const t=ev.target;if(t.dataset.hm&&HY.score[t.dataset.hm]){HY.score[t.dataset.hm].memo=t.value;hySave();}});
+  $('hyPane').addEventListener('change',()=>hySave());
+  if(SRC&&SRC.own&&!userGet())userPut();
+  buildExSel();todoShow();
+  SCMIO.receive('navi',handleEnvelope);
+});
+</script>
+</body></html>
