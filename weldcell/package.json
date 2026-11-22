@@ -1,0 +1,13 @@
+{
+  "name": "weldcell",
+  "version": "22.0.0",
+  "private": true,
+  "description": "WeldCell v22 — welding physical-AI research platform (simulator, learning, Sim2Real/Real2Sim bridge)",
+  "license": "UNLICENSED",
+  "scripts": {
+    "test": "node tests/run_tests.js && python3 tests/test_python.py",
+    "test:browser": "node tests/smoke_browser.js",
+    "build": "node tools/build_single.js",
+    "bridge": "python3 bridge/ws_bridge.py --backend mock --port 8765"
+  }
+}

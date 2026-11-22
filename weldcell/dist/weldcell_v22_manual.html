@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WeldCell v22 マニュアル</title>
+<style>
+:root{--paper:#f5f1e8;--paper2:#ece6d8;--ink:#1c2024;--ink2:#3c4248;--muted:#6f6a5e;--line:#d8cfbb;--steel:#216680;--molten:#d9591a;--green:#3f7d4f;--real:#7a3fc0;--code:#262b2f}
+@media (prefers-color-scheme: dark){:root{--paper:#12161b;--paper2:#1a2027;--ink:#e6ebef;--ink2:#c3ccd4;--muted:#8d98a3;--line:#2a333d;--steel:#6fb8ff;--molten:#ff9a52;--green:#5fd39a;--real:#c792ff;--code:#0b0f13}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Sans JP","Hiragino Sans",system-ui,sans-serif;font-size:15.5px;line-height:1.8}
+header{background:#1c2024;color:#f1ece1;padding:34px 22px 24px;border-bottom:3px solid var(--molten)}
+header .in,main{max-width:1000px;margin:0 auto}
+header .k{font-family:ui-monospace,Menlo,monospace;font-size:12px;letter-spacing:.28em;color:#ff9a52}
+header h1{margin:.2em 0;font-size:clamp(24px,4vw,38px);line-height:1.2}
+header p{color:#c9c2b3;max-width:760px;margin:.4em 0 0}
+.toolbar{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.toolbar .in{max-width:1000px;margin:0 auto;padding:8px 22px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.toolbar a{font-family:ui-monospace,Menlo,monospace;font-size:12px;text-decoration:none;color:#fff;background:var(--steel);padding:5px 10px;border-radius:7px}
+.toolbar a.go{background:var(--molten)} .toolbar a.r{background:var(--real)}
+main{padding:10px 22px 100px;display:grid;grid-template-columns:210px 1fr;gap:30px}
+nav{position:sticky;top:56px;align-self:start;font-size:13px;line-height:1.55;border-left:2px solid var(--line);padding-left:12px;max-height:calc(100vh - 70px);overflow:auto}
+nav a{display:block;color:var(--ink2);text-decoration:none;padding:2px 0} nav a:hover{color:var(--molten)}
+@media(max-width:820px){main{grid-template-columns:1fr} nav{position:static;max-height:none}}
+section{border-top:1px solid var(--line);padding-top:16px;margin-top:18px}
+h2{font-size:23px;margin:.2em 0 .4em} h2 small{display:block;font-size:12px;color:var(--muted);font-family:ui-monospace,Menlo,monospace;font-weight:400}
+h3{font-size:17px;color:var(--steel);margin:1.3em 0 .3em}
+code,kbd{font-family:ui-monospace,Menlo,monospace;font-size:.86em;background:var(--paper2);border:1px solid var(--line);border-radius:5px;padding:0 5px}
+pre{background:var(--code);color:#e7edf0;border-radius:10px;padding:12px 14px;overflow:auto;font-size:13px;line-height:1.55}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:10px 0}
+th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top} th{background:var(--paper2);font-size:12.5px}
+.eq{background:var(--paper2);border-left:3px solid var(--steel);padding:8px 14px;border-radius:6px;font-family:"Cambria Math","STIX Two Math",Georgia,serif;font-size:16px;overflow-x:auto;margin:10px 0}
+.note,.warn,.key{border-radius:10px;padding:10px 14px;margin:12px 0;font-size:14.5px;border:1px solid var(--line);background:var(--paper2)}
+.warn{border-color:var(--molten)} .key{border-color:var(--green)}
+.note b:first-child,.warn b:first-child,.key b:first-child{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.12em;display:block;color:var(--muted)}
+.stagelink{font-family:ui-monospace,Menlo,monospace;font-size:12px;text-decoration:none;color:#fff;background:var(--molten);padding:3px 9px;border-radius:6px;white-space:nowrap}
+.fig{border:1px solid var(--line);border-radius:10px;background:var(--paper2);padding:10px;overflow:auto}
+.fig pre{margin:0;background:transparent;color:var(--ink);font-size:12.5px}
+footer{max-width:1000px;margin:0 auto;padding:20px 22px 60px;color:var(--muted);font-size:13px;border-top:3px solid var(--ink)}
+</style>
+</head>
+<body>
+<header><div class="in">
+  <div class="k">WELDCELL v22 · USER &amp; THEORY MANUAL</div>
+  <h1>溶接フィジカル AI 研究開発基盤 — WeldCell v22</h1>
+  <p>7 自由度溶接コボット（単腕／双腕／ヒューマノイド）・溶融池熱モデル・ビジョン・強化学習を，<b>契約（contract）</b>でつないだシミュレータ兼研究基盤です．
+  同じ方策・報酬・観測定義が，サロゲート学習 → ライブ 3D シミュレータ → 実機（ブリッジ）まで地続きに動きます（Sim2Real）．
+  実機の計測から溶融池モデルを校正して戻す経路（Real2Sim）も備えます．</p>
+</div></header>
+<div class="toolbar"><div class="in">
+  <a class="go" href="weldcell_v22.html" target="_blank" rel="noopener">▶ ツールを開く</a>
+  <a href="weldcell_v22.html#stage=1" target="_blank" rel="noopener">① 条件設定</a>
+  <a href="weldcell_v22.html#stage=2" target="_blank" rel="noopener">② 配置</a>
+  <a href="weldcell_v22.html#stage=3" target="_blank" rel="noopener">③ 溶接</a>
+  <a href="weldcell_v22.html#stage=4" target="_blank" rel="noopener">④ 学習</a>
+  <a class="r" href="weldcell_v22.html#stage=5" target="_blank" rel="noopener">⑤ Sim⇄Real</a>
+</div></div>
+<main>
+<nav>
+  <a href="#s1">1 はじめに</a><a href="#s2">2 クイックスタート</a><a href="#s3">3 画面構成</a>
+  <a href="#s4">4 ステージ別の操作</a><a href="#s5">5 契約とアーキテクチャ</a><a href="#s6">6 数理モデル</a>
+  <a href="#s7">7 学習（BC→CEM・DR）</a><a href="#s8">8 Sim2Real 運用</a><a href="#s9">9 Real2Sim 校正</a>
+  <a href="#s10">10 データ形式と API</a><a href="#s11">11 研究への拡張</a><a href="#s12">12 v21 からの変更</a><a href="#s13">13 前提と限界</a><a href="#s14">14 参考文献</a>
+</nav>
+<div>
+<section id="s1"><h2>1 はじめに<small>purpose</small></h2>
+<p>本基盤の目的は，<b>「溶融池を知覚し，動いて溶接する身体を持つ AI（溶接フィジカル AI）」</b>を段階的に構築することです．
+二段階アプローチ — ①シミュレーションで学習モデル（方策＋世界モデル）を作り，②実機（フィジカル）で適応学習する — の両段階を
+同じソフトウェア構造で扱えるように設計しています．</p>
+<div class="key"><b>DESIGN PRINCIPLE</b>ロボット・溶融池・制御器は<b>契約</b>（WeldInput / PoolObservation / ControlAction）だけで結合します．
+どれを入れ替えても（解析モデル↔サロゲート↔学習済み世界モデル↔実機センサ，古典 AUTO↔RL 方策，シミュロボ↔実機ロボ）残りのコードは変わりません．</div>
+</section>
+
+<section id="s2"><h2>2 クイックスタート<small>first weld, first policy, first calibration</small></h2>
+<ol>
+<li><b>開く</b>：<code>index.html</code> をブラウザで開く（ネット不要．フォントのみオンライン時に取得）．</li>
+<li><b>① 条件設定</b>：継手「隅肉」・姿勢「下向 F」．プロセス条件（電流 175 A・電圧 24 V・η0.80）と速度 7 mm/s を確認．</li>
+<li><b>② 配置</b>：入ると到達性評価が自動実行され，溶接線が緑（到達可）／赤（不可）で表示．赤があれば「基台を自動探索」．</li>
+<li><b>③ 溶接</b>：ランバーの <kbd>Approach</kbd> → <kbd>Start Weld</kbd>（または <kbd>Space</kbd>）．ダッシュボードのタブで溶融池・熱場・品質を観測．</li>
+<li><b>④ 学習</b>：<kbd>Train</kbd>（BC→CEM）．「学習」タブに 制御なし／AUTO／BC／RL の比較表．<kbd>Deploy</kbd> で③の溶接に配備．</li>
+<li><b>⑤ Sim⇄Real</b>：接続先「仮想実機」→ 接続 → SHADOW で残差を確認 → CONTROL → ARM → 励起シーケンス → 「実機ログで校正」→「適用」．残差が縮むことを確認．</li>
+</ol>
+<table><tr><th>キー</th><th>動作</th></tr>
+<tr><td><kbd>Space</kbd></td><td>溶接開始／停止</td></tr><tr><td><kbd>Esc</kbd></td><td>停止（CONTROL 中は E-STOP）</td></tr>
+<tr><td><kbd>1</kbd>〜<kbd>5</kbd></td><td>ステージ切替</td></tr><tr><td>ダブルクリック（3D）</td><td>視点リセット</td></tr></table>
+</section>
+
+<section id="s3"><h2>3 画面構成<small>layout</small></h2>
+<div class="fig"><pre>
+┌ ヘッダ: ロゴ │ ①条件 ②配置 ③溶接 ④学習 ⑤Sim⇄Real │ [SIM] 設定保存 読込 既定 マニュアル ┐
+├ ランバー: Home Approach 動作シミュ ▶Start ■Stop ●REC │ phase 進捗 制御器 池L×W 面積 入熱 倣い IK 報酬 ┤
+├──────────── 3D ワークスペース ────────────┬── VISION ──┬──── インスペクタ ────┐
+│ ロボット・ワーク・溶融池・ビード・到達性 │ カメラ画像 │ ステージ別セクション      │
+├──── ダッシュボード（タブ）──────────────────────────┤ ラベル·記号│スライダ│数値│単位│↺ │
+│ テレメトリ│溶融池│熱場│品質│学習│Sim⇄Real│ログ         │ （黄=変更済 / 橙=制御中） │
+└──────────────────────────────────────────┴──────────────────────┘</pre></div>
+<ul>
+<li><b>パラメータ行</b>：スライダと数値入力は連動．↺ で既定値．ラベルにカーソルを置くと説明．</li>
+<li><b>設定値と実際値</b>：AUTO／方策が速度や角度を調整している間，行は<b>橙色</b>で<b>実際値</b>を表示します．設定値（公称条件）は保持され，Home / Approach / 新規溶接で戻ります．</li>
+<li><b>設定 JSON</b>：全パラメータ・選択肢・乱数シード・Real2Sim 校正値・Home 姿勢を保存／読込（実験の再現）．</li>
+</ul>
+</section>
+
+<section id="s4"><h2>4 ステージ別の操作<small>stages</small></h2>
+<h3>① 条件設定 <a class="stagelink" href="weldcell_v22.html#stage=1" target="_blank">開く</a></h3>
+<p>継手（隅肉／ビードオンプレート／突き合わせ），姿勢（F/H/V↑/V↓），経路（直線／角回し／角回し＋別部材）．
+プロセス条件（I, V, η, 材料, 板厚, 予熱），トーチ姿勢（速度, 作業角, 進行角, アーク長, 手首ロール／チルト, 脚長），外乱（溶接線の曲がり・ノイズ・シード）．
+入熱 Q=ηVI と単位長入熱 H=Q/v を即時表示．</p>
+<h3>② 配置・到達性 <a class="stagelink" href="weldcell_v22.html#stage=2" target="_blank">開く</a></h3>
+<p>システム構成（単腕眼手／双腕カメラアーム），形態（独立2台／双腕統合／ヒューマノイド），基台位置，IK 減衰 λ，角部停止．
+「溶接線を評価」で 41 点の IK 収束と 7 軸の関節限界を確認．「基台を自動探索」は基台 X/Z を 5×5 格子で探索し到達率最大の位置へ移動．</p>
+<h3>③ 溶接・観測 <a class="stagelink" href="weldcell_v22.html#stage=3" target="_blank">開く</a></h3>
+<table><tr><th>溶融池制御</th><th>内容</th></tr>
+<tr><td>OFF</td><td>設定値のまま</td></tr>
+<tr><td>AUTO 3軸（v21 古典）</td><td>面積→速度，幅→アーク長，縦横比→作業角の比例制御（ゲイン倍率可変）</td></tr>
+<tr><td>AUTO 契約版</td><td>core の AutoHoldController を契約経由で 20 Hz 適用（実機でも同一コード）</td></tr>
+<tr><td>RL 方策</td><td>④で学習・読込した方策を PolicyController で 20 Hz 適用</td></tr></table>
+<p>倣い制御（シームセンサ）は独立に ON/OFF．ライブ記録（REC）は契約スキーマで JSONL 書出し．</p>
+<h3>④ 学習 <a class="stagelink" href="weldcell_v22.html#stage=4" target="_blank">開く</a></h3>
+<p>タスク定義（観測 compact3 / pool11 / <b>要件19</b>，行動 Δ3 / <b>要件7</b>，報酬重み），学習環境（サロゲート表／物理直），ドメインランダム化，BC 初期化，CEM ハイパーパラメータ．
+Train → 学習曲線と評価表 → Deploy → 方策 JSON 書出し／読込．連携中核パネルでは Coordinator ロールアウト・WeldCellEnv 評価・軌跡 JSONL・サロゲート表 JSON を出力．</p>
+<h3>⑤ Sim⇄Real <a class="stagelink" href="weldcell_v22.html#stage=5" target="_blank">開く</a></h3>
+<p>接続（仮想実機／WebSocket），運用モード（SIM／SHADOW／CONTROL），ARM・E-STOP，セーフティ（変化率上限・ウォッチドッグ），Real2Sim 校正（励起・ログ・ファイル・合成データ）．</p>
+</section>
+
+<section id="s5"><h2>5 契約とアーキテクチャ<small>contract & coordinator</small></h2>
+<div class="eq">robot.step → getWeldInput → pool.setInput → pool.step → PoolObservation → controller.update → ControlAction → robot.applyControl</div>
+<table><tr><th>契約</th><th>主な項目（SI 単位）</th></tr>
+<tr><td>WeldInput（robot→pool）</td><td>溶接点，局所フレーム u（進行）/v（横断）/n（法線），travelSpeed，workAngle / workDev，travelAngle，standoff，weldPosition，process{I,V,η,Q,material,T0,thickness}，seamParam</td></tr>
+<tr><td>PoolObservation（pool→制御）</td><td>L, W, area, penetration, centroidAlong/Across, peakT, t85, status（ok / no_pool / burn_through / stale）</td></tr>
+<tr><td>RobotState</td><td>pose[6]（seam フレームのトーチ位置・姿勢），vel[6]，deviation[3]，trackError，lateralOffset，seamParam，weldInput</td></tr>
+<tr><td>ControlAction</td><td>絶対値（travelSpeed, workAngle, travelAngle, standoff, lateralOffset, wristRoll）と増分（dTravelSpeed, dWorkAngle, dTravelAngle, dStandoff, dLateralOffset, dWristRoll, dAlong）．<code>applyAction()</code> で全実装が同じ解釈・同じ限界</td></tr></table>
+<p>Coordinator は時計を持ち，各ティックで上式を回して <code>frame = {weldInput, poolObs, robotState, action, reward}</code> を発行・記録します．
+<code>frame.action</code> は「そのティックの開始時に適用された行動」で，記録は常に (s, a, r, s′) として整合します．</p>
+</section>
+
+<section id="s6"><h2>6 数理モデル<small>models</small></h2>
+<h3>6.1 運動学（7 自由度）</h3>
+<div class="eq">T<sub>TCP</sub>(q) = (∏<sub>i=1..7</sub> A<sub>i</sub>(q<sub>i</sub>)) · T<sub>tool</sub>　　Δq = Jᵀ(JJᵀ + λ²I)⁻¹ e　（減衰最小二乗 IK，|Δq|≤0.18 rad/iter，関節限界でクランプ）</div>
+<h3>6.2 溶融池（Rosenthal 3D 移動熱源の重ね合わせ）</h3>
+<div class="eq">T(ξ,y,z) = T₀ + Σ<sub>j</sub> c<sub>j</sub>/r<sub>j</sub> · exp[−v(r<sub>j</sub>+ξ<sub>j</sub>)/(2α)]，　c<sub>j</sub> = w<sub>j</sub> · Q/(2πk)，　Q = η·VI·effScale，　α = k/(ρc)，　k ← k·kScale</div>
+<p>3×3 の熱源をガウス重み w=exp(−(i²+j²)/1.4) で配置（進行方向 σ<sub>A</sub>=σ₀+3·lean，横 σ<sub>P</sub>=σ₀，σ₀=(0.6+0.35ℓ<sub>a</sub>)·sigScale）．
+進行角でアーク点のてこ・深さ補正，姿勢ごとの重力バイアスで重心補正．T=T<sub>m</sub> 等温線から L・W・溶込み・面積を求め，溶込み ≥ 0.95×板厚で溶け落ち．</p>
+<div class="eq">t<sub>8/5</sub> ≈ (Q/v)/(2πk) · [1/(500−T₀) − 1/(800−T₀)]　（厚板近似，参考値）</div>
+<h3>6.3 報酬（全モード共通 PoolHoldReward）</h3>
+<div class="eq">r = clamp(1 − w<sub>A</sub>|A−A*|/A* − w<sub>T</sub>|e<sub>track</sub>|/3 mm − w<sub>E</sub>·effort, −1, 1)，　溶融池なし r=−1，溶け落ち r=−1</div>
+<p>A* は公称条件（①の設定値）での物理モデルの池面積．学習・ライブ・実機で同じ A* を用います．</p>
+<h3>6.4 ビジョン・干渉</h3>
+<p>ピンホール投影 p̃ ~ K[R|t]P̃，推定ノイズ σ ∝ 0.25+0.85(1−graze)．リンクをカプセルとみなし線分間最短距離で干渉判定，12 候補の視点をヒステリシス優先で探索．</p>
+</section>
+
+<section id="s7"><h2>7 学習（BC → CEM・ドメインランダム化）<small>learning</small></h2>
+<ol>
+<li><b>Codec</b>：観測を [-1,1] に正規化（compact3 は面積誤差・倣い誤差/3mm・進捗）．行動 [-1,1] を増分（例 Δv ±0.8 mm/s/tick）へ．</li>
+<li><b>BC（模倣学習）</b>：AUTO の実演（4 エピソード）から (o, a) を収集し，a = tanh(W[o;1]) の W をリッジ回帰（atanh 変換）で推定 → CEM の初期平均．
+熟練者データ（要件定義：10 名以上）を同じ JSONL 形式で取り込めば，そのまま BC に使えます．</li>
+<li><b>CEM</b>：θ ~ N(μ, diag σ²) を母集団サンプリング，上位エリートで μ, σ を再推定（σ ≥ 0.04）．評価は 2 エピソード平均．</li>
+<li><b>ドメインランダム化</b>：effScale / kScale / sigScale を ±% で 6 変種のサロゲート表に事前展開しエピソードごとに選択．計測ノイズ・観測遅延・初期速度／アーク長（±30%）も乱択．</li>
+<li><b>評価</b>：学習と別シードで 制御なし / AUTO / BC / RL を比較（平均報酬・面積誤差・面積変動 CV・倣い RMS）．</li>
+</ol>
+<div class="note"><b>EXTENSION</b>線形方策は「実機へ持っていける最小の方策」として採用しています．PPO/SAC などは <code>bridge/weldcell_env.py</code>（Gymnasium 互換・同一物理）で学習し，
+同じ契約（RobotState / PoolObservation → ControlAction）に合わせて <code>IController</code> として差し込めます．</div>
+</section>
+
+<section id="s8"><h2>8 Sim2Real 運用<small>bridge · shadow · control</small></h2>
+<table><tr><th>モード</th><th>動作</th></tr>
+<tr><td>SIM</td><td>実機を参照しない</td></tr>
+<tr><td>SHADOW</td><td>実機の設定値をライブ 3D に写し（デジタルツイン），実機計測 W とシミュレーション予測 W の残差 RMSE を監視．指令は送らない</td></tr>
+<tr><td>CONTROL</td><td>③で選んだ制御器（AUTO 契約版／RL 方策）が<b>実機の観測</b>で 20 Hz 動作し，SafetyLimiter 経由で実機へ指令（ARM 必須）</td></tr></table>
+<div class="warn"><b>SAFETY</b>本ブリッジは研究用です．実機側のインターロック（領域・速度・アーク監視・非常停止回路）を必ず併用してください．
+SafetyLimiter は範囲・変化率（速度 mm/s²，角度 °/s）・ウォッチドッグ（計測途絶で停止）・E-STOP を提供します．</div>
+<p>仮想実機（ブラウザ内または <code>bridge/ws_bridge.py</code>）は，隠れ真値（effScale 0.90, kScale 1.15, sigScale 1.10），アクチュエータ遅れ 0.25 s，計測ノイズ 4%，通信遅延を持つ模擬プラントで，
+ハードウェアなしで SHADOW / CONTROL / Real2Sim の全手順を検証できます．プロトコルの詳細は <code>docs/PROTOCOL.md</code>．</p>
+</section>
+
+<section id="s9"><h2>9 Real2Sim 校正<small>calibration</small></h2>
+<div class="eq">min<sub>θ</sub> Σ<sub>records</sub> Σ<sub>ch∈{W,L,pen}</sub> w<sub>ch</sub> · ((ŷ<sub>ch</sub>(x; θ) − y<sub>ch</sub>)/y<sub>ch</sub>)²，　θ = log(effScale, kScale, sigScale)，Nelder–Mead</div>
+<ol>
+<li><b>データ</b>：(a) 接続中の実機ログ（metrics＋state），(b) CSV／JSONL ファイル（列名例：<code>current_A, voltage_V, speed_mm_s | velocity_cm_min, arc_length_mm, work_dev_deg, width_mm, length_mm, pen_mm</code>），(c) 合成データ（検証用）．</li>
+<li><b>励起</b>：識別性を高めるため，速度 {4,7,11} mm/s × アーク長 {1.5,3,4.5} mm × 作業角 {−8,0,+8}° の 27 点を乱順に保持（CONTROL+ARM 時）．</li>
+<li><b>校正</b>：長いログは 160 点に間引き平均 → 推定 → 校正前後の RMSE とパリティ図．</li>
+<li><b>適用</b>：ライブ溶融池・デジタルツイン予測・学習サロゲートが校正済みモデルに切替．SHADOW の残差が縮むことを確認 → 再学習 → CONTROL．</li>
+</ol>
+<div class="note"><b>NOTE</b>効率と熱伝導率は池寸法に対して部分的に相関するため，励起が短いと個別値の推定はばらつきます（予測誤差は小さくても）．溶込み（断面マクロ）や t8/5（熱電対）を加えると識別性が上がります．</div>
+</section>
+
+<section id="s10"><h2>10 データ形式と API<small>data & API</small></h2>
+<h3>軌跡 JSONL（<code>weldcell-traj/2</code>）</h3>
+<pre>{"_type":"header","schema":"weldcell-traj/2","coreVersion":"2.0","source":"live-sim|real|core-rollout","codec":{...},"config":{...}}
+{"t":..,"obs":[..],"action":{..},"action_vec":[..],"reward":0.93,"next_obs":[..],"done":false,
+ "weldInput":{..},"poolObs":{..},"robotState":{..}}</pre>
+<h3>方策 JSON</h3>
+<p><code>{kind:"LinearPolicy", obsDim, actDim, theta, codec:{obs, act, obsNames, obsLo, obsHi, obsRaw, actNames, actLo, actHi}, targetArea, reward, process, calib, training, control_dt:0.05}</code>
+— <code>bridge/policy_runtime.py</code> で JS と同一の出力（テスト済み）．</p>
+<h3>window.CobotAPI（自動化・外部エージェント用）</h3>
+<pre>CobotAPI.getState()  getPoolObs()  getWeldInput()  applyControl(action)  approach()  startWeld()  stop()  reset()
+CobotAPI.setParam('speed', 8)  setChoice('ctlMode','policy')  getConfig()  setStage(4)  quality()
+window.WeldCell   // core / learning / sim2real の全クラス（Coordinator, Codec, CEMTrainer, Calibrator, BridgeClient ...）</pre>
+</section>
+
+<section id="s11"><h2>11 研究への拡張<small>how to extend</small></h2>
+<table><tr><th>やりたいこと</th><th>差し込み口</th></tr>
+<tr><td>CFD／FDM 溶融池・学習済み世界モデル</td><td><code>IWeldPool</code> を実装（<code>reset/setInput/step/observe</code>）．<code>WorldModelPool(predictFn)</code> がひな形．Coordinator の <code>setPool()</code> で差し替え</td></tr>
+<tr><td>新しい観測・行動（画像特徴，先端幅・先端距離 等）</td><td><code>OBS_SPECS</code> / <code>ACT_SPECS</code>（core.js）に特徴量 <code>{name, lo, hi, get(rs,obs,ctx)}</code> を追加 → Python 側 <code>OBS_FEATURES</code> にも追加</td></tr>
+<tr><td>別アルゴリズム（PPO/SAC/MPC）</td><td><code>IController</code>（<code>update(rs, obs, dt)</code>）を実装．Python では <code>weldcell_env.py</code> で学習</td></tr>
+<tr><td>実機（ROS 2）</td><td><code>bridge/ws_bridge.py</code> の <code>Ros2Backend</code> に topic を実装（docstring 参照）</td></tr>
+<tr><td>熟練者データ</td><td>同一 JSONL 形式で記録 → <code>fitBC</code>（模倣学習）・<code>Calibrator</code>（Real2Sim）に投入</td></tr></table>
+</section>
+
+<section id="s12"><h2>12 v21 からの変更<small>changelog</small></h2>
+<ul>
+<li><b>UI</b>：5 ステージ化（Sim⇄Real 追加），常時表示のランバー，スキーマ駆動のインスペクタ（数値入力・単位・リセット・説明），タブ式ダッシュボード，品質タブ，イベントログ，設定 JSON，キーボードショートカット，オフライン化（three.js 同梱）．</li>
+<li><b>物理</b>：池長さが潰れる不具合（複数ピーク時）を修正．プロセス条件の可変化，校正ノブ，t8/5，溶け落ち判定．計測値から表示用フリッカーを除去．</li>
+<li><b>学習</b>：サロゲートを同一物理から生成（v21 は条件不一致），横補正を含む全行動の配備，BC 初期化，DR，別シード評価，要件定義の 19/7 次元 Codec，方策 JSON 入出力，固定制御周期．</li>
+<li><b>連携中核 v2</b>：単一の制御意味論（applyAction），単一の報酬，(s,a,r,s′) の整合した記録（v21 は r 欠落），操作量ペナルティの修正，シード付き乱数．</li>
+<li><b>Sim2Real/Real2Sim</b>：ブリッジプロトコル，実機アダプタ，SafetyLimiter，仮想実機，SHADOW/CONTROL，励起，校正，リプレイ，Python（物理移植・ブリッジ・方策ランタイム・Gym 環境）．</li>
+<li><b>その他</b>：Home で J7 が戻らない／到達性評価で J7 未確認／始点の IK 未収束を修正．</li>
+</ul>
+</section>
+
+<section id="s13"><h2>13 前提と限界<small>assumptions</small></h2>
+<div class="warn"><b>PEDAGOGICAL MODEL</b>溶融池は線形熱伝導（Rosenthal）で，対流・マランゴニ・潜熱・自由表面・溶滴移行・温度依存物性を含みません．
+姿勢補正・品質判定は経験的な目安です．仮想実機は検証用の模擬プラントです．定量的な施工判断には使わないでください．</div>
+</section>
+
+<section id="s14"><h2>14 参考文献<small>references</small></h2>
+<ol style="font-size:14px">
+<li>Rosenthal, D. (1946). The theory of moving sources of heat and its application to metal treatments. <i>Trans. ASME</i>, 68, 849–866.</li>
+<li>Goldak, J., Chakravarti, A., &amp; Bibby, M. (1984). A new finite element model for welding heat sources. <i>Metall. Trans. B</i>, 15(2), 299–305.</li>
+<li>Kou, S. (2003). <i>Welding Metallurgy</i> (2nd ed.). Wiley.</li>
+<li>Siciliano, B. et al. (2009). <i>Robotics: Modelling, Planning and Control</i>. Springer.</li>
+<li>Nakamura, Y., &amp; Hanafusa, H. (1986). Inverse kinematic solutions with singularity robustness. <i>ASME J. Dyn. Syst. Meas. Control</i>, 108(3), 163–171.</li>
+<li>Rubinstein, R. Y., &amp; Kroese, D. P. (2004). <i>The Cross-Entropy Method</i>. Springer.</li>
+<li>Tobin, J. et al. (2017). Domain randomization for transferring deep neural networks from simulation to the real world. <i>IROS</i>.</li>
+<li>Pomerleau, D. A. (1991). Efficient training of artificial neural networks for autonomous navigation. <i>Neural Computation</i>, 3(1), 88–97.</li>
+<li>Nelder, J. A., &amp; Mead, R. (1965). A simplex method for function minimization. <i>The Computer Journal</i>, 7(4), 308–313.</li>
+<li>Ha, D., &amp; Schmidhuber, J. (2018). World Models. arXiv:1803.10122.</li>
+<li>Eppinger, S. D., &amp; Browning, T. R. (2012). <i>Design Structure Matrix Methods and Applications</i>. MIT Press.</li>
+</ol>
+</section>
+</div>
+</main>
+<footer>WeldCell v22 · ユーザ＆理論マニュアル · ツール（<code>index.html</code>）と同じフォルダ構成で使用 · 教育・研究用近似モデル</footer>
+</body>
+</html>

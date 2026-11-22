@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WeldCell v22 — Welding Physical-AI Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<!-- three.js r128 vendored (MIT) — works offline; see vendor/THREE_LICENSE -->
+<script src="vendor/three.r128.min.js"></script>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><b>Weld<i>Cell</i> v22</b><small>welding physical-AI platform · Sim⇄Real</small></div>
+  <nav class="stepper" id="stepper">
+    <button class="step" data-s="1"><span class="n">1</span><span class="t"><b>条件設定</b><small>Plan · process</small></span></button>
+    <button class="step" data-s="2"><span class="n">2</span><span class="t"><b>配置・到達性</b><small>Place · reach</small></span></button>
+    <button class="step" data-s="3"><span class="n">3</span><span class="t"><b>溶接・観測</b><small>Weld · sense</small></span></button>
+    <button class="step" data-s="4"><span class="n">4</span><span class="t"><b>学習</b><small>Learn · policy</small></span></button>
+    <button class="step real" data-s="5"><span class="n">5</span><span class="t"><b>Sim⇄Real</b><small>bridge · calibrate</small></span></button>
+  </nav>
+  <div class="hdr-tools">
+    <span class="modebadge sim" id="modeBadge" title="運用モード：SIM＝シミュレーションのみ／SHADOW＝実機を監視し差分を計測／CONTROL＝方策で実機を制御">SIM</span>
+    <button class="ibtn" id="cfgSave" title="実験設定（全パラメータ・乱数シード・校正値）を JSON で保存">💾 設定保存</button>
+    <button class="ibtn" id="cfgLoad" title="設定 JSON を読み込み">📂 読込</button>
+    <button class="ibtn" id="cfgReset" title="全パラメータを既定値へ">↺ 既定</button>
+    <a class="ibtn" id="manualBtn" href="docs/manual.html" target="_blank" rel="noopener">📖 マニュアル</a>
+    <input type="file" id="cfgFile" accept=".json,application/json" class="hide">
+  </div>
+</header>
+
+<div class="runbar">
+  <div class="runbtns">
+    <button class="rb" id="homeBtn" title="初期姿勢へ戻る">⌂ Home</button>
+    <button class="rb" id="approachBtn" title="溶接線始端へアプローチ（到達性評価つき）">↘ Approach</button>
+    <button class="rb" id="dryBtn" title="アーク無しで経路を走行（ドライラン）">▷ 動作シミュ</button>
+    <button class="rb go" id="weldBtn" title="溶接開始 / 再開">▶ Start Weld <kbd>Space</kbd></button>
+    <button class="rb stop" id="stopBtn" title="停止">■ Stop</button>
+    <button class="rb" id="recBtn" title="ライブ記録（JSONL）の開始／停止">● REC</button>
+  </div>
+  <div class="stat">
+    <div class="kv"><span class="k">phase</span><span class="v" id="mPhase">idle</span></div>
+    <div class="kv prog"><span class="k">progress</span><span class="v" id="mProg">0%</span><div class="pbar"><i id="mProgBar"></i></div></div>
+    <div class="kv"><span class="k">controller</span><span class="v" id="mCtl">AUTO</span></div>
+    <div class="kv"><span class="k">pool L×W</span><span class="v" id="mPool">—</span></div>
+    <div class="kv"><span class="k">area</span><span class="v" id="mArea">—</span></div>
+    <div class="kv"><span class="k">heat input</span><span class="v" id="mHI">—</span></div>
+    <div class="kv"><span class="k">track err</span><span class="v" id="mTrack">—</span></div>
+    <div class="kv"><span class="k">IK err</span><span class="v" id="mErr">—</span></div>
+    <div class="kv"><span class="k">reward</span><span class="v" id="mRew">—</span></div>
+  </div>
+</div>
+
+<div class="main">
+  <section class="stage-area">
+    <div class="views">
+      <div class="view" id="wsView">
+        <div class="tag">Workspace <small id="wsSub">cobot · workpiece</small></div>
+        <div class="legend"><span><i style="background:var(--acc)"></i>到達可</span><span><i style="background:var(--bad)"></i>到達不可</span><span><i style="background:var(--acc2)"></i>ビード</span></div>
+        <div class="hint">drag: 回転 · 右/shift-drag: 平行移動 · wheel: ズーム · dbl-click: リセット</div>
+        <canvas id="wsCanvas"></canvas>
+        <div class="toast" id="toast"></div>
+      </div>
+      <div class="view" id="camView">
+        <div class="tag">Vision <small id="camSub">eye-in-hand</small></div>
+        <div class="rec"><i></i>WELD-CAM</div>
+        <canvas id="camCanvas"></canvas>
+        <canvas id="camOverlay"></canvas>
+        <div class="camhud" id="camHud"></div>
+        <div class="camtools" id="camModes"></div>
+      </div>
+    </div>
+
+    <div class="dash">
+      <div class="tabs" id="tabs">
+        <button class="tab on" data-p="tele">テレメトリ</button>
+        <button class="tab" data-p="pool">溶融池</button>
+        <button class="tab" data-p="thermal">熱場（計算）</button>
+        <button class="tab" data-p="quality">品質</button>
+        <button class="tab" data-p="learn">学習</button>
+        <button class="tab" data-p="s2r">Sim⇄Real <span class="dot hide" id="s2rDot"></span></button>
+        <button class="tab" data-p="log">ログ</button>
+      </div>
+      <div class="tabpanes">
+        <div class="pane on" id="pane-tele">
+          <div class="card"><div class="ctag">トーチ姿勢 vs 溶接線 <small>横ずれ・進行角・作業角</small></div><canvas id="poseChart"></canvas><div class="clegend">時間 → 右端が最新 · 各系列は独立スケール</div></div>
+          <div class="card"><div class="ctag">溶融池 <small>速度・面積・幅・長さ（破線＝目標）</small></div><canvas id="poolChart"></canvas><div class="clegend">時間 → 右端が最新 · 各系列は独立スケール</div></div>
+        </div>
+        <div class="pane" id="pane-pool">
+          <div class="card"><div class="ctag">溶融池形状 <small>実寸 mm · 簡易／詳細計算</small></div><canvas id="poolShape"></canvas></div>
+          <div class="card"><div class="ctag">カメラ画像としての溶融池 <small id="poolCamTag">眼手カメラ</small></div><canvas id="poolCamImg"></canvas></div>
+        </div>
+        <div class="pane" id="pane-thermal">
+          <div class="card"><div class="ctag">上面温度場 <small>白=Tm · 橙=1100/800 · 青=500℃</small></div><canvas id="mpfTop"></canvas></div>
+          <div class="card"><div class="ctag">横断面 <small>y–z · 溶込み</small></div><canvas id="mpfSec"></canvas></div>
+          <div class="card"><div class="ctag">中心線温度 <small>T(ξ) · 熱サイクル</small></div><canvas id="mpfCycle"></canvas></div>
+        </div>
+        <div class="pane" id="pane-quality">
+          <div class="card" style="flex:1.3"><div class="ctag">溶接品質の指標 <small>計算モデル＋観測から算出（教育用近似）</small></div><div id="qualityBox" class="logbox"></div></div>
+          <div class="card"><div class="ctag">安定性 <small>溶融池面積の変動・倣い誤差</small></div><canvas id="qualChart"></canvas></div>
+        </div>
+        <div class="pane" id="pane-learn">
+          <div class="card"><div class="ctag">学習曲線 <small id="rlCurveTag">CEM · best / elite mean per iteration</small></div><canvas id="rlCurveBig"></canvas></div>
+          <div class="card"><div class="ctag">方策評価 <small>同一シードの未学習エピソードで比較</small></div><div id="evalBox" class="logbox"><span class="mono" style="color:var(--dim)">④ 学習 で Train → 評価結果がここに表示されます</span></div></div>
+        </div>
+        <div class="pane" id="pane-s2r">
+          <div class="card"><div class="ctag">デジタルツイン残差 <small>実機計測 vs シミュレーション予測（幅 W）</small></div><canvas id="resChart"></canvas><div class="clegend" id="resLeg">実機未接続</div></div>
+          <div class="card"><div class="ctag">Real2Sim 校正 <small>予測 vs 計測（幅 W, mm）</small></div><canvas id="parityChart"></canvas><div class="clegend" id="parityLeg">データ未読込</div></div>
+        </div>
+        <div class="pane" id="pane-log">
+          <div class="card"><div class="ctag">イベントログ <small>操作・状態遷移・警告</small> <button class="ibtn" id="logClear" style="margin-left:auto;padding:1px 8px">clear</button></div><div class="logbox" id="logBox"></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <aside class="inspector">
+    <div class="insp-head"><div class="ttl"><span class="n" id="inspN">1</span><span id="inspTitle">条件設定</span></div><p id="inspDesc"></p></div>
+    <div class="insp-body" id="inspector"></div>
+  </aside>
+</div>
+
+<script src="js/pool_model.js"></script>
+<script src="js/core.js"></script>
+<script src="js/learning.js"></script>
+<script src="js/sim2real.js"></script>
+<script src="js/app/params.js"></script>
+<script src="js/app/cell.js"></script>
+<script src="js/app/loop.js"></script>
+<script src="js/app/panels.js"></script>
+</body>
+</html>
