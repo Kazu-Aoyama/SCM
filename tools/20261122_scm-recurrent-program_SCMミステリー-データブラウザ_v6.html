@@ -53,6 +53,16 @@ nav .rxnavbtn{background:var(--amber)!important;color:#1F2A30!important;font-wei
 #rxguide .rxs{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}#rxguide .rxs button,#rxguide .rxnav button{border:1px solid var(--teal);background:#fff;color:var(--teal);border-radius:14px;padding:3px 10px;cursor:pointer;font-size:12px}
 #rxguide .rxs button.on{background:var(--teal);color:#fff}#rxguide .rxnav{display:flex;gap:6px;justify-content:space-between;margin-top:8px}
 .rxflash{outline:3px solid var(--amber)!important;outline-offset:3px;transition:outline .3s}
+.hctl{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px}.hctl input{padding:3px 6px;border-radius:5px;border:1px solid #9AB;font-family:inherit}.hctl label{opacity:.85}
+.dsb{padding:2px 9px;border-radius:10px;font-size:12px;font-weight:bold}.dsb.s{background:#E8A33D;color:#1F2A30}.dsb.u{background:#5B8C5A;color:#fff}
+nav .ionavbtn{color:var(--teal)!important;font-weight:bold}
+.iodrop{border:2px dashed var(--line);border-radius:10px;padding:16px;text-align:center;color:var(--gray);margin-top:6px}.iodrop.on{border-color:var(--teal);background:#E6F2F3}.iodrop input{margin-bottom:6px;max-width:100%}
+.err{color:var(--red)}.req{display:inline-block;background:var(--red);color:#fff;border-radius:4px;padding:0 5px;font-size:11px}tr.miss td{background:#FCEBD3}
+.lv{display:inline-block;border-radius:4px;padding:0 6px;font-size:11px;color:#fff;background:var(--amber)}.lv.e{background:var(--red)}.lv.i{background:var(--gray)}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:8px 16px;border-radius:8px;z-index:80;display:none;max-width:90vw;font-size:13px}
+.umonly{display:none}body.usermode .umonly{display:block}body.usermode #rx .rxgrid{opacity:.45;pointer-events:none}body.usermode #rxguide{display:none!important}
+.nodata{color:#4A5A63;background:#F5F7F8}.btn[disabled]{opacity:.45;cursor:default}
+@media(max-width:600px){main{padding:12px 16px}header{padding:12px 16px}.ctl select,.ctl input[type=search]{max-width:100%}.hctl{margin-left:0}}
 </style><!-- SCMIO:BEGIN -->
 <script>
 /* SCMIO — SCMリカレント教育ツール共通の入出力モジュール
@@ -423,7 +433,7 @@ nav .rxnavbtn{background:var(--amber)!important;color:#1F2A30!important;font-wei
 </script>
 <!-- SCMIO:END -->
 </head><body>
-<header><div><h1>SCMミステリー データブラウザ</h1><p>株式会社ブルーマウンテン（講義用の合成データ）2023〜2025年　原先生「Supply Chain Mystery」の演習データを集計して可視化</p></div></header>
+<header><div><h1>SCMミステリー データブラウザ</h1><p id="hsub">株式会社ブルーマウンテン（講義用の合成データ）2023〜2025年　原先生「Supply Chain Mystery」の演習データを集計して可視化</p></div><div class="hctl"><span id="dsbadge" class="dsb s">サンプルデータ</span><label for="evi" title="対策を始めた月。グラフに縦線を引き，テーマ別 R3 で前後を比べる">介入日</label><input type="month" id="evi" value="2024-04"></div></header>
 <nav id="nav"><button data-t="ov" class="on">概要</button><button data-t="ex">エクスプローラ</button><button data-t="rd">ラウンド別（R1〜R5）</button><button data-t="cv">矢印の検証</button><button data-t="eq">生産ライン・設備</button><button data-t="pc">部品調達</button><button data-t="sk">製品（SKU）</button><button data-t="dc">データ辞書</button></nav>
 <main>
 <section id="ov" class="on"></section>
@@ -443,29 +453,27 @@ const README="# 株式会社ブルーマウンテン SCMデータセット\n\n�
 'use strict';
 const $=s=>document.querySelector(s), esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const PAL=['#0F7C8C','#E8A33D','#C8553D','#17384A','#5B8C5A','#8E6BB0','#7A8C99','#2E86AB','#B5651D','#4F6D7A','#D17A9C','#9AA83E'];
-const MON=[];for(let y=2023;y<=2025;y++)for(let m=1;m<=12;m++)MON.push(`${y}-${String(m).padStart(2,'0')}`);
 const fmtN=(v,d=0)=>v==null||isNaN(v)?'–':Number(v).toLocaleString('ja-JP',{minimumFractionDigits:d,maximumFractionDigits:d});
-// ---------- masters
-if(DATA.LITE){const un=o=>{const cols=o.c.map(c=>{const a=new Array(c.length);let s=0;for(let i=0;i<c.length;i++){s+=c[i];a[i]=s}return a});const sc=o.s||{};Object.entries(sc).forEach(([j,v])=>{cols[j]=cols[j].map(x=>x/v)});return Array.from({length:o.n},(_,i)=>cols.map(c=>c[i]))};
- DATA.ORD=un(DATA.ORD).map(r=>[...r.slice(0,11),0,...r.slice(11,18),0]);DATA.SHP=un(DATA.SHP).map(r=>[r[0],r[1],0,r[2],0,r[3],r[4]]);DATA.PRD=un(DATA.PRD);DATA.INV=un(DATA.INV);
- const [PS_,PP_]=DATA.PROCK;DATA.PROC=un(DATA.PROC).map(r=>[PS_[r[1]],PP_[r[2]],r[0],r[3],r[3]+r[4],0,0,0]);DATA.INVD={};DATA.CUST={cols:[],rows:[]};}
-function tab(o){return o.rows.map(r=>Object.fromEntries(o.cols.map((c,i)=>[c,r[i]])))}
-const SKU=tab(DATA.SKU), CUST=tab(DATA.CUST), SUP=tab(DATA.SUP), PS=tab(DATA.PS), BOM=tab(DATA.BOM), SP=tab(DATA.SP), FIN=tab(DATA.FIN);
-const LINES=DATA.LINES, DCS=DATA.DCS, RANKS=['S','A','B','C'];
-const PGS=[...new Set(SKU.map(s=>s.product_group))].sort();
-const SKUI=Object.fromEntries(SKU.map((s,i)=>[s.sku,i]));
-// dates
-const D0=Date.UTC(2023,0,1);const dstr=i=>new Date(D0+i*864e5).toISOString().slice(0,10);
-const DAYM=[];for(let i=0;i<DATA.NDAY;i++){const d=new Date(D0+i*864e5);DAYM.push((d.getUTCFullYear()-2023)*12+d.getUTCMonth())}
-// ---------- tabs
-document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button,main>section').forEach(x=>x.classList.remove('on'));b.classList.add('on');$('#'+b.dataset.t).classList.add('on');RENDER[b.dataset.t]&&RENDER[b.dataset.t]()});
+// ---------- アプリの状態（データを差し替えても残るもの）
+const APP={mode:'sample',name:'株式会社ブルーマウンテン（サンプル）',evi:'2024-04',data:null,RENDER:{},cvApi:null,meta:null};
+const FN=(c,ext)=>`${SCMIO.stamp()}_scm-recurrent-program_${String(c).replace(/[\\/:*?"<>|\s　，,（）()]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'').slice(0,70)}.${ext}`;
+const R4=v=>typeof v==='number'&&isFinite(v)?Math.round(v*1e4)/1e4:v;
+function dl(name,text,type){try{SCMIO.download(text,name,type)}catch(e){alert('ダウンロードできませんでした')}}
+function toast(msg,ms){let t=$('#toast');if(!t){t=document.createElement('div');t.id='toast';document.body.appendChild(t)}t.textContent=msg;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',ms||4500)}
+function showTab(t){const b=document.querySelector(`nav button[data-t="${t}"]`),s=$('#'+t);if(!b||!s)return;document.querySelectorAll('nav button,main>section').forEach(x=>x.classList.remove('on'));b.classList.add('on');s.classList.add('on');APP.RENDER[t]&&APP.RENDER[t]()}
+document.getElementById('nav').addEventListener('click',e=>{const b=e.target.closest('button[data-t]');if(b)showTab(b.dataset.t)});
 function subtabs(host,items,cb){const d=document.createElement('div');d.className='sub';items.forEach(([k,t],i)=>{const b=document.createElement('button');b.textContent=t;if(!i)b.classList.add('on');b.onclick=()=>{d.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');cb(k)};d.appendChild(b)});host.appendChild(d);return d}
+// ---------- 系列をラボへ（INTEGRATION.md の series 形式）
+function periodOf(X,o){if(o&&o.period)return o.period;if(!X||!X.length)return null;if(X.every(x=>/^\d{4}-\d{2}$/.test(x)))return 'month';if(X.every(x=>/^\d{4}-\d{2}-\d{2}$/.test(x)))return 'day';return null}
+function sendSeries(title,X,series,unit,period){const pl={title,period,t:X.slice(),series:{},source:'データブラウザ：'+APP.name};series.forEach(s=>{let nm=s.name,k=2;while(pl.series[nm])nm=s.name+'（'+(k++)+'）';pl.series[nm]={unit:s.unit||unit||'',v:X.map((_,i)=>{const v=s.data[i];return v==null||isNaN(v)?null:R4(v)})}});
+ SCMIO.sendTo('lab',SCMIO.envelope('series','data',pl,title),{done:r=>toast(r==='delivered'?'システム分析ラボに系列を送った':'ラボに直接届かなかったため .scm.json を保存した（ラボの「開く」で読み込む）')})}
 // ---------- chart
 let CID=0;
 function chart(host,o){
  const id='c'+(++CID);const W=o.w||640,H=o.h||300,ml=60,mr=16,mt=12,mb=o.rot?62:36;
  const wrap=document.createElement('div');wrap.className='card';
- wrap.innerHTML=`<div class="ctitle"><span>${esc(o.title||'')}</span><span class="acts"><button class="btn" data-a="csv">CSV</button><button class="btn" data-a="svg">SVG</button></span></div>${o.sub?`<div class="note">${o.sub}</div>`:''}<div class="chart" id="${id}"></div><div class="lg"></div>${o.foot?`<div class="note">${o.foot}</div>`:''}`;
+ const per=o.type==='scatter'?null:periodOf(o.x,o);
+ wrap.innerHTML=`<div class="ctitle"><span>${esc(o.title||'')}</span><span class="acts"><button class="btn" data-a="csv">CSV</button><button class="btn" data-a="svg">SVG</button>${per&&o.lab!==false?'<button class="btn" data-a="lab" title="この図の系列をシステム分析ラボに送る（同じ端末の中だけ）">ラボへ送る</button>':''}</span></div>${o.sub?`<div class="note">${o.sub}</div>`:''}<div class="chart" id="${id}"></div><div class="lg"></div>${o.foot?`<div class="note">${o.foot}</div>`:''}`;
  host.appendChild(wrap);
  const box=wrap.querySelector('.chart'),lg=wrap.querySelector('.lg');const off=new Set();
  const X=o.x, type=o.type||'line';
@@ -473,16 +481,17 @@ function chart(host,o){
   const ser=o.series.filter(s=>!off.has(s.name));
   let vals=[];if(type==='stack'){X.forEach((_,i)=>{let p=0,n=0;ser.forEach(s=>{const v=s.data[i]||0;if(v>0)p+=v;else n+=v});vals.push(p,n)})}else if(type==='scatter'){ser.forEach(s=>s.data.forEach(p=>vals.push(p[1])))}else ser.forEach(s=>s.data.forEach(v=>v!=null&&!isNaN(v)&&vals.push(v)));
   (o.ref||[]).forEach(r=>r.y!=null&&vals.push(r.y));
+  if(!vals.length)vals=[0];
   let lo=o.yMin!=null?o.yMin:Math.min(0,...vals),hi=o.yMax!=null?o.yMax:Math.max(...vals,lo+1e-9);if(o.yMin==null&&o.tight){lo=Math.min(...vals);const pad=(hi-lo)*0.08||1;lo-=pad;hi+=pad}
   const ticks=niceTicks(lo,hi,5);lo=Math.min(lo,ticks[0]);hi=Math.max(hi,ticks[ticks.length-1]);
   let xlo,xhi,xs;
-  if(type==='scatter'){const xv=[];ser.forEach(s=>s.data.forEach(p=>xv.push(p[0])));xlo=o.xMin!=null?o.xMin:Math.min(...xv);xhi=o.xMax!=null?o.xMax:Math.max(...xv);xs=v=>ml+(v-xlo)/(xhi-xlo||1)*(W-ml-mr)}
+  if(type==='scatter'){const xv=[];ser.forEach(s=>s.data.forEach(p=>xv.push(p[0])));if(!xv.length)xv.push(0,1);xlo=o.xMin!=null?o.xMin:Math.min(...xv);xhi=o.xMax!=null?o.xMax:Math.max(...xv);xs=v=>ml+(v-xlo)/(xhi-xlo||1)*(W-ml-mr)}
   const n=X?X.length:0,bw=(W-ml-mr)/Math.max(n,1),xc=i=>ml+bw*(i+.5),ys=v=>mt+(hi-v)/(hi-lo||1)*(H-mt-mb);
   let g=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="11">`;
   ticks.forEach(t=>{g+=`<line x1="${ml}" x2="${W-mr}" y1="${ys(t)}" y2="${ys(t)}" stroke="#E3E8EB"/><text x="${ml-6}" y="${ys(t)+4}" text-anchor="end" fill="#7A8C99">${fmtTick(t)}</text>`});
   if(o.yLabel)g+=`<text x="12" y="${mt+(H-mt-mb)/2}" transform="rotate(-90 12 ${mt+(H-mt-mb)/2})" text-anchor="middle" fill="#7A8C99">${esc(o.yLabel)}</text>`;
   if(type!=='scatter'){const every=Math.ceil(n/(o.rot?40:14));X.forEach((l,i)=>{if(i%every)return;g+=o.rot?`<text x="${xc(i)}" y="${H-mb+12}" text-anchor="end" transform="rotate(-45 ${xc(i)} ${H-mb+12})" fill="#556">${esc(l)}</text>`:`<text x="${xc(i)}" y="${H-mb+16}" text-anchor="middle" fill="#556">${esc(l)}</text>`});
-   (o.vbands||[]).forEach(b=>{g+=`<line x1="${ml+bw*b.i}" x2="${ml+bw*b.i}" y1="${mt}" y2="${H-mb}" stroke="#C8553D" stroke-dasharray="4 3"/><text x="${ml+bw*b.i+4}" y="${mt+11}" fill="#C8553D">${esc(b.label)}</text>`})}
+   (o.vbands||[]).forEach(b=>{if(b.i==null||b.i<0||b.i>=n)return;g+=`<line x1="${ml+bw*b.i}" x2="${ml+bw*b.i}" y1="${mt}" y2="${H-mb}" stroke="#C8553D" stroke-dasharray="4 3"/><text x="${ml+bw*b.i+4}" y="${mt+11}" fill="#C8553D">${esc(b.label)}</text>`})}
   else{niceTicks(xlo,xhi,6).forEach(t=>{if(t<xlo||t>xhi)return;const lab=o.xfmt?o.xfmt(t):fmtTick(t);if(lab!=='')g+=`<text x="${xs(t)}" y="${H-mb+16}" text-anchor="middle" fill="#556">${lab}</text>`});if(o.xLabel)g+=`<text x="${(W+ml)/2}" y="${H-4}" text-anchor="middle" fill="#7A8C99">${esc(o.xLabel)}</text>`}
   (o.ref||[]).forEach(r=>{if(r.y!=null)g+=`<line x1="${ml}" x2="${W-mr}" y1="${ys(r.y)}" y2="${ys(r.y)}" stroke="${r.c||'#C8553D'}" stroke-dasharray="5 4"/><text x="${W-mr-2}" y="${ys(r.y)-4}" text-anchor="end" fill="${r.c||'#C8553D'}">${esc(r.label||'')}</text>`});
   g+=`<line x1="${ml}" x2="${W-mr}" y1="${ys(Math.max(lo,0))}" y2="${ys(Math.max(lo,0))}" stroke="#9AA"/>`;
@@ -502,309 +511,435 @@ function chart(host,o){
  function legend(){lg.innerHTML=o.series.length>1||o.forceLegend?o.series.map((s,i)=>`<span data-i="${i}" class="${off.has(s.name)?'off':''}"><i style="background:${s.color||PAL[i%PAL.length]};${s.dash?'height:2px;border-top:2px dashed '+(s.color||PAL[i%PAL.length])+';background:none':''}"></i>${esc(s.name)}</span>`).join(''):'';
   lg.querySelectorAll('span').forEach(sp=>sp.onclick=()=>{const nm=o.series[+sp.dataset.i].name;off.has(nm)?off.delete(nm):off.add(nm);legend();draw()})}
  legend();draw();
- wrap.querySelector('[data-a=csv]').onclick=()=>{let t;if(type==='scatter'){t='series,x,y,label\n'+o.series.map(s=>s.data.map(p=>[s.name,p[0],p[1],p[2]||''].join(',')).join('\n')).join('\n')}else{t=['x',...o.series.map(s=>s.name)].join(',')+'\n'+X.map((x,i)=>[x,...o.series.map(s=>s.data[i]==null?'':s.data[i])].join(',')).join('\n')}dl((o.title||'chart')+'.csv','﻿'+t,'text/csv')};
- wrap.querySelector('[data-a=svg]').onclick=()=>dl((o.title||'chart')+'.svg',box.querySelector('svg').outerHTML,'image/svg+xml');
+ wrap.querySelector('[data-a=csv]').onclick=()=>{let rows;if(type==='scatter'){rows=[['series','x','y','label'],...o.series.flatMap(s=>s.data.map(p=>[s.name,R4(p[0]),R4(p[1]),p[2]||'']))]}else{rows=[['x',...o.series.map(s=>s.name)],...X.map((x,i)=>[x,...o.series.map(s=>s.data[i]==null||isNaN(s.data[i])?'':R4(s.data[i]))])]}dl(FN(o.title||'chart','csv'),SCMIO.toCsv(rows),'text/csv')};
+ wrap.querySelector('[data-a=svg]').onclick=()=>dl(FN(o.title||'chart','svg'),box.querySelector('svg').outerHTML,'image/svg+xml');
+ const lb=wrap.querySelector('[data-a=lab]');if(lb)lb.onclick=()=>sendSeries(o.title||'データブラウザの系列',X,o.series,o.unit,per);
  return wrap}
 function dec(v){if(v==null||isNaN(v)||Number.isInteger(v))return 0;const a=Math.abs(v);return a>=100?0:a>=10?1:2}
 function fmtTick(v,d){const a=Math.abs(v);if(d!=null&&d!==true)return fmtN(v,d);if(a>=1e6)return fmtN(v/1e6,a>=1e7?0:1)+'M';if(a>=1e4)return fmtN(v/1e3,0)+'k';return fmtN(v,a>=100||Number.isInteger(v)?0:a>=10?1:2)}
-function niceTicks(lo,hi,n){if(hi===lo)hi=lo+1;const r=(hi-lo)/n,p=Math.pow(10,Math.floor(Math.log10(r))),f=r/p,st=(f<1.5?1:f<3?2:f<7?5:10)*p;const t=[];for(let v=Math.floor(lo/st)*st;v<=hi+st*.5;v+=st)t.push(+v.toFixed(10));return t}
-function dl(name,text,type){try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}catch(e){alert('ダウンロードできませんでした')}}
+function niceTicks(lo,hi,n){if(!isFinite(lo)||!isFinite(hi)){lo=0;hi=1}if(hi===lo)hi=lo+1;const r=(hi-lo)/n,p=Math.pow(10,Math.floor(Math.log10(r))),f=r/p,st=(f<1.5?1:f<3?2:f<7?5:10)*p;const t=[];for(let v=Math.floor(lo/st)*st;v<=hi+st*.5;v+=st)t.push(+v.toFixed(10));return t}
 function tableHTML(cols,rows,opt={}){return `<div class="tw"><table class="t"><tr>${cols.map((c,i)=>`<th class="${i<(opt.left||1)?'l':''}">${esc(c)}</th>`).join('')}</tr>${rows.map(r=>`<tr class="${opt.hl&&opt.hl(r)?'hl':''}">${r.map((c,i)=>`<td class="${i<(opt.left||1)||typeof c==='string'?'l':''}">${typeof c==='number'?fmtN(c,opt.dec&&opt.dec[i]!=null?opt.dec[i]:dec(c)):esc(c??'')}</td>`).join('')}</tr>`).join('')}</table></div>`}
-function sortable(host){host.querySelectorAll('table.t').forEach(tb=>{tb.querySelectorAll('th').forEach((th,ci)=>th.onclick=()=>{const rows=[...tb.querySelectorAll('tr')].slice(1);const asc=th.dataset.s!=='a';th.dataset.s=asc?'a':'d';const val=tr=>{const t=tr.children[ci].textContent.replace(/,/g,'');const v=parseFloat(t);return isNaN(v)?t:v};rows.sort((a,b)=>{const x=val(a),y=val(b);return (x>y?1:x<y?-1:0)*(asc?1:-1)});rows.forEach(r=>tb.appendChild(r))})})}
-// ---------- dimensions
-const SA=i=>SKU[i];
-const DIMS={line:{t:'ライン',vals:LINES,get:(s)=>s.line},pg:{t:'製品群',vals:PGS,get:s=>s.product_group},mode:{t:'生産方式',vals:['MTS','MTO'],get:s=>s.make_mode},abc:{t:'ABC区分',vals:['A','B','C'],get:s=>s.abc_class}};
-// ---------- sources & metrics
-// ORD row: sku,m,rank,dc, n,q,v,nv,ot,ff,nc,cq,uf,cs,ct,o2s,s2d,ltn,ex,plt
-const SRC={
- ord:{t:'受注（受注月で集計）',rows:DATA.ORD,mi:1,nf:16,f0:4,extra:{rank:{t:'顧客ランク',vals:RANKS,get:r=>RANKS[r[2]]},dc:{t:'担当DC',vals:DCS,get:r=>DCS[r[3]]}},
-  M:{q:['受注数量','個',s=>s[1]],v:['受注金額','百万円',s=>s[2]/100],n:['注文行数','行',s=>s[0]],otif:['OTIF','％',s=>s[3]?s[4]/s[3]*100:null],ff:['初回充足率','％',s=>s[3]?s[5]/s[3]*100:null],cr:['取消率（行）','％',s=>s[0]?s[6]/s[0]*100:null],cq:['取消数量','個',s=>s[7]],uf:['約束納期時点の未充足数量','個',s=>s[8]],cs:['非OTIF：欠品・分納あり','行',s=>s[9]],ct:['非OTIF：その他（一括納品の遅れ）','行',s=>s[10]],o2s:['受注→初回出荷（平均）','日',s=>s[13]?s[11]/s[13]:null],s2d:['初回出荷→初回納品（平均）','日',s=>s[13]?s[12]/s[13]:null],ex:['特急便を使った注文行の割合','％',s=>s[3]?s[14]/s[3]*100:null],plt:['約束リードタイム（平均）','日',s=>s[0]?s[15]/s[0]:null]}},
- shp:{t:'出荷（出荷月で集計）',rows:DATA.SHP,mi:1,nf:6,f0:4,map:r=>r[3]?[0,0,0,r[4],r[5],r[6]]:[r[4],r[5],r[6],0,0,0],extra:{dc:{t:'出荷DC',vals:DCS,get:r=>DCS[r[2]]},tm:{t:'配送方法',vals:['通常','特急'],get:r=>r[3]?'特急':'通常'}},
-  M:{q:['出荷数量','個',s=>s[1]+s[4]],xq:['特急便の出荷数量','個',s=>s[4]],xr:['特急便の比率（数量）','％',s=>(s[1]+s[4])?s[4]/(s[1]+s[4])*100:null],c:['運賃','百万円',s=>(s[2]+s[5])/100],xc:['特急便の運賃','百万円',s=>s[5]/100],cpu:['1個あたり運賃','円',s=>(s[1]+s[4])?(s[2]+s[5])*1e4/(s[1]+s[4]):null],n:['出荷明細数','件',s=>s[0]+s[3]]}},
- prd:{t:'生産',rows:DATA.PRD,mi:1,nf:2,f0:2,extra:{},M:{ac:['生産実績','個',s=>s[1]],pl:['生産計画','個',s=>s[0]],ach:['計画達成率','％',s=>s[0]?s[1]/s[0]*100:null]}},
- inv:{t:'在庫（DC，見込生産品，月平均）',rows:DATA.INV,mi:2,nf:4,avg:true,map:r=>[r[3],r[4],r[5],r[3]*SKU[r[0]].unit_cost],extra:{dc:{t:'DC',vals:DCS,get:r=>DCS[r[1]]}},
-  M:{oh:['手持在庫','個',s=>s[0]],oo:['入荷待ち（on_order）','個',s=>s[1]],bo:['出荷待ち（backorder）','個',s=>s[2]],val:['在庫金額（原価）','百万円',s=>s[3]/1e6]}}
-};
-if(DATA.LITE){delete SRC.ord.extra.rank;delete SRC.ord.extra.dc;delete SRC.shp.extra.dc;delete SRC.inv.extra.dc;delete SRC.shp.M.n}
-const BUCK={m:{t:'月',n:36,f:m=>m,lab:i=>MON[i]},q:{t:'四半期',n:12,f:m=>Math.floor(m/3),lab:i=>`${2023+Math.floor(i/4)}Q${i%4+1}`},y:{t:'年',n:3,f:m=>Math.floor(m/12),lab:i=>String(2023+i)}};
-function aggregate(src,{flt={},by='all',bucket='m',topN=8,metric}){
- const S=SRC[src],B=BUCK[bucket],nf=S.nf;const groups=new Map();const cnt=new Array(B.n).fill(0);
- const dimGet=k=>DIMS[k]?r=>DIMS[k].get(SKU[r[0]]):S.extra[k]?S.extra[k].get:k==='sku'?r=>SKU[r[0]].sku:()=>'全体';
- const fk=Object.entries(flt).filter(([k,v])=>v&&v.size&&(DIMS[k]||S.extra[k]));
- const gget=dimGet(by);const monthsSeen=new Set();
- for(const r of S.rows){let ok=true;for(const [k,v] of fk){if(!v.has(dimGet(k)(r))){ok=false;break}}if(!ok)continue;
-  const m=r[S.mi];if(m<0||m>35)continue;const b=B.f(m);const key=gget(r);let a=groups.get(key);if(!a){a=Array.from({length:B.n},()=>new Float64Array(nf));groups.set(key,a)}
-  const vals=S.map?S.map(r):r.slice(S.f0,S.f0+nf);const t=a[b];for(let j=0;j<nf;j++)t[j]+=vals[j];}
- let keys=[...groups.keys()];
- if(by==='sku'){const f=SRC[src].M[metric][2];const tot=k=>{const s=new Float64Array(nf);groups.get(k).forEach(t=>t.forEach((v,j)=>s[j]+=v));return f(s)||0};keys.sort((a,b)=>tot(b)-tot(a));if(keys.length>topN){const rest=keys.slice(topN);const o=Array.from({length:B.n},()=>new Float64Array(nf));rest.forEach(k=>groups.get(k).forEach((t,i)=>t.forEach((v,j)=>o[i][j]+=v)));keys=keys.slice(0,topN);groups.set('その他',o);keys.push('その他')}}
- else{const order=DIMS[by]?DIMS[by].vals:S.extra[by]?S.extra[by].vals:keys;keys=order.filter(k=>groups.has(k))}
- const div=S.avg?(bucket==='m'?1:bucket==='q'?3:12):1;
- return {x:Array.from({length:B.n},(_,i)=>B.lab(i)),keys,get:(k,mk)=>{const f=S.M[mk][2];return groups.get(k).map(t=>{const s=Array.from(t,v=>v/div);const v=f(s);return v==null?null:v})}}}
+function sortable(host){host.querySelectorAll('table.t').forEach(tb=>{tb.querySelectorAll('th').forEach((th,ci)=>th.onclick=()=>{const rows=[...tb.querySelectorAll('tr')].slice(1);const asc=th.dataset.s!=='a';th.dataset.s=asc?'a':'d';const val=tr=>{const t=tr.children[ci].textContent.replace(/[,％%]|（\d+）/g,'');const v=parseFloat(t);return isNaN(v)||!/^\s*[-−]?[\d.]/.test(t)?t:v};rows.sort((a,b)=>{const x=val(a),y=val(b);if(typeof x!==typeof y)return (typeof x==='number'?-1:1)*(asc?1:-1);return (x>y?1:x<y?-1:0)*(asc?1:-1)});rows.forEach(r=>tb.appendChild(r))})})}
 function msel(host,key,label,vals,state,on){const d=document.createElement('details');d.className='ms';const upd=()=>{d.querySelector('summary').textContent=`${label}：${state[key]&&state[key].size?[...state[key]].join('，'):'すべて'}`};
  d.innerHTML=`<summary></summary><div class="box"><label><input type="checkbox" data-all> すべて</label>${vals.map(v=>`<label><input type="checkbox" value="${esc(v)}"> ${esc(v)}</label>`).join('')}</div>`;
  const cbs=[...d.querySelectorAll('input[value]')],all=d.querySelector('[data-all]');const sync=()=>{const s=state[key];cbs.forEach(c=>c.checked=!!(s&&s.has(c.value)));all.checked=!(s&&s.size)};
  cbs.forEach(c=>c.onchange=()=>{state[key]=new Set(cbs.filter(x=>x.checked).map(x=>x.value));if(state[key].size===vals.length)state[key]=new Set();sync();upd();on()});all.onchange=()=>{state[key]=new Set();sync();upd();on()};
  sync();upd();host.appendChild(d);return d}
-// ---------- overview
-const RENDER={};
-function yearOrd(flt={}){const a=aggregate('ord',{flt,by:'all',bucket:'y'});return k=>a.get('全体',k)}
-function yearShp(){const a=aggregate('shp',{by:'all',bucket:'y'});return k=>a.get('全体',k)}
-RENDER.ov=(()=>{let done=false;return()=>{if(done)return;done=true;const h=$('#ov');
- const yo=yearOrd(),ys=yearShp();const fy=k=>[0,1,2].map(y=>FIN.filter(f=>f.month.startsWith(String(2023+y))).reduce((a,f)=>a+f[k],0));
- const rev=fy('revenue'),op=fy('operating_profit'),lc=fy('logistics_cost');
- h.innerHTML=`<h2>会社の状況：受注は伸びたのに，納期どおりに届く割合（OTIF）は下がり続けた</h2><div class="kpi">
- <div><small>売上（2023→2025年）</small><b>${fmtN(rev[0]/1e8,1)}→${fmtN(rev[2]/1e8,1)}億円</b></div>
- <div><small>受注数量（2023→2025年）</small><b>${fmtN(yo('q')[0]/1e6,2)}→${fmtN(yo('q')[2]/1e6,2)}百万個</b></div>
- <div><small>OTIF（注文行，取消を除く）</small><b>${yo('otif').map(v=>fmtN(v,1)).join('→')}％</b></div>
- <div><small>取消率（注文行）</small><b>${yo('cr').map(v=>fmtN(v,1)).join('→')}％</b></div>
- <div><small>特急便の比率（出荷数量）</small><b>${ys('xr').map(v=>fmtN(v,1)).join('→')}％</b></div>
- <div><small>物流費（2023→2025年）</small><b>${fmtN(lc[0]/1e8,1)}→${fmtN(lc[2]/1e8,1)}億円</b></div></div>
- <div class="see">OTIFの定義（このブラウザ共通）：注文行（order_id×sku）ごとに，約束納期までの納品数量の合計が注文数量に達していれば「OTIF」。取消の印が1つでもある注文行は分母から除く。初回充足率：最初の納品が約束納期までに全量であった割合。いずれも受注月で集計する。原先生の演習のOTIF（96.7→94.4→91.6％）と一致する。</div>
- <div class="grid2" id="ovg"></div><h3>14の表と結合のしかた</h3><div class="card" id="ovt"></div>`;
- const g=$('#ovg');const a=aggregate('ord',{by:'mode',bucket:'m'}),al=aggregate('ord',{by:'all',bucket:'m'});
- chart(g,{title:'月別OTIF：見込生産（MTS）と受注生産（MTO）',x:a.x,series:[{name:'全体',data:al.get('全体','otif'),color:'#17384A',w:2.5},...a.keys.map((k,i)=>({name:k,data:a.get(k,'otif'),color:PAL[i]}))],unit:'％',tight:true,vbands:[{i:15,label:'2024-04 安全在庫の設定変更'}]});
- const l=aggregate('ord',{by:'line',bucket:'m',flt:{mode:new Set(['MTS'])}});
- chart(g,{title:'ライン別のOTIF（見込生産品）：LINE-3だけが落ち込む',x:l.x,series:l.keys.map(k=>({name:k,data:l.get(k,'otif'),color:k==='LINE-3'?'#C8553D':undefined,w:k==='LINE-3'?3:1.6})),unit:'％',tight:true});
- chart(g,{title:'月別の受注数量と生産実績（全社）',x:al.x,series:[{name:'受注数量',data:al.get('全体','q')},{name:'生産実績',data:aggregate('prd',{by:'all'}).get('全体','ac')}],unit:'個'});
- chart(g,{title:'売上に占める営業利益と物流費の割合（finance_monthly）',x:FIN.map(f=>f.month),series:[{name:'営業利益率',data:FIN.map(f=>f.operating_profit/f.revenue*100)},{name:'物流費率',data:FIN.map(f=>f.logistics_cost/f.revenue*100),color:'#C8553D'}],unit:'％'});
- $('#ovt').innerHTML=tableHTML(['表','何の記録か','1行の単位','行数','結合キー'],[['orders','顧客の注文','注文×SKU',219742,'order_id＋sku → shipments，deliveries'],['shipments','DCからの出荷と運賃','注文行の1回の出荷',221213,'order_id＋sku'],['deliveries','納品・不足・分納・取消','注文行の1件の記録',242730,'order_id＋sku'],['inventory_daily','DCの日次在庫（MTSのみ）','日×DC×SKU',180840,'sku'],['production','生産計画と実績','日×工場×ライン×SKU',24523,'sku，date＋plant＋line'],['equipment_daily','ラインの稼働・生産','日×工場×ライン',5480,'date＋plant＋line'],['procurement','部品の発注と入荷','発注明細',4396,'part_id＋supplier_id'],['sales_plan_monthly','予測・販売計画・生産計画・実績','月×製品群',216,'month＋product_group'],['finance_monthly','全社の損益・在庫評価','月',36,'month'],['product_master','製品の属性・担当ライン','SKU',80,'sku → line'],['customer_master','顧客の属性・約束LT・担当DC','顧客',220,'customer_id'],['supplier_master','サプライヤの属性','サプライヤ',24,'supplier_id'],['part_supplier','部品の調達先・単一調達','部品×サプライヤ',112,'part_id，supplier_id'],['bom','製品の部品構成','SKU×部品',350,'sku，part_id']],{left:3});
-}})();
-// ---------- explorer
-RENDER.ex=(()=>{let done=false;const st={src:'ord',metric:'otif',by:'line',bucket:'m',type:'line',flt:{},top:8,cmp:'otif'};return()=>{if(done)return;done=true;const h=$('#ex');
- h.innerHTML=`<h2>エクスプローラ：表・指標・切り口・絞り込みを選んで集計する</h2><div class="card"><div class="ctl" id="exc1"></div><div class="ctl" id="exc2"></div><div class="note" id="exnote"></div></div><div id="exout"></div>`;
- const c1=$('#exc1'),c2=$('#exc2');
- const build=()=>{const S=SRC[st.src];if(!S.M[st.metric])st.metric=Object.keys(S.M)[0];
-  const byOpts=[['all','全体'],...Object.entries(DIMS).map(([k,d])=>[k,d.t]),...Object.entries(S.extra).map(([k,d])=>[k,d.t]),['sku','SKU（上位）']];if(!byOpts.find(o=>o[0]===st.by))st.by='all';
-  c1.innerHTML=`<label>表</label><select id="xs">${Object.entries(SRC).map(([k,s])=>`<option value="${k}" ${k===st.src?'selected':''}>${s.t}</option>`).join('')}</select>
-  <label>指標</label><select id="xm">${Object.entries(S.M).map(([k,m])=>`<option value="${k}" ${k===st.metric?'selected':''}>${m[0]}（${m[1]}）</option>`).join('')}</select>
-  <label>系列の切り口</label><select id="xb">${byOpts.map(([k,t])=>`<option value="${k}" ${k===st.by?'selected':''}>${t}</option>`).join('')}</select>
-  <label>集計単位</label><select id="xk">${Object.entries(BUCK).map(([k,b])=>`<option value="${k}" ${k===st.bucket?'selected':''}>${b.t}</option>`).join('')}</select>
-  <label>グラフ</label><select id="xt"><option value="line">折れ線</option><option value="bar" ${st.type==='bar'?'selected':''}>棒</option><option value="stack" ${st.type==='stack'?'selected':''}>積み上げ棒</option></select>`;
-  c2.innerHTML='<label>絞り込み</label>';Object.entries(DIMS).forEach(([k,d])=>msel(c2,k,d.t,d.vals,st.flt,run));Object.entries(S.extra).forEach(([k,d])=>msel(c2,k,d.t,d.vals,st.flt,run));
-  const rb=document.createElement('button');rb.className='btn';rb.textContent='絞り込みを解除';rb.onclick=()=>{st.flt={};build();run()};c2.appendChild(rb);
-  $('#xs').onchange=e=>{st.src=e.target.value;st.flt={};build();run()};$('#xm').onchange=e=>{st.metric=e.target.value;run()};$('#xb').onchange=e=>{st.by=e.target.value;run()};$('#xk').onchange=e=>{st.bucket=e.target.value;run()};$('#xt').onchange=e=>{st.type=e.target.value;run()};
-  $('#exnote').textContent=st.src==='inv'?'在庫は日次の値を月平均したもの（四半期・年はその平均）。在庫表には見込生産品（MTS）だけが収録されている。':st.src==='ord'?'受注月で集計。OTIF・初回充足率の分母は取消のない注文行。非OTIFの内訳は簡易分類：欠品・分納の印・不足数量・複数回出荷・納品不足のいずれかがあれば「欠品・分納あり」，なければ「その他」。':st.src==='shp'?'出荷日の月で集計（2026年の出荷は除く）。':'生産表の日別SKU別数量を月で合計。'};
- const run=()=>{const S=SRC[st.src],m=S.M[st.metric];const a=aggregate(st.src,{flt:st.flt,by:st.by,bucket:st.bucket,topN:st.top,metric:st.metric});const o=$('#exout');o.innerHTML='';
-  const ser=a.keys.map(k=>({name:k,data:a.get(k,st.metric)}));const isRate=m[1]==='％'||m[1]==='日'||m[1]==='円';
-  chart(o,{title:`${m[0]}（${m[1]}）— ${S.t}`,x:a.x,series:ser,type:isRate&&st.type==='stack'?'line':st.type,unit:m[1],tight:isRate,w:1100,h:360,rot:st.bucket==='m',vbands:st.bucket==='m'?[{i:15,label:'2024-04'}]:[],foot:isRate&&st.type==='stack'?'率・平均の指標は積み上げできないため折れ線で表示しています。':''});
-  const tot=k=>{const v=a.get(k,st.metric).filter(x=>x!=null);return v.length?(isRate?v.reduce((p,c)=>p+c,0)/v.length:v.reduce((p,c)=>p+c,0)):null};
-  const tb=document.createElement('div');tb.className='card';tb.innerHTML=`<div class="ctitle"><span>数値表</span></div>`+tableHTML(['系列',...a.x,isRate?'期間平均':'期間合計'],a.keys.map(k=>[k,...a.get(k,st.metric),tot(k)]));o.appendChild(tb);sortable(tb)};
- build();run()}})();
-// ---------- rounds
-RENDER.rd=(()=>{let done=false;return()=>{if(done)return;done=true;const h=$('#rd');
- h.innerHTML=`<h2>ラウンド別：原先生の演習の5つのラウンドで見た図を，自分で動かして確かめる</h2>`;const body=document.createElement('div');
- subtabs(h,[['r1','R1 物流（H4）'],['r2','R2 予測・計画（H1・H5）'],['r3','R3 安全在庫（H2）'],['r4','R4 部品調達（H3）'],['r5','R5 生産能力（H6）']],k=>ROUND[k](body));h.appendChild(body);ROUND.r1(body)}})();
-const ROUND={};
-ROUND.r1=b=>{b.innerHTML=`<div class="see"><b>H4：出荷後の配送に時間がかかるようになり，納期遅れが増えた</b>――正しければ「出荷→納品」の日数が延び，非OTIFの多くが輸送の遅れになるはず。</div><div class="grid2"></div>`;const g=b.querySelector('.grid2');
- const y=aggregate('ord',{bucket:'y'}),m=aggregate('ord',{bucket:'m'});
- chart(g,{title:'受注→初回出荷と，初回出荷→初回納品の平均日数（年別）',type:'bar',x:y.x,series:[{name:'受注→出荷',data:y.get('全体','o2s')},{name:'出荷→納品',data:y.get('全体','s2d')}],unit:'日',labels:2});
- chart(g,{title:'同（月別）：延びているのは出荷前の区間',x:m.x,series:[{name:'受注→出荷',data:m.get('全体','o2s')},{name:'出荷→納品',data:m.get('全体','s2d')}],unit:'日'});
- chart(g,{title:'非OTIFの内訳（年別，注文行数）',type:'stack',x:y.x,series:[{name:'欠品・分納あり',data:y.get('全体','cs'),color:'#C8553D'},{name:'その他（一括納品の遅れ）',data:y.get('全体','ct'),color:'#7A8C99'}],unit:'行',foot:'簡易分類のため，原先生の分類（在庫欠品77％，輸送遅延12％）とは区分が異なる。欠品・分納ありの割合は '+y.get('全体','cs').map((v,i)=>fmtN(v/(v+y.get('全体','ct')[i])*100,1)+'％').join('，')});
- const s=aggregate('shp',{bucket:'m'});chart(g,{title:'特急便の比率（出荷数量，月別）：OTIFが落ちる時期に増える',x:s.x,series:[{name:'特急便の比率',data:s.get('全体','xr'),color:'#C8553D'}],unit:'％',foot:'特急便は欠品分の追加出荷に使われる（物流部メモ）。特急の増加は原因ではなく結果。'})};
-ROUND.r2=b=>{b.innerHTML=`<div class="see"><b>H1：需要予測の精度が低下した／H5：販売計画が過大</b>――正しければ予測誤差が年とともに大きくなり，計画が実績を上回るはず。</div><div class="ctl"><label>製品群</label><select id="r2g"><option value="">すべて（合計）</option>${PGS.map(p=>`<option>${p}</option>`).join('')}</select></div><div class="grid2" id="r2o"></div>`;
- const run=()=>{const pg=$('#r2g').value;const o=$('#r2o');o.innerHTML='';const rows=SP.filter(r=>!pg||r.product_group===pg);const by=k=>MON.map(mo=>rows.filter(r=>r.month===mo).reduce((a,r)=>a+r[k],0));
-  const A=by('actual_qty'),F=by('forecast_qty'),Sp=by('sales_plan_qty'),Pp=by('production_plan_qty');
-  chart(o,{title:'月別の統計予測・販売計画・生産計画・実績（sales_plan_monthly）',x:MON,series:[{name:'実績',data:A,color:'#17384A',w:2.6},{name:'統計予測',data:F},{name:'販売計画',data:Sp},{name:'生産計画',data:Pp,dash:true}],unit:'個'});
-  const yr=v=>[0,1,2].map(y=>v.slice(y*12,y*12+12).reduce((a,c)=>a+c,0));const ya=yr(A);
-  chart(o,{title:'実績を100としたときの予測・計画（年別）',type:'bar',x:['2023','2024','2025'],series:[{name:'統計予測',data:yr(F).map((v,i)=>v/ya[i]*100)},{name:'販売計画',data:yr(Sp).map((v,i)=>v/ya[i]*100)},{name:'生産計画',data:yr(Pp).map((v,i)=>v/ya[i]*100)}],ref:[{y:100,label:'実績＝100'}],yMin:80,labels:0});
-  // WAPE by year: dataset forecast and MA6 1-step
-  const grp=pg?[pg]:PGS;const w=(fk)=>[0,1,2].map(y=>{let e=0,s=0;grp.forEach(p=>{const r=SP.filter(x=>x.product_group===p);for(let i=y*12;i<y*12+12;i++){const a=r[i].actual_qty;let f;if(fk==='ma'){if(i<6)continue;f=r.slice(i-6,i).reduce((q,x)=>q+x.actual_qty,0)/6}else f=r[i].forecast_qty;e+=Math.abs(a-f);s+=a}});return s?e/s*100:null});
-  chart(o,{title:'製品群×月次の予測誤差 WAPE（年別）',type:'bar',x:['2023','2024','2025'],series:[{name:'データの統計予測',data:w('fc')},{name:'過去6か月移動平均（1か月先）',data:w('ma')}],unit:'％',labels:1,foot:'WAPE＝Σ|実績−予測|／Σ実績×100。移動平均は2023年1〜6月を除く。誤差が年とともに一律に大きくなっているかを見る。'});
-  const st=aggregate('ord',{by:'pg',bucket:'y'});chart(o,{title:'製品群別のOTIF（年別）',type:'bar',x:st.x,series:st.keys.map(k=>({name:k,data:st.get(k,'otif')})),unit:'％',yMin:50})};
- $('#r2g').onchange=run;run()};
-ROUND.r3=b=>{b.innerHTML=`<div class="see"><b>H2：安全在庫の設定が不足し，欠品が起きている</b>――2024年4月にA・B区分を18日分→24日分に引き上げ，C区分は据え置いた。A・B区分の充足率と在庫は増えたか（差の差で比べる）。</div><div class="grid2" id="r3o"></div><div class="card" id="r3t"></div>`;
- const o=$('#r3o');const ab=aggregate('ord',{flt:{mode:new Set(['MTS']),abc:new Set(['A','B'])},bucket:'m'}),c=aggregate('ord',{flt:{mode:new Set(['MTS']),abc:new Set(['C'])},bucket:'m'});
- const fA=ab.get('全体','ff'),fC=c.get('全体','ff'),oA=ab.get('全体','otif'),oC=c.get('全体','otif');
- chart(o,{title:'初回充足率：A・B区分（引き上げ）とC区分（据え置き），見込生産品',x:MON,series:[{name:'A・B区分',data:fA,color:'#C8553D'},{name:'C区分',data:fC,color:'#0F7C8C'}],unit:'％',tight:true,vbands:[{i:6,label:'変更前 2023-07'},{i:15,label:'変更 2024-04'},{i:24,label:'2025-01'}]});
- const iv=aggregate('inv',{by:'abc',bucket:'m'});chart(o,{title:'在庫金額（原価，月平均）：ABC区分別',x:MON,series:iv.keys.map(k=>({name:k+'区分',data:iv.get(k,'val')})),unit:'百万円',vbands:[{i:15,label:'2024-04'}]});
- const ivl=aggregate('inv',{by:'line',bucket:'m',flt:{abc:new Set(['A','B'])}});chart(o,{title:'A・B区分の手持在庫（月平均）：ライン別',x:MON,series:ivl.keys.map(k=>({name:k,data:ivl.get(k,'oh'),w:k==='LINE-3'?3:1.6})),unit:'個',vbands:[{i:15,label:'2024-04'}],foot:'LINE-3の品目だけ，設定を上げても在庫が増えていない。'});
- const bo=aggregate('inv',{by:'line',bucket:'m'});chart(o,{title:'入荷待ち（on_order）：ライン別（見込生産品）',x:MON,series:bo.keys.map(k=>({name:k,data:bo.get(k,'oo'),w:k==='LINE-3'?3:1.6})),unit:'個',vbands:[{i:15,label:'2024-04'}],foot:'補充を手配しても入ってこない量。LINE-3で積み上がる。'});
- const mean=(a,i,j)=>{const v=a.slice(i,j).filter(x=>x!=null);return v.reduce((p,c)=>p+c,0)/v.length};
- const did=(A,C)=>{const a0=mean(A,6,15),a1=mean(A,15,24),c0=mean(C,6,15),c1=mean(C,15,24);return [a0,a1,c0,c1,(a1-a0)-(c1-c0)]};const d1=did(fA,fC),d2=did(oA,oC);
- $('#r3t').innerHTML=`<div class="ctitle"><span>差の差（DiD）：変更前 2023年7月〜2024年3月，変更後 2024年4月〜12月（月平均）</span></div>`+tableHTML(['指標','A・B 変更前','A・B 変更後','C 変更前','C 変更後','差の差（ポイント）'],[['初回充足率（％）',...d1],['OTIF（％）',...d2]],{dec:[0,1,1,1,1,2]})+`<div class="note">C区分との比較では改善していても，A・B区分の水準そのものは下がりうる。設定の引き上げと実際の在庫増加は同じではない。</div>`};
-ROUND.r4=b=>{b.innerHTML=`<div class="see"><b>H3：部品の納入遅延が，製品の欠品を増やしている</b>――正しければ，遅延した部品を使うSKUでOTIFが下がり，遅延の時期と製品の遅れが対応するはず。</div><div class="ctl"><label>サプライヤ</label><select id="r4s">${SUP.map(s=>`<option ${s.supplier_id==='SUP-07'?'selected':''}>${s.supplier_id}</option>`).join('')}</select><label><input type="checkbox" id="r4ss" checked> 単一調達の部品だけで依存SKUを判定</label></div><div class="grid2" id="r4o"></div><div class="card" id="r4t"></div>`;
- const run=()=>{const sid=$('#r4s').value,ss=$('#r4ss').checked;const o=$('#r4o');o.innerHTML='';
-  const P=DATA.PROC.filter(p=>p[0]===sid);const delay=P.map(p=>p[4]-p[3]);
-  chart(o,{title:`${sid} の納入日差（実入荷日−約束入荷日）`,type:'scatter',series:[{name:'発注',data:P.map(p=>[p[2]/365.25+2023,p[4]-p[3],`${dstr(p[2])} ${p[1]} 遅延${p[4]-p[3]}日`])}],xLabel:'発注日（年）',xfmt:v=>Number.isInteger(v)?String(v):'',yLabel:'日',ref:[{y:0,label:'約束どおり',c:'#7A8C99'}],xMin:2023,xMax:2026});
-  const srt=[...delay].sort((a,b)=>a-b),q=p=>srt.length?srt[Math.min(srt.length-1,Math.floor(p*srt.length))]:null;
-  const hist=new Map();delay.forEach(v=>hist.set(v,(hist.get(v)||0)+1));const xs=[...hist.keys()].sort((a,b)=>a-b);const hx=[];for(let v=Math.min(...xs,0);v<=Math.max(...xs,0);v++)hx.push(v);
-  chart(o,{title:`納入日差の分布（${P.length}件，中央値 ${q(.5)}日，90％点 ${q(.9)}日）`,type:'bar',x:hx.map(String),series:[{name:'件数',data:hx.map(v=>hist.get(v)||0)}],unit:'件'});
-  const parts=new Set(PS.filter(r=>r.supplier_id===sid&&(!ss||r.single_source===true||r.single_source==='True')).map(r=>r.part_id));
-  const dep=new Set(BOM.filter(r=>parts.has(r.part_id)).map(r=>r.sku));
-  const d1=aggregateSkuSet(dep,true),d0=aggregateSkuSet(dep,false);
-  chart(o,{title:`依存SKU（${dep.size}品目）とその他のSKUのOTIF（見込生産品，月別）`,x:MON,series:[{name:'依存SKU',data:d1,color:'#C8553D'},{name:'その他のSKU',data:d0,color:'#0F7C8C'}],unit:'％',tight:true});
-  const mon=Array.from({length:36},()=>[]);P.forEach(p=>{const m=DAYM[Math.min(p[2],DATA.NDAY-1)];mon[m]&&mon[m].push(p[4]-p[3])});
-  chart(o,{title:`${sid} の月別平均納入日差（発注月）`,type:'bar',x:MON,series:[{name:'平均遅延',data:mon.map(v=>v.length?v.reduce((a,c)=>a+c,0)/v.length:null)}],unit:'日'});
-  const val=SKU.filter(s=>dep.has(s.sku));$('#r4t').innerHTML=`<div class="ctitle"><span>${sid} に依存するSKU（${ss?'単一調達の部品':'すべての部品'}を経由）</span></div>`+tableHTML(['SKU','製品群','生産方式','ライン','ABC','経由する部品'],val.map(s=>[s.sku,s.product_group,s.make_mode,s.line,s.abc_class,BOM.filter(r=>r.sku===s.sku&&parts.has(r.part_id)).map(r=>r.part_id).join('，')]),{left:6})};
- $('#r4s').onchange=run;$('#r4ss').onchange=run;run()};
-function aggregateSkuSet(set,inside){const acc=Array.from({length:36},()=>[0,0]);for(const r of DATA.ORD){const s=SKU[r[0]];if(s.make_mode!=='MTS')continue;if(set.has(s.sku)!==inside)continue;acc[r[1]][0]+=r[8];acc[r[1]][1]+=r[7]}return acc.map(a=>a[1]?a[0]/a[1]*100:null)}
-// equipment helpers
-function lineSpeedBase(ln){if(DATA.LITE)return DATA.EQL[ln].base;const v=DATA.EQ[ln].filter(e=>e[3]>0&&e[4]>0).map(e=>e[4]/e[3]).sort((a,b)=>a-b);return v[Math.floor(.95*(v.length-1))]}
-function eqAgg(ln,bucket){if(DATA.LITE){const M=DATA.EQL[ln].m;if(bucket==='m')return M.map(r=>Float64Array.from(r));const B=BUCK[bucket];const a=Array.from({length:B.n},()=>new Float64Array(7));M.forEach((r,m)=>{const x=a[B.f(m)];r.forEach((v,j)=>x[j]+=v)});return a}const B=BUCK[bucket];const a=Array.from({length:B.n},()=>new Float64Array(7));DATA.EQ[ln].forEach((e,i)=>{const t=a[B.f(DAYM[i])];for(let j=0;j<6;j++)t[j]+=e[j];t[6]++});return a}
-ROUND.r5=b=>{b.innerHTML=`<div class="see"><b>H6：需要の伸びに生産能力が追いついていない</b>――正しければ，負荷の高いラインでOTIFや未充足量が悪化し，受注の伸びに生産が追いつかないはず。</div><div class="grid2" id="r5o"></div><div class="card" id="r5t"></div>`;const o=$('#r5o');
- const ly=aggregate('ord',{by:'line',bucket:'y',flt:{mode:new Set(['MTS'])}});
- chart(o,{title:'ライン別のOTIF（見込生産品，年別）',type:'bar',x:ly.x,series:ly.keys.map(k=>({name:k,data:ly.get(k,'otif'),color:k==='LINE-3'?'#C8553D':undefined})),unit:'％',yMin:50,labels:1});
- chart(o,{title:'ライン別の約束納期時点の未充足数量（見込生産品，年別）',type:'bar',x:ly.x,series:ly.keys.map(k=>({name:k,data:ly.get(k,'uf'),color:k==='LINE-3'?'#C8553D':undefined})),unit:'個'});
- const oy=aggregate('ord',{by:'line',bucket:'y'}),py=aggregate('prd',{by:'line',bucket:'y'});
- const gr=(a,k,mk)=>{const v=a.get(k,mk);return (v[2]/v[0]-1)*100};
- chart(o,{title:'2023→2025年の増加率：受注数量と生産実績（ライン別）',type:'bar',x:LINES,series:[{name:'受注数量',data:LINES.map(l=>gr(oy,l,'q'))},{name:'生産実績',data:LINES.map(l=>gr(py,l,'ac'))}],unit:'％',labels:1});
- const lm=LINES.map(l=>{const base=lineSpeedBase(l);return eqAgg(l,'m').map(t=>t[3]?t[4]/base/t[3]*100:null)});
- chart(o,{title:'負荷率（月別）＝ 生産数量 ÷ 基準処理速度 ÷ 稼働時間',x:MON,series:LINES.map((l,i)=>({name:l,data:lm[i],w:l==='LINE-3'?3:1.6,color:l==='LINE-3'?'#C8553D':undefined})),unit:'％',tight:true,foot:'基準処理速度：各ラインの日別処理速度（生産数量／稼働時間）の95パーセンタイル。'});
- const yr=LINES.map(l=>eqAgg(l,'y'));
- chart(o,{title:'2025年の時間の内訳（計画時間に占める割合）',type:'stack',x:LINES,series:[{name:'稼働',data:yr.map(a=>a[2][3]/a[2][0]*100),color:'#0F7C8C'},{name:'段取り',data:yr.map(a=>a[2][2]/a[2][0]*100),color:'#E8A33D'},{name:'停止',data:yr.map(a=>a[2][1]/a[2][0]*100),color:'#C8553D'}],unit:'％',yMax:100});
- const rho=[.5,.6,.7,.75,.8,.85,.9,.95];chart(o,{title:'待ち時間の目安 ρ／(1−ρ)：負荷率が上がると急増する',type:'bar',x:rho.map(r=>r.toFixed(2)),series:[{name:'ρ/(1−ρ)',data:rho.map(r=>r/(1-r))}],labels:1,foot:'ρが0.70→0.85で約2.4倍。'});
- $('#r5t').innerHTML=`<div class="ctitle"><span>ライン別の設備の年間集計（計画・停止・段取り・稼働は時間）</span></div>`+tableHTML(['ライン','年','計画','停止','段取り','稼働','生産数量','処理速度（個/時）','稼働率（稼働／計画，％）'],LINES.flatMap((l,i)=>yr[i].map((t,y)=>[l,String(2023+y),t[0],t[1],t[2],t[3],t[4],t[3]?t[4]/t[3]:null,t[0]?t[3]/t[0]*100:null])),{left:2,hl:r=>r[0]==='LINE-3'})};
-// ---------- equipment tab
-RENDER.eq=(()=>{let done=false;return()=>{if(done)return;done=true;const h=$('#eq');
- h.innerHTML=`<h2>生産ライン・設備：日々の稼働時間と生産数量</h2><div class="card"><div class="ctl"><label>ライン</label><select id="eql">${LINES.map(l=>`<option ${l==='LINE-3'?'selected':''}>${l}</option>`).join('')}</select><label>集計単位</label><select id="eqb">${DATA.LITE?'':'<option value="d">日</option>'}<option value="w" selected>週</option><option value="m">月</option></select><span class="note" id="eqn"></span></div></div><div id="eqo"></div>`;
- const run=()=>{const l=$('#eql').value,bk=$('#eqb').value;const E=DATA.LITE?null:DATA.EQ[l];const o=$('#eqo');o.innerHTML='';
-  let x,rows;if(DATA.LITE){rows=bk==='w'?DATA.EQL[l].w:DATA.EQL[l].m;x=bk==='w'?rows.map((_,i)=>dstr(i*7)):MON}else if(bk==='d'){x=E.map((_,i)=>dstr(i));rows=E.map(e=>[...e,1])}else{const f=bk==='w'?i=>Math.floor(i/7):i=>DAYM[i];const n=bk==='w'?Math.ceil(E.length/7):36;rows=Array.from({length:n},()=>new Array(7).fill(0));E.forEach((e,i)=>{const t=rows[f(i)];for(let j=0;j<6;j++)t[j]+=e[j];t[6]++});x=bk==='w'?rows.map((_,i)=>dstr(i*7)):MON}
-  const base=lineSpeedBase(l);$('#eqn').textContent=`${DATA.PLANT[l]}　基準処理速度（95パーセンタイル）：${fmtN(base,1)}個/時`;
-  const g=document.createElement('div');g.className='grid2';o.appendChild(g);
-  chart(g,{title:`${l}：時間の内訳（${bk==='d'?'日':'合計'}）`,type:'stack',x,series:[{name:'稼働',data:rows.map(r=>r[3]),color:'#0F7C8C'},{name:'段取り',data:rows.map(r=>r[2]),color:'#E8A33D'},{name:'停止',data:rows.map(r=>r[1]),color:'#C8553D'}],unit:'時間',rot:true});
-  chart(g,{title:`${l}：生産数量と不良数量`,x,series:[{name:'生産数量',data:rows.map(r=>r[4])},{name:'不良数量',data:rows.map(r=>r[5])}],unit:'個',rot:true});
-  chart(g,{title:`${l}：処理速度（生産数量／稼働時間）`,x,series:[{name:'処理速度',data:rows.map(r=>r[3]&&r[4]?r[4]/r[3]:null)}],unit:'個/時',tight:true,rot:true,ref:[{y:base,label:'基準（95％点）'}]});
-  const inv=DATA.INVD[l];if(inv){let iy;if(bk==='d')iy=inv;else{const f=bk==='w'?i=>Math.floor(i/7):i=>DAYM[i];const n=rows.length;const s=Array.from({length:n},()=>[0,0,0,0,0]);inv.forEach((v,i)=>{const t=s[f(i)];for(let j=0;j<4;j++)t[j]+=v[j];t[4]++});iy=s.map(t=>t.slice(0,4).map(v=>v/t[4]))}
-   chart(g,{title:`${l} の見込生産品の在庫（DC合計）`,x,series:[{name:'手持在庫',data:iy.map(v=>v[0])},{name:'入荷待ち',data:iy.map(v=>v[1])},{name:'出荷待ち',data:iy.map(v=>v[2])}],unit:'個',rot:true})}};
- $('#eql').onchange=run;$('#eqb').onchange=run;run()}})();
-// ---------- procurement tab
-RENDER.pc=(()=>{let done=false;return()=>{if(done)return;done=true;const h=$('#pc');
- const rows=SUP.map(s=>{const P=DATA.PROC.filter(p=>p[0]===s.supplier_id);const dl=P.map(p=>p[4]-p[3]).sort((a,b)=>a-b);const lt=P.map(p=>p[4]);const q=p=>dl.length?dl[Math.min(dl.length-1,Math.floor(p*dl.length))]:null;
-  const parts=PS.filter(r=>r.supplier_id===s.supplier_id);return [s.supplier_id,s.country,P.length,parts.length,parts.filter(r=>r.single_source===true||r.single_source==='True').length,s.lead_time_mean_days,lt.length?lt.reduce((a,c)=>a+c,0)/lt.length:null,dl.length?dl.reduce((a,c)=>a+c,0)/dl.length:null,q(.9),dl.length?dl.filter(v=>v>0).length/dl.length*100:null,DATA.LITE?DATA.SUPDEF[s.supplier_id]:P.reduce((a,p)=>a+p[7],0)/Math.max(1,P.reduce((a,p)=>a+p[5],0))*100]});
- h.innerHTML=`<h2>部品調達：サプライヤごとの納入の遅れ</h2><div class="card"><div class="ctitle"><span>サプライヤ一覧（列名をクリックで並べ替え）</span></div>${tableHTML(['サプライヤ','国','発注件数','部品数','うち単一調達','基準LT（日）','実調達日数（平均）','納入日差（平均）','納入日差（90％点）','遅延率（％）','不良率（％）'],rows,{left:2,hl:r=>r[0]==='SUP-07',dec:[0,0,0,0,0,0,1,1,0,1,2]})}</div><div class="grid2" id="pco"></div>`;sortable(h);
- const o=$('#pco');const bySup=SUP.map(s=>s.supplier_id);
- chart(o,{title:'サプライヤ別の納入日差（平均と90％点）',type:'bar',x:bySup,series:[{name:'平均',data:rows.map(r=>r[7])},{name:'90％点',data:rows.map(r=>r[8])}],unit:'日',rot:true});
- const mon=Array.from({length:36},()=>[0,0]);DATA.PROC.forEach(p=>{const m=DAYM[Math.min(p[2],DATA.NDAY-1)];mon[m][0]+=p[4]-p[3];mon[m][1]++});
- chart(o,{title:'全サプライヤの月別平均納入日差（発注月）',x:MON,series:[{name:'平均納入日差',data:mon.map(v=>v[1]?v[0]/v[1]:null)}],unit:'日'})}})();
-// ---------- SKU tab
-RENDER.sk=(()=>{let done=false;return()=>{if(done)return;done=true;const h=$('#sk');
- const oy=aggregate('ord',{by:'sku',bucket:'y',topN:999,metric:'q'});
- const rows=SKU.map(s=>{const q=oy.keys.includes(s.sku)?oy.get(s.sku,'q'):[0,0,0],ot=oy.keys.includes(s.sku)?oy.get(s.sku,'otif'):[null,null,null];return [s.sku,s.product_group,s.make_mode,s.line,s.abc_class,s.production_lt_days,s.unit_price,q[0],q[2],q[0]?(q[2]/q[0]-1)*100:null,ot[0],ot[1],ot[2]]});
- h.innerHTML=`<h2>製品（SKU）：一覧から選ぶと，受注・生産・在庫・OTIF・部品構成を表示</h2><div class="card"><div class="ctl"><input type="search" id="skq" placeholder="SKU・製品群・ラインで検索"><span class="note">行をクリックで詳細</span></div><div id="skt"></div></div><div id="skudet"></div>`;
- const draw=()=>{const q=$('#skq').value.trim();$('#skt').innerHTML=tableHTML(['SKU','製品群','方式','ライン','ABC','生産LT','単価（円）','受注 2023','受注 2025','増加率（％）','OTIF 2023','OTIF 2024','OTIF 2025'],rows.filter(r=>!q||r.slice(0,5).join(' ').includes(q)),{left:5,hl:r=>r[3]==='LINE-3'&&r[2]==='MTS',dec:[0,0,0,0,0,0,0,0,0,1,1,1,1]});sortable($('#skt'));
-  $('#skt').querySelectorAll('tr').forEach((tr,i)=>{if(!i)return;tr.style.cursor='pointer';tr.onclick=()=>skuDetail(tr.children[0].textContent)})};
- $('#skq').oninput=draw;draw()}})();
-function skuDetail(sku){const d=$('#skudet');d.style.display='block';const s=SKU[SKUI[sku]];d.innerHTML=`<h3>${sku}　<span class="pill">${s.product_group}</span><span class="pill">${s.make_mode}</span><span class="pill">${s.line}</span><span class="pill">ABC ${s.abc_class}</span><span class="pill">生産LT ${s.production_lt_days}日</span></h3><div class="grid2" id="sdg"></div><div class="card" id="sdb"></div>`;
- const f={};const o=aggregate('ord',{by:'sku',bucket:'m',topN:999,metric:'q'}),p=aggregate('prd',{by:'sku',bucket:'m',topN:999,metric:'ac'}),iv=aggregate('inv',{by:'sku',bucket:'m',topN:999,metric:'oh'});const g=$('#sdg');
- const has=(a)=>a.keys.includes(sku);
- chart(g,{title:'受注数量と生産実績（月別）',x:MON,series:[{name:'受注数量',data:has(o)?o.get(sku,'q'):[]},{name:'生産実績',data:has(p)?p.get(sku,'ac'):[]},{name:'生産計画',data:has(p)?p.get(sku,'pl'):[],dash:true}],unit:'個'});
- chart(g,{title:'OTIFと初回充足率（月別）',x:MON,series:[{name:'OTIF',data:has(o)?o.get(sku,'otif'):[]},{name:'初回充足率',data:has(o)?o.get(sku,'ff'):[],dash:true}],unit:'％',tight:true,vbands:[{i:15,label:'2024-04'}]});
- if(has(iv))chart(g,{title:'在庫（DC合計，月平均）',x:MON,series:[{name:'手持在庫',data:iv.get(sku,'oh')},{name:'入荷待ち',data:iv.get(sku,'oo')},{name:'出荷待ち',data:iv.get(sku,'bo')}],unit:'個',vbands:[{i:15,label:'2024-04'}]});
- const parts=BOM.filter(r=>r.sku===sku);$('#sdb').innerHTML=`<div class="ctitle"><span>部品構成（BOM）と調達先</span></div>`+tableHTML(['部品','必要数','調達先','単一調達','単価（円）','MOQ','サプライヤの国','基準LT（日）'],parts.flatMap(b=>PS.filter(r=>r.part_id===b.part_id).map(r=>{const su=SUP.find(x=>x.supplier_id===r.supplier_id)||{};return [b.part_id,b.qty_per_unit,r.supplier_id,(r.single_source===true||r.single_source==='True')?'単一':'',r.unit_price,r.moq,su.country,su.lead_time_mean_days]})),{left:4,hl:r=>r[2]==='SUP-07'});
- d.scrollIntoView({behavior:'smooth'})}
-// ---------- dictionary (markdown)
-function md(t){const L=t.split('\n');let h='',i=0,inT=false,inC=false,inL=false;const inl=s=>esc(s).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/\[([^\]]+)\]\(#([^)]+)\)/g,'<a href="#$2">$1</a>').replace(/&lt;a id=&quot;([^&]+)&quot;&gt;&lt;\/a&gt;/g,'<a id="$1"></a>');
+function md(t){const L=t.split('\n');let h='',inT=false,inC=false,inL=false;const inl=s=>esc(s).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/\[([^\]]+)\]\(#([^)]+)\)/g,'<a href="#$2">$1</a>').replace(/&lt;a id=&quot;([^&]+)&quot;&gt;&lt;\/a&gt;/g,'<a id="$1"></a>');
  for(const l of L){if(l.startsWith('```')){h+=inC?'</pre>':'<pre>';inC=!inC;continue}if(inC){h+=esc(l)+'\n';continue}
   if(/^\|/.test(l)){const c=l.replace(/^\||\|$/g,'').split('|');if(/^[\s:|-]+$/.test(l.replace(/\|/g,'')))continue;if(!inT){h+='<table><tr>'+c.map(x=>`<th>${inl(x.trim())}</th>`).join('')+'</tr>';inT=true}else h+='<tr>'+c.map(x=>`<td>${inl(x.trim())}</td>`).join('')+'</tr>';continue}else if(inT){h+='</table>';inT=false}
   if(/^\s*- /.test(l)){if(!inL){h+='<ul>';inL=true}h+='<li>'+inl(l.replace(/^\s*- /,''))+'</li>';continue}else if(inL){h+='</ul>';inL=false}
   const m=l.match(/^(#{1,4}) (.*)/);if(m){h+=`<h${m[1].length}>${inl(m[2])}</h${m[1].length}>`;continue}if(l.trim()==='---'){h+='<hr>';continue}if(l.trim())h+='<p>'+inl(l)+'</p>'}
  if(inT)h+='</table>';if(inL)h+='</ul>';return h}
-RENDER.dc=(()=>{let done=false;return()=>{if(done)return;done=true;$('#mdbox').innerHTML=typeof README==='undefined'?'<div class="note">この軽量版にはデータ辞書（README）を入れていません。完全版のHTML，またはNotionの解説ページを見てください。</div>':'<div class="note">配布データに付属のREADME（データ辞書）をそのまま表示しています。</div>'+md(README)}})();
-// ---------- causal link verification
-const CV=(()=>{
- const MTS={mode:new Set(['MTS'])};const DIM=[31,28,31,30,31,30,31,31,30,31,30,31];const mdays=m=>{const y=2023+Math.floor(m/12),mo=m%12;return mo===1&&y%4===0?29:DIM[mo]};
- let V=null;
- function build(){if(V)return V;V={};const per=(a,mk)=>Object.fromEntries(LINES.map(l=>[l,a.keys.includes(l)?a.get(l,mk):new Array(36).fill(null)]));
-  const o=aggregate('ord',{by:'line',flt:MTS}),s=aggregate('shp',{by:'line',flt:MTS}),iv=aggregate('inv',{by:'line'}),p=aggregate('prd',{by:'line'}),pm=aggregate('prd',{by:'line',flt:MTS});
-  const eq={};LINES.forEach(l=>{const base=lineSpeedBase(l);const a=eqAgg(l,'m');eq[l]={load:a.map(t=>t[3]?t[4]/base/t[3]*100:null),cap:a.map((t,m)=>t[3]*base/mdays(m)),setup:a.map((t,m)=>t[2]/t[6]),out:a.map((t,m)=>t[4]/mdays(m))}});
-  const fromEq=k=>Object.fromEntries(LINES.map(l=>[l,eq[l][k]]));
-  const prodDay=Object.fromEntries(LINES.map(l=>[l,(p.keys.includes(l)?p.get(l,'ac'):[]).map((v,m)=>v/mdays(m))]));
-  const oo=per(iv,'oo'),pmd=Object.fromEntries(LINES.map(l=>[l,(pm.keys.includes(l)?pm.get(l,'ac'):new Array(36).fill(null)).map((v,m)=>v?v/mdays(m):null)]));
-  // safety stock setting
-  const ab=aggregate('ord',{by:'line',flt:{mode:new Set(['MTS']),abc:new Set(['A','B'])}}),cc=aggregate('ord',{by:'line',flt:{mode:new Set(['MTS']),abc:new Set(['C'])}});
-  const ss=Object.fromEntries(LINES.map(l=>{const qa=ab.keys.includes(l)?ab.get(l,'q'):new Array(36).fill(0),qc=cc.keys.includes(l)?cc.get(l,'q'):new Array(36).fill(0);return [l,qa.map((a,m)=>{const t=(a||0)+(qc[m]||0);return t?((a||0)*(m<15?18:24)+(qc[m]||0)*18)/t:null})]}));
-  // forecast error weighted by line pg mix
-  const fe=Object.fromEntries(LINES.map(l=>{const a=aggregate('ord',{by:'pg',flt:{mode:new Set(['MTS']),line:new Set([l])}});return [l,MON.map((mo,m)=>{let w=0,e=0;a.keys.forEach(pg=>{const q=a.get(pg,'q')[m]||0;const r=SP.find(x=>x.month===mo&&x.product_group===pg);if(!r||!r.actual_qty)return;e+=q*Math.abs(r.actual_qty-r.forecast_qty)/r.actual_qty*100;w+=q});return w?e/w:null})]}));
-  // supplier delay for parts used by MTS SKUs on line (by promised arrival month)
-  const pl={};BOM.forEach(b=>{const s=SKU[SKUI[b.sku]];if(s.make_mode!=='MTS')return;(pl[b.part_id]=pl[b.part_id]||new Set()).add(s.line)});
-  const sd=Object.fromEntries(LINES.map(l=>[l,Array.from({length:36},()=>[0,0])]));DATA.PROC.forEach(p=>{const ls=pl[p[1]];if(!ls)return;const di=p[2]+p[3];if(di>=DATA.NDAY)return;const m=DAYM[di];ls.forEach(l=>{sd[l][m][0]+=Math.max(0,p[4]-p[3]);sd[l][m][1]++})});
-  const def=(k,name,unit,data,note)=>V[k]={k,name,unit,data,note};
-  def('dem','需要','個/月',per(o,'q'),'見込生産品の受注数量（受注月）');
-  def('load','ライン負荷率','％',fromEq('load'),'生産数量÷基準処理速度（95％点）÷稼働時間');
-  def('setup','段取り時間','時間/日',fromEq('setup'),'equipment_daily の setup_hours の日平均');
-  def('cap','生産能力','個/日',fromEq('cap'),'稼働時間×基準処理速度の日平均');
-  def('prod','生産','個/日',prodDay,'ラインの全品目の生産実績の日平均');
-  def('wait','生産待ち','個',oo,'代用：DCの入荷待ち（on_order）の月平均');
-  const bo0=per(iv,'bo'),dq=per(o,'q');def('rlt','補充リードタイム','日',Object.fromEntries(LINES.map(l=>[l,bo0[l].map((v,m)=>dq[l][m]?v/(dq[l][m]/mdays(m)):null)])),'代用：出荷待ち（backorder）÷1日あたり需要（リトルの法則で「待っている日数」）');
-  def('inv','在庫','個',per(iv,'oh'),'DCの手持在庫の月平均');
-  def('short','欠品','個/月',per(o,'uf'),'約束納期時点の未充足数量（受注月）');
-  def('bo','受注残','個',per(iv,'bo'),'DCの出荷待ち（backorder）の月平均');
-  def('otif','OTIF','％',per(o,'otif'),'取消を除く注文行');
-  def('ff','初回充足率','％',per(o,'ff'),'');
-  def('exp','特急便','％',per(s,'xr'),'出荷数量に占める特急便の比率（出荷月）');
-  def('frt','物流費','円/個',per(s,'cpu'),'1個あたり運賃（出荷月）');
-  def('cxl','顧客の取消','％',per(o,'cr'),'取消のある注文行の割合');
-  def('dlv','配送日数','日',per(o,'s2d'),'初回出荷→初回納品の平均');
-  def('o2s','出荷までの日数','日',per(o,'o2s'),'受注→初回出荷の平均');
-  def('ss','安全在庫の設定','日',ss,'A・B区分は2024年4月に18→24日。ラインの品目構成で加重平均');
-  def('fe','予測誤差','％',fe,'製品群×月の|実績−統計予測|÷実績を，ラインの製品群構成で加重');
-  def('sup','部品の納入遅延','日',Object.fromEntries(LINES.map(l=>[l,sd[l].map(a=>a[1]?a[0]/a[1]:null)])),'そのラインの見込生産品が使う部品の平均遅延日数（約束入荷月，早着は0）');
-  return V}
- const ID=new Set(['cap>prod','setup>cap','prod>inv','wait>rlt','prod>rlt']);
- const PRE=[['dem','load','+'],['dem','prod','+'],['setup','cap','-'],['cap','prod','+'],['load','wait','+'],['load','rlt','+'],['rlt','short','+'],['inv','short','-'],['short','otif','-'],['short','exp','+'],['exp','frt','+'],['short','cxl','+'],['dem','short','+'],['ss','inv','+'],['ss','wait','+'],['fe','short','+'],['sup','short','+'],['dlv','otif','-'],['load','otif','-']];
- // stats
- function zline(a){const v=a.filter(x=>x!=null&&!isNaN(x));const m=v.reduce((p,c)=>p+c,0)/v.length;const sd=Math.sqrt(v.reduce((p,c)=>p+(c-m)**2,0)/Math.max(1,v.length-1))||1;return a.map(x=>x==null||isNaN(x)?null:(x-m)/sd)}
- function resid(data,lines){const Z=Object.fromEntries(lines.map(l=>[l,zline(data[l])]));const mm=Array.from({length:36},(_,t)=>{const v=lines.map(l=>Z[l][t]).filter(x=>x!=null);return v.length?v.reduce((p,c)=>p+c,0)/v.length:0});
-  return Object.fromEntries(lines.map(l=>[l,Z[l].map((x,t)=>x==null?null:x-mm[t])]))}
- function corr(pairs){const n=pairs.length;if(n<6)return {r:null,n};let sx=0,sy=0;pairs.forEach(([x,y])=>{sx+=x;sy+=y});const mx=sx/n,my=sy/n;let a=0,b=0,c=0;pairs.forEach(([x,y])=>{a+=(x-mx)*(y-my);b+=(x-mx)**2;c+=(y-my)**2});return {r:b&&c?a/Math.sqrt(b*c):null,n}}
- function pairs(X,Y,lines,lag,filt){const P=[];lines.forEach(l=>{for(let t=Math.max(lag,0);t<36;t++){const x=X[l][t-lag],y=Y[l][t];if(x==null||y==null)continue;if(filt&&!filt(l,t))continue;P.push([x,y])}});return P}
- function test(xk,yk,pol,opt){const V=build();const lines=opt.lines;const fe=opt.fe;const X=fe?resid(V[xk].data,lines):Object.fromEntries(lines.map(l=>[l,zline(V[xk].data[l])])),Y=fe?resid(V[yk].data,lines):Object.fromEntries(lines.map(l=>[l,zline(V[yk].data[l])]));
-  const sg=pol==='+'?1:-1;const lag={};for(let L=-3;L<=3;L++){lag[L]=L>=0?corr(pairs(X,Y,lines,L)):corr(pairs(Y,X,lines,-L))}
-  let best=0;for(let L=1;L<=3;L++)if(lag[L].r!=null&&Math.abs(lag[L].r)>Math.abs(lag[best].r||0)+0.05)best=L;
-  const r=lag[best].r,n=lag[best].n,crit=2/Math.sqrt(n);const rev=Math.max(...[1,2,3].map(L=>Math.abs(lag[-L].r||0)));
-  const LD=build().load.data;const hi=(l,t)=>LD[l][t]!=null&&LD[l][t]>=95,lo=(l,t)=>LD[l][t]!=null&&LD[l][t]<95;
-  const rh=corr(pairs(X,Y,lines,best,hi)),rl=corr(pairs(X,Y,lines,best,lo));
-  // cross-line change
-  const ch=lines.map(l=>{const a=V[xk].data[l],b=V[yk].data[l];const m=(v,y)=>{const s=v.slice(y*12,y*12+12).filter(x=>x!=null);return s.length?s.reduce((p,c)=>p+c,0)/s.length:null};const rc=(v)=>{const a0=m(v,0),a2=m(v,2);return a0?((a2-a0)/Math.abs(a0)*100):null};return {l,dx:rc(a),dy:rc(b)}});
-  const agree=ch.filter(c=>c.dx!=null&&c.dy!=null&&Math.sign(c.dx)*Math.sign(c.dy)===sg).length;
-  const isQ=k=>/^個|^個\//.test(V[k].unit)||V[k].unit==='個';
-  const lv=k=>{const pts=[];lines.forEach(l=>{const a=V[k].data[l];const ym=y=>{const s=a.slice(y*12,y*12+12).filter(x=>x!=null);return s.length?s.reduce((p,c)=>p+c,0)/s.length:null};const b=ym(0);[0,1,2].forEach(y=>{let v=ym(y);if(v!=null&&isQ(k))v=b?v/b*100:null;pts.push(v)})});return pts};
-  const lx=lv(xk),ly=lv(yk);const dm=a=>{const out=a.slice();[0,1,2].forEach(y=>{const idx=lines.map((_,i)=>i*3+y).filter(i=>a[i]!=null);const m=idx.reduce((p,i)=>p+a[i],0)/idx.length;idx.forEach(i=>out[i]=a[i]-m)});return out};
-  const LP=[];const dx=dm(lx),dy=dm(ly);dx.forEach((x,i)=>{if(x!=null&&dy[i]!=null)LP.push([x,dy[i]])});const lr=corr(LP.length>=6?LP:[]);lr.n=LP.length;
-  let v,cls;const sig=x=>x.r!=null&&Math.abs(x.r)>2/Math.sqrt(x.n);
-  if(ID.has(xk+'>'+yk)){v='定義から決まる';cls='id'}
-  else if(r!=null&&Math.abs(r)>crit&&Math.sign(r)===sg){v=(sig(rh)&&!sig(rl))?'条件付きで支持（負荷率95％以上のとき）':(sig(rl)&&!sig(rh)&&rh.n>=6)?'条件付きで支持（負荷率95％未満のとき）':'支持';cls='ok'}
-  else if(sig(lr)&&Math.sign(lr.r)===sg){v='ライン間の差として支持（月々の動きでは見えない）';cls='ok'}
-  else if(r!=null&&Math.abs(r)>crit){v='逆の極性の関係（フィードバックや共通の原因を疑う）';cls='ng'}
-  else if(sig(rh)&&Math.sign(rh.r)===sg){v='条件付きで支持（負荷率95％以上のとき）';cls='ok'}
-  else if(sig(rl)&&Math.sign(rl.r)===sg){v='条件付きで支持（負荷率95％未満のとき）';cls='ok'}
-  else{v='判定不能（データでは関係が見えない）';cls='na'}
-  const notes=[];if(rev>Math.abs(r||0)+0.1&&rev>crit)notes.push('結果側が先に動いている（逆向きの矢印・フィードバックを疑う）');if(best>0)notes.push(`${best}か月の遅れで最も強い`);
-  if(sig(lr)&&Math.sign(lr.r)!==sg)notes.push('ライン間の水準では逆の向き');return {xk,yk,pol,r,n,crit,best,lag,rh,rl,ch,agree,v,cls,notes,X,Y,lr,LP,lines}}
- return {build,test,PRE,ID}})();
-RENDER.cv=(()=>{let done=false;const st={fe:true,lines:new Set(LINES),cands:CV.PRE.map(c=>c.slice()),sel:0};return()=>{if(done)return;done=true;const h=$('#cv');const V=CV.build();
- const opts=Object.values(V).map(v=>`<option value="${v.k}">${v.name}</option>`).join('');
- h.innerHTML=`<h2>矢印の検証：因果関係の候補を，データで「支持・反証・判定不能」に仕分ける</h2>
- <div class="see">変数はすべて <b>ライン×月</b>（5ライン×36か月）の系列。各ラインの中で標準化したうえで，<b>同じ月の全ラインの平均を差し引く</b>（季節の山など全ラインに共通の動きを除く）。この「月々の動き」の相関（原因を0〜3か月ずらす），負荷率95％以上／未満に分けた相関に加えて，<b>ライン×年の水準</b>（年ごとにライン間の差を見る。数量は2023年＝100の指数）の相関と，2023→2025年の変化の向きがそろうライン数から判定する。<b>相関は因果の証明ではない</b>。判定は「この矢印を残すか・条件を付けるか・別の説明を探すか」を決める材料。</div>
- <div class="card"><div class="ctl"><label><input type="checkbox" id="cvfe" checked> 全ラインに共通の動き（季節など）を除く</label><span id="cvl"></span><button class="btn" id="cvcsv">ワークベンチ用に書き出す</button><button class="btn" id="cvres">判定表をCSVで保存</button></div>
- <div class="ctl"><label>候補を追加：原因</label><select id="cvx">${opts}</select><label>結果</label><select id="cvy">${opts}</select><label>極性</label><select id="cvp"><option>+</option><option>-</option></select><button class="btn solid" id="cvadd" style="background:#0F7C8C;color:#fff">追加して検証</button></div>
- <div id="cvt"></div></div><div id="cvd"></div><div class="card"><div class="ctitle"><span>変数の定義（データからの作り方）</span></div>${tableHTML(['変数','単位','作り方'],Object.values(V).map(v=>[v.name,v.unit,v.note]),{left:3})}</div>`;
- const lh=$('#cvl');lh.innerHTML='<label>使うライン</label>';msel(lh,'ln','ライン',LINES,st,()=>{run()});st.ln=new Set();
- $('#cvfe').onchange=e=>{st.fe=e.target.checked;run()};
- $('#cvadd').onclick=()=>{const x=$('#cvx').value,y=$('#cvy').value;if(x===y)return;st.cands.push([x,y,$('#cvp').value]);st.sel=st.cands.length-1;run()};
- let R=[];
- const run=()=>{const lines=st.ln&&st.ln.size?LINES.filter(l=>st.ln.has(l)):LINES;R=st.cands.map(c=>CV.test(c[0],c[1],c[2],{fe:st.fe,lines}));
-  const col={ok:'#0F7C8C',ng:'#C8553D',na:'#7A8C99',id:'#17384A'};
-  $('#cvt').innerHTML=`<div class="tw" style="max-height:520px"><table class="t"><tr><th class="l">#</th><th class="l">原因 → 結果</th><th>想定の極性</th><th>相関 r</th><th>遅れ（月）</th><th>判定の目安 ±2/√n</th><th>負荷率≥95％のr</th><th>＜95％のr</th><th>ライン×年の水準 r</th><th>変化の向きが合うライン</th><th class="l">判定</th><th class="l">補足</th><th></th></tr>${R.map((t,i)=>`<tr data-i="${i}" style="cursor:pointer;${i===st.sel?'background:#E6F2F3':''}"><td class="l">${i+1}</td><td class="l">${V[t.xk].name} → ${V[t.yk].name}</td><td style="text-align:center">${t.pol}</td><td>${fmtN(t.r,2)}</td><td>${t.best}</td><td>${fmtN(t.crit,2)}</td><td>${fmtN(t.rh.r,2)}（${t.rh.n}）</td><td>${fmtN(t.rl.r,2)}（${t.rl.n}）</td><td>${fmtN(t.lr.r,2)}（${t.lr.n}）</td><td>${t.agree}／${lines.length}</td><td class="l"><b style="color:${col[t.cls]}">${t.v}</b></td><td class="l" style="white-space:normal;min-width:180px">${t.notes.join('。')}</td><td><button class="btn" data-del="${i}">削除</button></td></tr>`).join('')}</table></div><div class="note">行をクリックすると下に詳細を表示。（ ）内は月の数。</div>`;
-  $('#cvt').querySelectorAll('tr[data-i]').forEach(tr=>tr.onclick=e=>{if(e.target.dataset.del!=null){st.cands.splice(+e.target.dataset.del,1);st.sel=0;run();return}st.sel=+tr.dataset.i;run()});
-  detail(R[st.sel],lines)};
- function detail(t,lines){const d=$('#cvd');d.innerHTML='';if(!t)return;const V=CV.build();const g=document.createElement('div');g.className='grid2';d.appendChild(g);
-  const xn=V[t.xk].name,yn=V[t.yk].name;
-  chart(g,{title:`ずらした相関：${xn} → ${yn}`,type:'bar',x:['結果が3か月先','2','1','同じ月','原因が1か月先','2','3'],series:[{name:'r',data:[-3,-2,-1,0,1,2,3].map(L=>t.lag[L].r)}],ref:[{y:t.crit,label:'+2/√n',c:'#7A8C99'},{y:-t.crit,label:'−2/√n',c:'#7A8C99'}],yMin:-1,yMax:1,labels:2,foot:'右側（原因が先）で想定の符号に強ければ矢印を支持。左側（結果が先）の方が強ければ，逆向きの矢印やフィードバックを疑う。'});
-  const LD=V.load.data;const hi=[],lo=[];lines.forEach(l=>{for(let tt=t.best;tt<36;tt++){const x=t.X[l][tt-t.best],y=t.Y[l][tt];if(x==null||y==null)continue;(LD[l][tt]>=95?hi:lo).push([x,y,`${l} ${MON[tt]}`])}});
-  chart(g,{title:`散布図（${st.fe?'共通の動きを除いた':'ライン内で標準化した'}値，遅れ${t.best}か月）`,type:'scatter',series:[{name:'負荷率95％以上の月',data:hi,color:'#C8553D'},{name:'95％未満の月',data:lo,color:'#0F7C8C'}],xLabel:xn,yLabel:yn,forceLegend:true});
-  ['LINE-3',lines.find(l=>l!=='LINE-3')].filter(Boolean).forEach(l=>{if(!lines.includes(l))return;chart(g,{title:`${l}：${xn}（${V[t.xk].unit}）と${yn}（${V[t.yk].unit}）`,x:MON,series:[{name:xn,data:zline(V[t.xk].data[l])},{name:yn,data:zline(V[t.yk].data[l]),color:'#C8553D'}],sub:'それぞれライン内で標準化（平均0，標準偏差1）して重ねた',vbands:[{i:15,label:'2024-04'}]})});
-  chart(g,{title:`ライン×年の水準（年ごとにライン間の平均を差し引いた値）`,type:'scatter',series:[{name:'ライン×年',data:t.LP.map((p,i)=>[p[0],p[1],''])}],xLabel:xn,yLabel:yn,r:5,foot:'各点が1つのライン・1つの年。右上がりなら＋，右下がりなら−の関係。数量は各ラインの2023年＝100の指数。'});
-  chart(g,{title:'2023→2025年の変化率（ライン別，年平均どうし）',type:'bar',x:t.ch.map(c=>c.l),series:[{name:xn+'の変化',data:t.ch.map(c=>c.dx)},{name:yn+'の変化',data:t.ch.map(c=>c.dy),color:'#C8553D'}],unit:'％',foot:`変化の向き（符号）を見る。想定の極性（${t.pol}）どおりの向きのライン：${t.agree}／${t.ch.length}`});}
- function zline(a){const v=a.filter(x=>x!=null);const m=v.reduce((p,c)=>p+c,0)/v.length;const sd=Math.sqrt(v.reduce((p,c)=>p+(c-m)**2,0)/Math.max(1,v.length-1))||1;return a.map(x=>x==null?null:(x-m)/sd)}
- $('#cvcsv').onclick=()=>{const V=CV.build();const keep=R.filter(t=>t.cls==='ok'||t.cls==='id');
-  const txt='# データブラウザ「矢印の検証」から書き出し（支持・条件付きで支持・定義から決まる矢印のみ）\n原因,結果,極性,遅れ\n'+keep.map(t=>`# ${V[t.xk].name}→${V[t.yk].name}：${t.v}（r=${fmtN(t.r,2)}，遅れ${t.best}か月）\n${V[t.xk].name},${V[t.yk].name},${t.pol},${t.best>0||['prod>inv','wait>rlt'].includes(t.xk+'>'+t.yk)?'遅れ':''}`).join('\n');
-  dl('20261114_scm-recurrent-program_矢印の検証-CLD用_v1.csv','﻿'+txt,'text/csv')};
- $('#cvres').onclick=()=>{const V=CV.build();dl('20261114_scm-recurrent-program_矢印の検証-判定表_v1.csv','﻿原因,結果,想定の極性,r,遅れ（月）,判定の目安,負荷率95%以上のr,95%未満のr,向きが合うライン数,判定,補足\n'+R.map(t=>[V[t.xk].name,V[t.yk].name,t.pol,t.r?.toFixed(3),t.best,t.crit.toFixed(3),t.rh.r?.toFixed(3),t.rl.r?.toFixed(3),t.agree,t.v,t.notes.join('。')].join(',')).join('\n'),'text/csv')};
- run()}})();
+// 変数名の別名（ワークベンチ・ラボから届いた名前を，このブラウザの変数に対応づける）
+const CV_ALIAS={dem:['需要','受注','受注数量','需要量','注文'],load:['ライン負荷率','負荷率','稼働負荷','設備負荷','負荷'],setup:['段取り時間','段取り','段取替え'],cap:['生産能力','能力','キャパシティ','生産キャパ'],prod:['生産','生産量','生産実績'],wait:['生産待ち','仕掛','生産待ち行列','仕掛在庫'],rlt:['補充リードタイム','補充LT','リードタイム','補充の遅れ'],inv:['在庫','在庫量','手持在庫','製品在庫'],short:['欠品','欠品数','品切れ','欠品量'],bo:['受注残','バックオーダー','出荷待ち'],otif:['OTIF','納期遵守率','納期遵守','サービス率'],ff:['初回充足率','充足率','フィルレート'],exp:['特急便','特急便の比率','特急輸送','緊急輸送'],frt:['物流費','運賃','輸送費','物流コスト'],cxl:['顧客の取消','取消','キャンセル','取消率','顧客離れ'],dlv:['配送日数','輸送日数','配送時間','配送リードタイム'],o2s:['出荷までの日数','出荷リードタイム'],ss:['安全在庫の設定','安全在庫','安全在庫水準'],fe:['予測誤差','需要予測誤差','予測精度の低さ','予測のずれ'],sup:['部品の納入遅延','部品遅延','納入遅延','部品の遅れ','調達遅延']};
+const nrm=s=>String(s||'').toLowerCase().replace(/[\s_\-・()（）「」『』]/g,'');
 
-RENDER.ov();
+// =====================================================================
+// BOOT：DATA（サンプル or 取り込んだ業務データの集計）から全タブを組み立てる
+// =====================================================================
+function BOOT(DATA,mode){
+ APP.mode=mode;APP.data=DATA;const SAMPLE=mode==='sample';
+ ['ov','ex','rd','cv','eq','pc','sk'].forEach(id=>{const s=$('#'+id);if(s)s.innerHTML=''});$('#mdbox').innerHTML='';
+ const RENDER=APP.RENDER={};APP.cvApi=null;
+ if(DATA.LITE&&!DATA._unl){DATA._unl=1;const un=o=>{const cols=o.c.map(c=>{const a=new Array(c.length);let s=0;for(let i=0;i<c.length;i++){s+=c[i];a[i]=s}return a});const sc=o.s||{};Object.entries(sc).forEach(([j,v])=>{cols[j]=cols[j].map(x=>x/v)});return Array.from({length:o.n},(_,i)=>cols.map(c=>c[i]))};
+  DATA.ORD=un(DATA.ORD).map(r=>[...r.slice(0,11),0,...r.slice(11,18),0]);DATA.SHP=un(DATA.SHP).map(r=>[r[0],r[1],0,r[2],0,r[3],r[4]]);DATA.PRD=un(DATA.PRD);DATA.INV=un(DATA.INV);
+  const [PS_,PP_]=DATA.PROCK;DATA.PROC=un(DATA.PROC).map(r=>[PS_[r[1]],PP_[r[2]],r[0],r[3],r[3]+r[4],0,0,0]);DATA.INVD={};DATA.CUST={cols:[],rows:[]};}
+ function tab(o){return o&&o.rows?o.rows.map(r=>Object.fromEntries(o.cols.map((c,i)=>[c,r[i]]))):[]}
+ const SKU=tab(DATA.SKU), CUST=tab(DATA.CUST), SUP=tab(DATA.SUP), PS=tab(DATA.PS), BOM=tab(DATA.BOM), SP=tab(DATA.SP), FIN=tab(DATA.FIN);
+ const AV=Object.assign({dlv:1,cancel:1,ship:1,rank:1,dc:1,price:1,plt:1,shp:1,shp_dc:1,shp_x:1,shp_frt:1,prd:1,prd_plan:1,inv:1,inv_oo:1,inv_bo:1,inv_dc:1,cost:1,eq:1,eq_setup:1,eq_down:1,eq_defect:1,proc:1,sp:1,sp_fc:1,sp_plan:1,fin:1,bom:1},DATA.AVAIL||{});
+ const LINES=DATA.LINES, DCS=DATA.DCS||['全体'], RANKS=DATA.RANKS||['S','A','B','C'];
+ const PGS=[...new Set(SKU.map(s=>s.product_group))].sort();
+ const SKUI=Object.fromEntries(SKU.map((s,i)=>[s.sku,i]));
+ const MODES=(()=>{const s=[...new Set(SKU.map(x=>x.make_mode))];return ['MTS','MTO'].filter(m=>s.includes(m)).concat(s.filter(m=>m!=='MTS'&&m!=='MTO').sort())})();
+ const ABCS=[...new Set(SKU.map(s=>s.abc_class))].filter(x=>x!=null).sort();
+ const HASMTS=MODES.includes('MTS'), MTSF=()=>HASMTS?{mode:new Set(['MTS'])}:{};
+ const MTSL=HASMTS&&MODES.length>1?'見込生産品':'';
+ // ---------- 暦（データから作る。サンプルは 2023-01〜2025-12）
+ const MON=DATA.MON||(()=>{const a=[];for(let y=2023;y<=2025;y++)for(let m=1;m<=12;m++)a.push(`${y}-${String(m).padStart(2,'0')}`);return a})();
+ const NM=MON.length, MI=Object.fromEntries(MON.map((m,i)=>[m,i]));
+ const Y0=+MON[0].slice(0,4), M0=+MON[0].slice(5,7)-1;
+ const YEARS=[...new Set(MON.map(m=>m.slice(0,4)))], NY=YEARS.length, YI=MON.map(m=>YEARS.indexOf(m.slice(0,4)));
+ const qlab=m=>m.slice(0,4)+'Q'+(Math.floor((+m.slice(5,7)-1)/3)+1);const QL=[...new Set(MON.map(qlab))], QI=MON.map(m=>QL.indexOf(qlab(m)));
+ const YCNT=YEARS.map((_,y)=>YI.filter(v=>v===y).length);
+ const D0=Date.UTC(Y0,M0,1);const dstr=i=>new Date(D0+i*864e5).toISOString().slice(0,10);
+ const NDAY=DATA.NDAY;const DAYM=[];for(let i=0;i<NDAY;i++){const k=dstr(i).slice(0,7);DAYM.push(MI[k]!=null?MI[k]:-1)}
+ const mdays=m=>{const y=+MON[m].slice(0,4),mo=+MON[m].slice(5,7);return new Date(Date.UTC(y,mo,0)).getUTCDate()};
+ const ymean=(a,y)=>{const s=a.filter((x,m)=>YI[m]===y&&x!=null);return s.length?s.reduce((p,c)=>p+c,0)/s.length:null};
+ const EVI=APP.evi&&MI[APP.evi]!=null?MI[APP.evi]:null;
+ const VB=(lab)=>EVI!=null?[{i:EVI,label:lab||(SAMPLE?MON[EVI]:'介入 '+MON[EVI])}]:[];
+ const YR=`${YEARS[0]}→${YEARS[NY-1]}年`;
+ // ---------- dimensions
+ const DIMS={line:{t:'ライン',vals:LINES,get:(s)=>s.line},pg:{t:'製品群',vals:PGS,get:s=>s.product_group},mode:{t:'生産方式',vals:MODES,get:s=>s.make_mode},abc:{t:'ABC区分',vals:ABCS,get:s=>s.abc_class}};
+ if(!SAMPLE){if(PGS.length<2)delete DIMS.pg;if(MODES.length<2)delete DIMS.mode}
+ // ---------- sources & metrics
+ // ORD row: sku,m,rank,dc, n,q,v,nv,ot,ff,nc,cq,uf,cs,ct,o2s,s2d,ltn,ex,plt
+ const SRC={
+  ord:{t:'受注（受注月で集計）',rows:DATA.ORD,mi:1,nf:16,f0:4,vol:s=>s[1],extra:{rank:{t:'顧客ランク',vals:RANKS,get:r=>RANKS[r[2]]},dc:{t:'担当DC',vals:DCS,get:r=>DCS[r[3]]}},
+   M:{q:['受注数量','個',s=>s[1]],v:['受注金額','百万円',s=>s[2]/100],n:['注文行数','行',s=>s[0]],otif:['OTIF','％',s=>s[3]?s[4]/s[3]*100:null],ff:['初回充足率','％',s=>s[3]?s[5]/s[3]*100:null],cr:['取消率（行）','％',s=>s[0]?s[6]/s[0]*100:null],cq:['取消数量','個',s=>s[7]],uf:['約束納期時点の未充足数量','個',s=>s[8]],cs:['非OTIF：欠品・分納あり','行',s=>s[9]],ct:['非OTIF：その他（一括納品の遅れ）','行',s=>s[10]],o2s:['受注→初回出荷（平均）','日',s=>s[13]?s[11]/s[13]:null],s2d:['初回出荷→初回納品（平均）','日',s=>s[13]?s[12]/s[13]:null],ex:['特急便を使った注文行の割合','％',s=>s[3]?s[14]/s[3]*100:null],plt:['約束リードタイム（平均）','日',s=>s[0]?s[15]/s[0]:null]}},
+  shp:{t:'出荷（出荷月で集計）',rows:DATA.SHP,mi:1,nf:6,f0:4,vol:s=>s[1]+s[4],map:r=>r[3]?[0,0,0,r[4],r[5],r[6]]:[r[4],r[5],r[6],0,0,0],extra:{dc:{t:'出荷DC',vals:DCS,get:r=>DCS[r[2]]},tm:{t:'配送方法',vals:['通常','特急'],get:r=>r[3]?'特急':'通常'}},
+   M:{q:['出荷数量','個',s=>s[1]+s[4]],xq:['特急便の出荷数量','個',s=>s[4]],xr:['特急便の比率（数量）','％',s=>(s[1]+s[4])?s[4]/(s[1]+s[4])*100:null],c:['運賃','百万円',s=>(s[2]+s[5])/100],xc:['特急便の運賃','百万円',s=>s[5]/100],cpu:['1個あたり運賃','円',s=>(s[1]+s[4])?(s[2]+s[5])*1e4/(s[1]+s[4]):null],n:['出荷明細数','件',s=>s[0]+s[3]]}},
+  prd:{t:'生産',rows:DATA.PRD,mi:1,nf:2,f0:2,vol:s=>s[1]||s[0],extra:{},M:{ac:['生産実績','個',s=>s[1]],pl:['生産計画','個',s=>s[0]],ach:['計画達成率','％',s=>s[0]?s[1]/s[0]*100:null]}},
+  inv:{t:SAMPLE?'在庫（DC，見込生産品，月平均）':'在庫（月平均）',rows:DATA.INV,mi:2,nf:4,avg:true,vol:s=>s[0],map:r=>[r[3],r[4],r[5],r[3]*(SKU[r[0]].unit_cost||0)],extra:{dc:{t:'DC',vals:DCS,get:r=>DCS[r[1]]}},
+   M:{oh:['手持在庫','個',s=>s[0]],oo:['入荷待ち（on_order）','個',s=>s[1]],bo:['出荷待ち（backorder）','個',s=>s[2]],val:['在庫金額（原価）','百万円',s=>s[3]/1e6]}}
+ };
+ if(DATA.LITE){delete SRC.ord.extra.rank;delete SRC.ord.extra.dc;delete SRC.shp.extra.dc;delete SRC.inv.extra.dc;delete SRC.shp.M.n}
+ {const O=SRC.ord.M;if(!AV.rank||RANKS.length<2)delete SRC.ord.extra.rank;if(!AV.dc||DCS.length<2){delete SRC.ord.extra.dc;delete SRC.shp.extra.dc;delete SRC.inv.extra.dc}
+  if(!AV.dlv)['otif','ff','uf','cs','ct'].forEach(k=>delete O[k]);if(!AV.cancel)['cr','cq'].forEach(k=>delete O[k]);if(!AV.ship)['o2s','s2d','ex'].forEach(k=>delete O[k]);if(!AV.price)delete O.v;if(!AV.plt)delete O.plt;
+  if(!AV.shp)delete SRC.shp;else{const S=SRC.shp.M;if(!AV.shp_x){['xq','xr','xc'].forEach(k=>delete S[k]);delete SRC.shp.extra.tm}if(!AV.shp_frt)['c','xc','cpu'].forEach(k=>delete S[k]);if(!AV.shp_dc)delete SRC.shp.extra.dc}
+  if(!AV.prd)delete SRC.prd;else if(!AV.prd_plan){delete SRC.prd.M.pl;delete SRC.prd.M.ach}
+  if(!AV.inv)delete SRC.inv;else{const I=SRC.inv.M;if(!AV.inv_oo)delete I.oo;if(!AV.inv_bo)delete I.bo;if(!AV.cost)delete I.val;if(!AV.inv_dc)delete SRC.inv.extra.dc}}
+ const HAS=(s,m)=>!!(SRC[s]&&(!m||SRC[s].M[m]));
+ const BUCK={m:{t:'月',n:NM,f:m=>m,lab:i=>MON[i]},q:{t:'四半期',n:QL.length,f:m=>QI[m],lab:i=>QL[i]},y:{t:'年',n:NY,f:m=>YI[m],lab:i=>YEARS[i]}};
+ Object.values(BUCK).forEach(B=>{B.cnt=new Array(B.n).fill(0);for(let m=0;m<NM;m++)B.cnt[B.f(m)]++});
+ function aggregate(src,{flt={},by='all',bucket='m',topN=8,metric}={}){
+  const S=SRC[src],B=BUCK[bucket],nf=S.nf;const groups=new Map();
+  const dimGet=k=>DIMS[k]?r=>DIMS[k].get(SKU[r[0]]):S.extra[k]?S.extra[k].get:k==='sku'?r=>SKU[r[0]].sku:()=>'全体';
+  const fk=Object.entries(flt).filter(([k,v])=>v&&v.size&&(DIMS[k]||S.extra[k])).map(([k,v])=>[dimGet(k),v]);
+  const gget=dimGet(by);
+  for(const r of S.rows){let ok=true;for(const [g,v] of fk){if(!v.has(g(r))){ok=false;break}}if(!ok)continue;
+   const m=r[S.mi];if(m<0||m>=NM)continue;const b=B.f(m);const key=gget(r);let a=groups.get(key);if(!a){a=Array.from({length:B.n},()=>new Float64Array(nf));groups.set(key,a)}
+   const vals=S.map?S.map(r):r.slice(S.f0,S.f0+nf);const t=a[b];for(let j=0;j<nf;j++)t[j]+=vals[j];}
+  let keys=[...groups.keys()];
+  if(by==='sku'){// 上位は「量」（受注数量・出荷数量・生産・在庫）で選ぶ。指標の値で選ぶと問題のSKUが「その他」に隠れるため
+   const vol=k=>{const s=new Float64Array(nf);groups.get(k).forEach(t=>t.forEach((v,j)=>s[j]+=v));return S.vol(s)||0};const vv=new Map(keys.map(k=>[k,vol(k)]));keys.sort((a,b)=>vv.get(b)-vv.get(a));
+   if(keys.length>topN){const rest=keys.slice(topN);const o=Array.from({length:B.n},()=>new Float64Array(nf));rest.forEach(k=>groups.get(k).forEach((t,i)=>t.forEach((v,j)=>o[i][j]+=v)));keys=keys.slice(0,topN);groups.set('その他',o);keys.push('その他')}}
+  else{const order=DIMS[by]?DIMS[by].vals:S.extra[by]?S.extra[by].vals:keys;keys=order.filter(k=>groups.has(k))}
+  return {x:Array.from({length:B.n},(_,i)=>B.lab(i)),keys,get:(k,mk)=>{const f=S.M[mk][2];const g=groups.get(k);if(!g)return new Array(B.n).fill(null);return g.map((t,i)=>{const div=S.avg?B.cnt[i]:1;const s=Array.from(t,v=>v/div);const v=f(s);return v==null?null:v})}}}
+ // 最も OTIF の低いライン（サンプルでは LINE-3）
+ const WORST=(()=>{if(!AV.dlv||!DATA.ORD.length)return LINES[0];const acc={};for(const r of DATA.ORD){const s=SKU[r[0]];if(HASMTS&&s.make_mode!=='MTS')continue;const a=acc[s.line]=acc[s.line]||[0,0];a[0]+=r[8];a[1]+=r[7]}let w=LINES[0],wv=Infinity;LINES.forEach(l=>{const a=acc[l];if(a&&a[1]&&a[0]/a[1]<wv){wv=a[0]/a[1];w=l}});return w})();
+ const WSUP=(()=>{if(SAMPLE&&SUP.some(s=>s.supplier_id==='SUP-07'))return 'SUP-07';const d={};(DATA.PROC||[]).forEach(p=>(d[p[0]]=d[p[0]]||[]).push(p[4]-p[3]));let w=SUP[0]&&SUP[0].supplier_id,wv=-Infinity;Object.entries(d).forEach(([k,v])=>{v.sort((a,b)=>a-b);const q=v[Math.min(v.length-1,Math.floor(.9*v.length))]+v.reduce((a,c)=>a+c,0)/v.length/1000;if(q>wv){wv=q;w=k}});return w})();
+ APP.worst=WORST;
+ const nodata=(what)=>`<div class="card nodata"><b>データなし</b>：${esc(what)}が読み込まれていないため，この図・表は出せない。「データ読込」タブで該当する表を割り当てると表示される。</div>`;
+ // ---------- 画面の枠（モードで切り替える部分）
+ document.body.classList.toggle('usermode',!SAMPLE);
+ const nb=t=>document.querySelector(`nav button[data-t="${t}"]`);
+ if(nb('rd'))nb('rd').textContent=SAMPLE?'ラウンド別（R1〜R5）':'テーマ別（R1〜R5）';
+ if(nb('eq'))nb('eq').style.display=AV.eq?'':'none';if(nb('pc'))nb('pc').style.display=AV.proc?'':'none';
+ const hp=$('#hsub');if(hp)hp.textContent=SAMPLE?'株式会社ブルーマウンテン（講義用の合成データ）2023〜2025年　原先生「Supply Chain Mystery」の演習データを集計して可視化':`読み込んだ業務データ：${APP.name}（${MON[0]}〜${MON[NM-1]}，${NM}か月）　このブラウザの中だけで集計（外部には送らない）`;
+ document.title=SAMPLE?'SCMミステリー データブラウザ：株式会社ブルーマウンテン':'データブラウザ：'+APP.name;
+ const ev=$('#evi');if(ev){ev.min=MON[0];ev.max=MON[NM-1];ev.value=APP.evi&&MI[APP.evi]!=null?APP.evi:''}
+ const bd=$('#dsbadge');if(bd){bd.textContent=SAMPLE?'サンプルデータ':'自社データ';bd.className='dsb '+(SAMPLE?'s':'u')}
+ // ---------- overview
+ const yearOrd=(flt={})=>{const a=aggregate('ord',{flt,by:'all',bucket:'y'});return k=>a.get('全体',k)};
+ RENDER.ov=(()=>{let done=false;return()=>{if(done)return;done=true;const h=$('#ov');
+  const yo=yearOrd();
+  if(SAMPLE){const ys=(()=>{const a=aggregate('shp',{by:'all',bucket:'y'});return k=>a.get('全体',k)})();const fy=k=>YEARS.map(y=>FIN.filter(f=>f.month.startsWith(y)).reduce((a,f)=>a+f[k],0));
+  const rev=fy('revenue'),lc=fy('logistics_cost');
+  h.innerHTML=`<h2>会社の状況：受注は伸びたのに，納期どおりに届く割合（OTIF）は下がり続けた</h2><div class="kpi">
+  <div><small>売上（2023→2025年）</small><b>${fmtN(rev[0]/1e8,1)}→${fmtN(rev[2]/1e8,1)}億円</b></div>
+  <div><small>受注数量（2023→2025年）</small><b>${fmtN(yo('q')[0]/1e6,2)}→${fmtN(yo('q')[2]/1e6,2)}百万個</b></div>
+  <div><small>OTIF（注文行，取消を除く）</small><b>${yo('otif').map(v=>fmtN(v,1)).join('→')}％</b></div>
+  <div><small>取消率（注文行）</small><b>${yo('cr').map(v=>fmtN(v,1)).join('→')}％</b></div>
+  <div><small>特急便の比率（出荷数量）</small><b>${ys('xr').map(v=>fmtN(v,1)).join('→')}％</b></div>
+  <div><small>物流費（2023→2025年）</small><b>${fmtN(lc[0]/1e8,1)}→${fmtN(lc[2]/1e8,1)}億円</b></div></div>
+  <div class="see">OTIFの定義（このブラウザ共通）：注文行（order_id×sku）ごとに，約束納期までの納品数量の合計が注文数量に達していれば「OTIF」。取消の印が1つでもある注文行は分母から除く。初回充足率：最初の納品が約束納期までに全量であった割合。いずれも受注月で集計する。原先生の演習のOTIF（96.7→94.4→91.6％）と一致する。</div>
+  <div class="card iohint">自社の業務データ（Excel）で同じ分析をするときは「<a href="#" data-go="io">データ読込</a>」タブへ。データはこのブラウザの外には送られない。</div>
+  <div class="grid2" id="ovg"></div><h3>14の表と結合のしかた</h3><div class="card" id="ovt"></div>`;
+  const g=$('#ovg');const a=aggregate('ord',{by:'mode',bucket:'m'}),al=aggregate('ord',{by:'all',bucket:'m'});
+  chart(g,{title:'月別OTIF：見込生産（MTS）と受注生産（MTO）',x:a.x,series:[{name:'全体',data:al.get('全体','otif'),color:'#17384A',w:2.5},...a.keys.map((k,i)=>({name:k,data:a.get(k,'otif'),color:PAL[i]}))],unit:'％',tight:true,vbands:VB(EVI===15?'2024-04 安全在庫の設定変更':null)});
+  const l=aggregate('ord',{by:'line',bucket:'m',flt:{mode:new Set(['MTS'])}});
+  chart(g,{title:`ライン別のOTIF（見込生産品）：${WORST}だけが落ち込む`,x:l.x,series:l.keys.map(k=>({name:k,data:l.get(k,'otif'),color:k===WORST?'#C8553D':undefined,w:k===WORST?3:1.6})),unit:'％',tight:true});
+  chart(g,{title:'月別の受注数量と生産実績（全社）',x:al.x,series:[{name:'受注数量',data:al.get('全体','q')},{name:'生産実績',data:aggregate('prd',{by:'all'}).get('全体','ac')}],unit:'個'});
+  chart(g,{title:'売上に占める営業利益と物流費の割合（finance_monthly）',x:FIN.map(f=>f.month),series:[{name:'営業利益率',data:FIN.map(f=>f.operating_profit/f.revenue*100)},{name:'物流費率',data:FIN.map(f=>f.logistics_cost/f.revenue*100),color:'#C8553D'}],unit:'％'});
+  const ROWS=DATA.ROWS||{orders:219742,shipments:221213,deliveries:242730,inventory_daily:180840,production:24523,equipment_daily:5480,procurement:4396,sales_plan_monthly:SP.length,finance_monthly:FIN.length,product_master:SKU.length,customer_master:CUST.length||220,supplier_master:SUP.length,part_supplier:PS.length,bom:BOM.length};
+  $('#ovt').innerHTML=tableHTML(['表','何の記録か','1行の単位','行数','結合キー'],[['orders','顧客の注文','注文×SKU',ROWS.orders,'order_id＋sku → shipments，deliveries'],['shipments','DCからの出荷と運賃','注文行の1回の出荷',ROWS.shipments,'order_id＋sku'],['deliveries','納品・不足・分納・取消','注文行の1件の記録',ROWS.deliveries,'order_id＋sku'],['inventory_daily','DCの日次在庫（MTSのみ）','日×DC×SKU',ROWS.inventory_daily,'sku'],['production','生産計画と実績','日×工場×ライン×SKU',ROWS.production,'sku，date＋plant＋line'],['equipment_daily','ラインの稼働・生産','日×工場×ライン',ROWS.equipment_daily,'date＋plant＋line'],['procurement','部品の発注と入荷','発注明細',ROWS.procurement,'part_id＋supplier_id'],['sales_plan_monthly','予測・販売計画・生産計画・実績','月×製品群',ROWS.sales_plan_monthly,'month＋product_group'],['finance_monthly','全社の損益・在庫評価','月',ROWS.finance_monthly,'month'],['product_master','製品の属性・担当ライン','SKU',ROWS.product_master,'sku → line'],['customer_master','顧客の属性・約束LT・担当DC','顧客',ROWS.customer_master,'customer_id'],['supplier_master','サプライヤの属性','サプライヤ',ROWS.supplier_master,'supplier_id'],['part_supplier','部品の調達先・単一調達','部品×サプライヤ',ROWS.part_supplier,'part_id，supplier_id'],['bom','製品の部品構成','SKU×部品',ROWS.bom,'sku，part_id']],{left:3});
+  }else{
+  const ys=HAS('shp')?(()=>{const a=aggregate('shp',{by:'all',bucket:'y'});return k=>a.get('全体',k)})():null;
+  const part=YEARS.map((y,i)=>YCNT[i]<12?`${y}年は${YCNT[i]}か月分`:'').filter(Boolean);
+  const k=[];const yy=v=>v.map(x=>fmtN(x,1)).join('→');
+  k.push(['受注数量（年別）',yo('q').map(v=>fmtN(v,0)).join('→')+'個']);
+  if(HAS('ord','v'))k.push(['受注金額（年別）',yo('v').map(v=>fmtN(v,1)).join('→')+'百万円']);
+  if(HAS('ord','otif'))k.push(['OTIF（注文行，取消を除く）',yy(yo('otif'))+'％']);
+  if(HAS('ord','ff'))k.push(['初回充足率',yy(yo('ff'))+'％']);
+  if(HAS('ord','cr'))k.push(['取消率（注文行）',yy(yo('cr'))+'％']);
+  if(ys&&HAS('shp','xr'))k.push(['特急便の比率（出荷数量）',yy(ys('xr'))+'％']);
+  if(ys&&HAS('shp','c'))k.push(['運賃（年別）',ys('c').map(v=>fmtN(v,1)).join('→')+'百万円']);
+  const lo=aggregate('ord',{by:'line',bucket:'y',flt:MTSF()});
+  h.innerHTML=`<h2>読み込んだデータの概要：${esc(APP.name)}</h2>
+  <div class="see">期間 <b>${MON[0]}〜${MON[NM-1]}</b>（${NM}か月${part.length?'，'+part.join('，'):''}）　SKU ${SKU.length}品目　ライン ${LINES.length}（${LINES.map(esc).join('，')}）${DCS.length>1?'　DC '+DCS.length:''}。年別の値は「${YEARS.join('→')}」の順。${AV.dlv?`OTIF：注文行（受注番号×品番）ごとに，約束納期までの納品数量の合計が注文数量に達していれば OTIF。取消のある注文行は分母から除く。OTIF が最も低いライン：<b>${esc(WORST)}</b>。`:'<b>納品の記録がないため OTIF・初回充足率は出せない。</b>'}${NM<12?'<br><b style="color:#C8553D">12か月に満たないため，季節の動きや年の比較は読み取りにくい。</b>':''}</div>
+  <div class="kpi">${k.map(([a,b])=>`<div><small>${a}</small><b>${b}</b></div>`).join('')}</div><div class="grid2" id="ovg"></div><h3>読み込んだ表</h3><div class="card" id="ovt"></div>`;
+  const g=$('#ovg');const al=aggregate('ord',{by:'all',bucket:'m'});
+  if(HAS('ord','otif')){const a=DIMS.mode?aggregate('ord',{by:'mode',bucket:'m'}):null;chart(g,{title:'月別OTIF'+(a?'：生産方式別':''),x:al.x,series:[{name:'全体',data:al.get('全体','otif'),color:'#17384A',w:2.5},...(a?a.keys.map((k,i)=>({name:k,data:a.get(k,'otif'),color:PAL[i]})):[])],unit:'％',tight:true,vbands:VB()});
+   const l=aggregate('ord',{by:'line',bucket:'m',flt:MTSF()});chart(g,{title:`ライン別のOTIF${MTSL?'（'+MTSL+'）':''}：最も低いのは ${WORST}`,x:l.x,series:l.keys.map(k=>({name:k,data:l.get(k,'otif'),color:k===WORST?'#C8553D':undefined,w:k===WORST?3:1.6})),unit:'％',tight:true,vbands:VB()})}
+  chart(g,{title:'月別の受注数量'+(HAS('prd')?'と生産実績':'')+'（全社）',x:al.x,series:[{name:'受注数量',data:al.get('全体','q')},...(HAS('prd')?[{name:'生産実績',data:aggregate('prd',{by:'all'}).get('全体','ac')}]:[])],unit:'個',vbands:VB()});
+  const lq=aggregate('ord',{by:'line',bucket:'m'});chart(g,{title:'ライン別の受注数量（月別）',type:'stack',x:lq.x,series:lq.keys.map(k=>({name:k,data:lq.get(k,'q')})),unit:'個'});
+  const T=(DATA.META&&DATA.META.tables)||[];
+  $('#ovt').innerHTML=tableHTML(['表','内容','読み込んだシート','行数','集計に使った行','期間','状態'],T.map(t=>[t.label,t.desc,t.src||'—',t.rows==null?'—':t.rows,t.used==null?'—':t.used,t.from?t.from+'〜'+t.to:'—',t.rows?'読み込み済み':'データなし（関係する指標・タブは非表示）']),{left:3,hl:r=>r[3]==='—'});
+  h.querySelector('h3').insertAdjacentHTML('afterend','<div class="note">「データなし」の表に関係する指標・タブ・矢印の変数は表示しない。年別の値の推移と，OTIF のライン別比較は「エクスプローラ」で切り口を変えて確かめる。</div>');
+  }
+  h.querySelectorAll('[data-go]').forEach(a=>a.onclick=e=>{e.preventDefault();showTab(a.dataset.go)});
+ }})();
+ // ---------- explorer
+ RENDER.ex=(()=>{let done=false;const st={src:'ord',metric:HAS('ord','otif')?'otif':'q',by:'line',bucket:'m',type:'line',flt:{},top:8,cmp:'otif'};return()=>{if(done)return;done=true;const h=$('#ex');
+  h.innerHTML=`<h2>エクスプローラ：表・指標・切り口・絞り込みを選んで集計する</h2><div class="card"><div class="ctl" id="exc1"></div><div class="ctl" id="exc2"></div><div class="note" id="exnote"></div></div><div id="exout"></div>`;
+  const c1=$('#exc1'),c2=$('#exc2');
+  const build=()=>{const S=SRC[st.src];if(!S.M[st.metric])st.metric=Object.keys(S.M)[0];
+   const byOpts=[['all','全体'],...Object.entries(DIMS).map(([k,d])=>[k,d.t]),...Object.entries(S.extra).map(([k,d])=>[k,d.t]),['sku','SKU（上位）']];if(!byOpts.find(o=>o[0]===st.by))st.by='all';
+   c1.innerHTML=`<label>表</label><select id="xs">${Object.entries(SRC).map(([k,s])=>`<option value="${k}" ${k===st.src?'selected':''}>${s.t}</option>`).join('')}</select>
+   <label>指標</label><select id="xm">${Object.entries(S.M).map(([k,m])=>`<option value="${k}" ${k===st.metric?'selected':''}>${m[0]}（${m[1]}）</option>`).join('')}</select>
+   <label>系列の切り口</label><select id="xb">${byOpts.map(([k,t])=>`<option value="${k}" ${k===st.by?'selected':''}>${t}</option>`).join('')}</select>
+   <label id="xnl" title="SKU（上位）のとき：量（数量）の多い順に何品目を個別に出すか">上位</label><select id="xn">${[5,8,10,15,20,30,50,9999].map(v=>`<option value="${v}" ${v===st.top?'selected':''}>${v===9999?'すべて':v+'品目'}</option>`).join('')}</select>
+   <label>集計単位</label><select id="xk">${Object.entries(BUCK).map(([k,b])=>`<option value="${k}" ${k===st.bucket?'selected':''}>${b.t}</option>`).join('')}</select>
+   <label>グラフ</label><select id="xt"><option value="line">折れ線</option><option value="bar" ${st.type==='bar'?'selected':''}>棒</option><option value="stack" ${st.type==='stack'?'selected':''}>積み上げ棒</option></select>`;
+   c2.innerHTML='<label>絞り込み</label>';Object.entries(DIMS).forEach(([k,d])=>msel(c2,k,d.t,d.vals,st.flt,run));Object.entries(S.extra).forEach(([k,d])=>msel(c2,k,d.t,d.vals,st.flt,run));
+   const rb=document.createElement('button');rb.className='btn';rb.textContent='絞り込みを解除';rb.onclick=()=>{st.flt={};build();run()};c2.appendChild(rb);
+   $('#xs').onchange=e=>{st.src=e.target.value;st.flt={};build();run()};$('#xm').onchange=e=>{st.metric=e.target.value;run()};$('#xb').onchange=e=>{st.by=e.target.value;run()};$('#xk').onchange=e=>{st.bucket=e.target.value;run()};$('#xt').onchange=e=>{st.type=e.target.value;run()};$('#xn').onchange=e=>{st.top=+e.target.value;run()};
+   $('#exnote').textContent=st.src==='inv'?(SAMPLE?'在庫は日次の値を月平均したもの（四半期・年はその平均）。在庫表には見込生産品（MTS）だけが収録されている。':'在庫は記録（日次・週次など）の値を月ごとに平均したもの（四半期・年はその平均）。'):st.src==='ord'?'受注月で集計。OTIF・初回充足率の分母は取消のない注文行。非OTIFの内訳は簡易分類：欠品・分納の印・不足数量・複数回出荷・納品不足のいずれかがあれば「欠品・分納あり」，なければ「その他」。':st.src==='shp'?(SAMPLE?'出荷日の月で集計（2026年の出荷は除く）。':'出荷日の月で集計（期間外の出荷は除く）。'):'生産表の日別SKU別数量を月で合計。'};
+  const run=()=>{const S=SRC[st.src],m=S.M[st.metric];const a=aggregate(st.src,{flt:st.flt,by:st.by,bucket:st.bucket,topN:st.top,metric:st.metric});const o=$('#exout');o.innerHTML='';
+   $('#xn').style.display=$('#xnl').style.display=st.by==='sku'?'':'none';
+   const ser=a.keys.map(k=>({name:k,data:a.get(k,st.metric)}));const isRate=m[1]==='％'||m[1]==='日'||m[1]==='円';
+   const title=`${m[0]}（${m[1]}）— ${S.t}`;
+   chart(o,{title,x:a.x,series:ser,type:isRate&&st.type==='stack'?'line':st.type,unit:m[1],tight:isRate,w:1100,h:360,rot:st.bucket==='m',vbands:st.bucket==='m'?VB():[],foot:(isRate&&st.type==='stack'?'率・平均の指標は積み上げできないため折れ線で表示しています。':'')+(st.by==='sku'?`SKU は受注・出荷・生産・在庫の量の多い順に上位${st.top>=9999?'すべて':st.top+'品目'}（残りは「その他」）。`:'')});
+   const tot=k=>{const v=a.get(k,st.metric).filter(x=>x!=null);return v.length?(isRate?v.reduce((p,c)=>p+c,0)/v.length:v.reduce((p,c)=>p+c,0)):null};
+   const cols=['系列',...a.x,isRate?'期間平均':'期間合計'],rows=a.keys.map(k=>[k,...a.get(k,st.metric),tot(k)]);
+   const tb=document.createElement('div');tb.className='card';tb.innerHTML=`<div class="ctitle"><span>数値表</span><span class="acts"><button class="btn" data-a="tcsv">CSV</button><button class="btn" data-a="txl">Excel</button></span></div>`+tableHTML(cols,rows);o.appendChild(tb);sortable(tb);
+   const out=()=>[cols,...rows.map(r=>r.map(v=>v==null||(typeof v==='number'&&isNaN(v))?null:R4(v)))];
+   tb.querySelector('[data-a=tcsv]').onclick=()=>dl(FN('エクスプローラ-'+m[0],'csv'),SCMIO.toCsv(out()),'text/csv');
+   tb.querySelector('[data-a=txl]').onclick=()=>{const fl=Object.entries(st.flt).filter(([k,v])=>v&&v.size).map(([k,v])=>`${(DIMS[k]||S.extra[k]||{t:k}).t}=${[...v].join('・')}`).join('，');SCMIO.download(SCMIO.writeXlsx([{name:'数値表',rows:out()},{name:'条件',rows:[['項目','値'],['データ',APP.name],['表',S.t],['指標',m[0]+'（'+m[1]+'）'],['切り口',(DIMS[st.by]||S.extra[st.by]||{t:st.by==='sku'?'SKU（上位）':'全体'}).t],['集計単位',BUCK[st.bucket].t],['絞り込み',fl||'なし'],['書き出した日',new Date().toISOString().slice(0,10)]]}]),FN('エクスプローラ-'+m[0],'xlsx'))}};
+  build();run()}})();
+ // ---------- rounds
+ const ROUND={};
+ RENDER.rd=(()=>{let done=false;return()=>{if(done)return;done=true;const h=$('#rd');
+  h.innerHTML=SAMPLE?`<h2>ラウンド別：原先生の演習の5つのラウンドで見た図を，自分で動かして確かめる</h2>`:`<h2>テーマ別：物流・予測・介入の前後・部品調達・生産能力の図</h2>`;const body=document.createElement('div');
+  subtabs(h,SAMPLE?[['r1','R1 物流（H4）'],['r2','R2 予測・計画（H1・H5）'],['r3','R3 安全在庫（H2）'],['r4','R4 部品調達（H3）'],['r5','R5 生産能力（H6）']]:[['r1','R1 物流'],['r2','R2 予測・計画'],['r3','R3 介入の前後比較'],['r4','R4 部品調達'],['r5','R5 生産能力']],k=>ROUND[k](body));h.appendChild(body);ROUND.r1(body)}})();
+ ROUND.r1=b=>{b.innerHTML=(SAMPLE?`<div class="see"><b>H4：出荷後の配送に時間がかかるようになり，納期遅れが増えた</b>――正しければ「出荷→納品」の日数が延び，非OTIFの多くが輸送の遅れになるはず。</div>`:`<div class="see">納期遅れが<b>出荷の前</b>（在庫がない・作れない）で起きているか，<b>出荷の後</b>（配送）で起きているかを見る。</div>`)+`<div class="grid2"></div>`;const g=b.querySelector('.grid2');
+  const y=aggregate('ord',{bucket:'y'}),m=aggregate('ord',{bucket:'m'});
+  if(HAS('ord','o2s')){chart(g,{title:'受注→初回出荷と，初回出荷→初回納品の平均日数（年別）',type:'bar',x:y.x,series:[{name:'受注→出荷',data:y.get('全体','o2s')},{name:'出荷→納品',data:y.get('全体','s2d')}],unit:'日',labels:2});
+  chart(g,{title:SAMPLE?'同（月別）：延びているのは出荷前の区間':'同（月別）',x:m.x,series:[{name:'受注→出荷',data:m.get('全体','o2s')},{name:'出荷→納品',data:m.get('全体','s2d')}],unit:'日',vbands:SAMPLE?[]:VB()})}else g.insertAdjacentHTML('beforeend',nodata('出荷（受注番号つき）または納品'));
+  if(HAS('ord','cs'))chart(g,{title:'非OTIFの内訳（年別，注文行数）',type:'stack',x:y.x,series:[{name:'欠品・分納あり',data:y.get('全体','cs'),color:'#C8553D'},{name:'その他（一括納品の遅れ）',data:y.get('全体','ct'),color:'#7A8C99'}],unit:'行',foot:(SAMPLE?'簡易分類のため，原先生の分類（在庫欠品77％，輸送遅延12％）とは区分が異なる。':'簡易分類：分納・初回の不足があれば「欠品・分納あり」。')+'欠品・分納ありの割合は '+y.get('全体','cs').map((v,i)=>fmtN(v/(v+y.get('全体','ct')[i])*100,1)+'％').join('，')});
+  if(HAS('shp','xr')){const s=aggregate('shp',{bucket:'m'});chart(g,{title:SAMPLE?'特急便の比率（出荷数量，月別）：OTIFが落ちる時期に増える':'特急便の比率（出荷数量，月別）',x:s.x,series:[{name:'特急便の比率',data:s.get('全体','xr'),color:'#C8553D'}],unit:'％',foot:SAMPLE?'特急便は欠品分の追加出荷に使われる（物流部メモ）。特急の増加は原因ではなく結果。':'',vbands:SAMPLE?[]:VB()})}else g.insertAdjacentHTML('beforeend',nodata('出荷（特急の区分）'))};
+ ROUND.r2=b=>{if(!AV.sp||!SP.length){b.innerHTML=nodata('需要・予測（demand）');return}
+  b.innerHTML=(SAMPLE?`<div class="see"><b>H1：需要予測の精度が低下した／H5：販売計画が過大</b>――正しければ予測誤差が年とともに大きくなり，計画が実績を上回るはず。</div>`:`<div class="see">予測・計画と実績のずれが，年とともに大きくなっているか・計画が実績を上回り続けていないかを見る。</div>`)+`<div class="ctl"><label>製品群</label><select id="r2g"><option value="">すべて（合計）</option>${[...new Set(SP.map(r=>r.product_group))].sort().map(p=>`<option>${esc(p)}</option>`).join('')}</select></div><div class="grid2" id="r2o"></div>`;
+  const run=()=>{const pg=$('#r2g').value;const o=$('#r2o');o.innerHTML='';const rows=SP.filter(r=>!pg||r.product_group===pg);const by=k=>MON.map(mo=>rows.filter(r=>r.month===mo).reduce((a,r)=>a+(r[k]||0),0));
+   const A=by('actual_qty'),F=by('forecast_qty'),Sp=by('sales_plan_qty'),Pp=by('production_plan_qty');
+   const ser=[{name:'実績',data:A,color:'#17384A',w:2.6}];if(AV.sp_fc)ser.push({name:'統計予測',data:F});if(AV.sp_plan){if(rows.some(r=>r.sales_plan_qty))ser.push({name:'販売計画',data:Sp});if(rows.some(r=>r.production_plan_qty))ser.push({name:'生産計画',data:Pp,dash:true})}
+   chart(o,{title:SAMPLE?'月別の統計予測・販売計画・生産計画・実績（sales_plan_monthly）':'月別の予測・計画・実績',x:MON,series:ser,unit:'個',vbands:SAMPLE?[]:VB()});
+   const yr=v=>YEARS.map((_,y)=>v.reduce((a,c,m)=>YI[m]===y?a+c:a,0));const ya=yr(A);
+   const yser=ser.slice(1).map(s=>({name:s.name,data:yr(s.data).map((v,i)=>ya[i]?v/ya[i]*100:null)}));
+   if(yser.length)chart(o,{title:'実績を100としたときの予測・計画（年別）',type:'bar',x:YEARS,series:yser,ref:[{y:100,label:'実績＝100'}],yMin:SAMPLE?80:undefined,labels:0});
+   const grp=pg?[pg]:[...new Set(SP.map(r=>r.product_group))];const w=(fk)=>YEARS.map((_,y)=>{let e=0,s=0;grp.forEach(p=>{const r=SP.filter(x=>x.product_group===p);for(let i=0;i<NM;i++){if(YI[i]!==y||!r[i])continue;const a=r[i].actual_qty;let f;if(fk==='ma'){if(i<6)continue;f=r.slice(i-6,i).reduce((q,x)=>q+x.actual_qty,0)/6}else{f=r[i].forecast_qty;if(f==null)continue}e+=Math.abs(a-f);s+=a}});return s?e/s*100:null});
+   chart(o,{title:'製品群×月次の予測誤差 WAPE（年別）',type:'bar',x:YEARS,series:[...(AV.sp_fc?[{name:SAMPLE?'データの統計予測':'データの予測',data:w('fc')}]:[]),{name:'過去6か月移動平均（1か月先）',data:w('ma')}],unit:'％',labels:1,foot:`WAPE＝Σ|実績−予測|／Σ実績×100。移動平均は最初の6か月（${MON[0]}〜${MON[Math.min(5,NM-1)]}）を除く。誤差が年とともに一律に大きくなっているかを見る。`});
+   if(HAS('ord','otif')&&DIMS.pg){const st=aggregate('ord',{by:'pg',bucket:'y'});chart(o,{title:'製品群別のOTIF（年別）',type:'bar',x:st.x,series:st.keys.map(k=>({name:k,data:st.get(k,'otif')})),unit:'％',yMin:SAMPLE?50:undefined})}};
+  $('#r2g').onchange=run;run()};
+ // R3：介入日の前後比較（サンプル：2024年4月の安全在庫の引き上げ，A・B区分 vs C区分）
+ const r3s={dim:DIMS.abc?'abc':Object.keys(DIMS)[0],set:{t:new Set(ABCS.filter(a=>a!=='C').length&&ABCS.includes('C')?ABCS.filter(a=>a!=='C'):ABCS.slice(0,1))}};
+ ROUND.r3=b=>{
+  if(EVI==null||EVI<1){b.innerHTML=`<div class="see">${SAMPLE?'':'<b>介入（対策）の前後比較</b>：'}画面右上の「介入日」に，対策を始めた月（例：安全在庫の設定を変えた月）を入れると，その前後を「対象群」と「比較群」で比べる（差の差）。${EVI===0?'<br>介入日がデータの最初の月なので，「前」の期間がない。':''}</div>`;return}
+  if(!AV.dlv){b.innerHTML=nodata('納品（OTIF・初回充足率の計算に必要）');return}
+  const dk=r3s.dim,D=DIMS[dk];const isDef=SAMPLE&&dk==='abc'&&[...r3s.set.t].sort().join()==='A,B'&&EVI===15;
+  b.innerHTML=(SAMPLE?`<div class="see"><b>H2：安全在庫の設定が不足し，欠品が起きている</b>――2024年4月にA・B区分を18日分→24日分に引き上げ，C区分は据え置いた。A・B区分の充足率と在庫は増えたか（差の差で比べる）。</div>`:`<div class="see">介入日（${MON[EVI]}）の前後で，<b>対象群</b>（対策をした群）と<b>比較群</b>（しなかった群）の変化を比べる（差の差）。両群に共通の変化（季節・景気）を差し引いて，対策の効果の目安を見る。</div>`)+`<div class="ctl"><label>群の分け方</label><select id="r3d">${Object.entries(DIMS).map(([k,d])=>`<option value="${k}" ${k===dk?'selected':''}>${d.t}</option>`).join('')}</select><label>対象群</label><span id="r3m"></span></div><div class="grid2" id="r3o"></div><div class="card" id="r3t"></div>`;
+  msel($('#r3m'),'t','対象群',D.vals,r3s.set,()=>ROUND.r3(b));$('#r3d').onchange=e=>{r3s.dim=e.target.value;r3s.set.t=new Set(DIMS[r3s.dim].vals.slice(0,1));ROUND.r3(b)};
+  const T=r3s.set.t&&r3s.set.t.size?r3s.set.t:new Set(D.vals.slice(0,1)),C=new Set(D.vals.filter(v=>!T.has(v)));
+  if(!C.size){$('#r3o').innerHTML='<div class="note">比較群がない（対象群にすべてを選んでいる）。</div>';return}
+  const base=dk==='mode'?{}:MTSF();const o=$('#r3o');const ab=aggregate('ord',{flt:{...base,[dk]:T},bucket:'m'}),c=aggregate('ord',{flt:{...base,[dk]:C},bucket:'m'});
+  const fA=ab.get('全体','ff'),fC=c.get('全体','ff'),oA=ab.get('全体','otif'),oC=c.get('全体','otif');
+  const a0=Math.max(0,EVI-9),b1=Math.min(NM,EVI+9);const tl=isDef?'A・B区分':`対象群（${[...T].join('・')}）`,cl=isDef?'C区分':`比較群（${[...C].join('・')}）`;
+  chart(o,{title:isDef?'初回充足率：A・B区分（引き上げ）とC区分（据え置き），見込生産品':`初回充足率：${tl}と${cl}${base.mode?'，'+MTSL:''}`,x:MON,series:[{name:isDef?'A・B区分':'対象群',data:fA,color:'#C8553D'},{name:isDef?'C区分':'比較群',data:fC,color:'#0F7C8C'}],unit:'％',tight:true,vbands:[{i:a0,label:(SAMPLE?'変更前 ':'前 ')+MON[a0]},{i:EVI,label:(SAMPLE?'変更 ':'介入 ')+MON[EVI]},...(b1<NM?[{i:b1,label:MON[b1]}]:[])]});
+  if(HAS('inv')){if(HAS('inv','val')){const iv=aggregate('inv',{by:dk,bucket:'m'});chart(o,{title:`在庫金額（原価，月平均）：${D.t}別`,x:MON,series:iv.keys.map(k=>({name:k+(dk==='abc'?'区分':''),data:iv.get(k,'val')})),unit:'百万円',vbands:VB()})}
+   const ivl=aggregate('inv',{by:'line',bucket:'m',flt:{[dk]:T}});chart(o,{title:isDef?'A・B区分の手持在庫（月平均）：ライン別':`${tl}の手持在庫（月平均）：ライン別`,x:MON,series:ivl.keys.map(k=>({name:k,data:ivl.get(k,'oh'),w:k===WORST?3:1.6})),unit:'個',vbands:VB(),foot:SAMPLE?'LINE-3の品目だけ，設定を上げても在庫が増えていない。':''});
+   if(HAS('inv','oo')){const bo=aggregate('inv',{by:'line',bucket:'m'});chart(o,{title:SAMPLE?'入荷待ち（on_order）：ライン別（見込生産品）':'入荷待ち（on_order）：ライン別',x:MON,series:bo.keys.map(k=>({name:k,data:bo.get(k,'oo'),w:k===WORST?3:1.6})),unit:'個',vbands:VB(),foot:SAMPLE?'補充を手配しても入ってこない量。LINE-3で積み上がる。':'補充を手配しても入ってこない量。'})}}
+  const mean=(a,i,j)=>{const v=a.slice(i,j).filter(x=>x!=null);return v.length?v.reduce((p,c)=>p+c,0)/v.length:null};
+  const did=(A,C)=>{const x0=mean(A,a0,EVI),x1=mean(A,EVI,b1),c0=mean(C,a0,EVI),c1=mean(C,EVI,b1);return [x0,x1,c0,c1,x0==null||x1==null||c0==null||c1==null?null:(x1-x0)-(c1-c0)]};const d1=did(fA,fC),d2=did(oA,oC);
+  const pre=isDef?'変更前':'前',post=isDef?'変更後':'後',tn=isDef?'A・B':'対象群',cn=isDef?'C':'比較群';
+  $('#r3t').innerHTML=`<div class="ctitle"><span>${isDef?'差の差（DiD）：変更前 2023年7月〜2024年3月，変更後 2024年4月〜12月（月平均）':`差の差（DiD）：介入前 ${MON[a0]}〜${MON[EVI-1]}，介入後 ${MON[EVI]}〜${MON[b1-1]}（月平均）`}</span></div>`+tableHTML(['指標',`${tn} ${pre}`,`${tn} ${post}`,`${cn} ${pre}`,`${cn} ${post}`,'差の差（ポイント）'],[['初回充足率（％）',...d1],['OTIF（％）',...d2]],{dec:[0,1,1,1,1,2]})+`<div class="note">${isDef?'C区分との比較では改善していても，A・B区分の水準そのものは下がりうる。設定の引き上げと実際の在庫増加は同じではない。':'比較群との差で見ると改善していても，対象群の水準そのものは下がりうる。前後の期間は介入日の前後それぞれ最大9か月。'}</div>`};
+ const aggregateSkuSet=(set,inside)=>{const acc=Array.from({length:NM},()=>[0,0]);for(const r of DATA.ORD){const s=SKU[r[0]];if(HASMTS&&s.make_mode!=='MTS')continue;if(set.has(s.sku)!==inside)continue;if(r[1]<0||r[1]>=NM)continue;acc[r[1]][0]+=r[8];acc[r[1]][1]+=r[7]}return acc.map(a=>a[1]?a[0]/a[1]*100:null)};
+ const DOY0=(D0-Date.UTC(Y0,0,1))/864e5;
+ ROUND.r4=b=>{if(!AV.proc||!DATA.PROC||!DATA.PROC.length){b.innerHTML=nodata('部品調達（procurement）');return}
+  b.innerHTML=(SAMPLE?`<div class="see"><b>H3：部品の納入遅延が，製品の欠品を増やしている</b>――正しければ，遅延した部品を使うSKUでOTIFが下がり，遅延の時期と製品の遅れが対応するはず。</div>`:`<div class="see">サプライヤの納入の遅れと，その部品を使う製品の OTIF の動きを見る（部品と製品の対応は，調達表の「使う製品」列か BOM から作る）。</div>`)+`<div class="ctl"><label>サプライヤ</label><select id="r4s">${SUP.map(s=>`<option ${s.supplier_id===WSUP?'selected':''}>${esc(s.supplier_id)}</option>`).join('')}</select><label><input type="checkbox" id="r4ss" checked> 単一調達の部品だけで依存SKUを判定</label></div><div class="grid2" id="r4o"></div><div class="card" id="r4t"></div>`;
+  const run=()=>{const sid=$('#r4s').value,ss=$('#r4ss').checked;const o=$('#r4o');o.innerHTML='';
+   const P=DATA.PROC.filter(p=>p[0]===sid);const delay=P.map(p=>p[4]-p[3]);
+   chart(o,{title:`${sid} の納入日差（実入荷日−約束入荷日）`,type:'scatter',series:[{name:'発注',data:P.map(p=>[Y0+(DOY0+p[2])/365.25,p[4]-p[3],`${dstr(p[2])} ${p[1]} 遅延${p[4]-p[3]}日`])}],xLabel:'発注日（年）',xfmt:v=>Number.isInteger(v)?String(v):'',yLabel:'日',ref:[{y:0,label:'約束どおり',c:'#7A8C99'}],xMin:Y0,xMax:Y0+NY});
+   const srt=[...delay].sort((a,b)=>a-b),q=p=>srt.length?srt[Math.min(srt.length-1,Math.floor(p*srt.length))]:null;
+   const hist=new Map();delay.forEach(v=>hist.set(v,(hist.get(v)||0)+1));const xs=[...hist.keys()].sort((a,b)=>a-b);const hx=[];const lo=Math.max(-60,Math.min(...xs,0)),hi=Math.min(120,Math.max(...xs,0));for(let v=lo;v<=hi;v++)hx.push(v);
+   chart(o,{title:`納入日差の分布（${P.length}件，中央値 ${q(.5)}日，90％点 ${q(.9)}日）`,type:'bar',x:hx.map(String),series:[{name:'件数',data:hx.map(v=>hist.get(v)||0)}],unit:'件'});
+   const parts=new Set(PS.filter(r=>r.supplier_id===sid&&(!ss||r.single_source===true||r.single_source==='True')).map(r=>r.part_id));
+   const dep=new Set(BOM.filter(r=>parts.has(r.part_id)).map(r=>r.sku));
+   if(BOM.length&&HAS('ord','otif')){const d1=aggregateSkuSet(dep,true),d0=aggregateSkuSet(dep,false);
+    chart(o,{title:`依存SKU（${dep.size}品目）とその他のSKUのOTIF（${MTSL||'全品目'}，月別）`,x:MON,series:[{name:'依存SKU',data:d1,color:'#C8553D'},{name:'その他のSKU',data:d0,color:'#0F7C8C'}],unit:'％',tight:true})}
+   const mon=Array.from({length:NM},()=>[]);P.forEach(p=>{const m=DAYM[Math.min(p[2],NDAY-1)];mon[m]&&mon[m].push(p[4]-p[3])});
+   chart(o,{title:`${sid} の月別平均納入日差（発注月）`,type:'bar',x:MON,series:[{name:'平均遅延',data:mon.map(v=>v.length?v.reduce((a,c)=>a+c,0)/v.length:null)}],unit:'日'});
+   const val=SKU.filter(s=>dep.has(s.sku));$('#r4t').innerHTML=BOM.length?`<div class="ctitle"><span>${esc(sid)} に依存するSKU（${ss?'単一調達の部品':'すべての部品'}を経由）</span></div>`+tableHTML(['SKU','製品群','生産方式','ライン','ABC','経由する部品'],val.map(s=>[s.sku,s.product_group,s.make_mode,s.line,s.abc_class,BOM.filter(r=>r.sku===s.sku&&parts.has(r.part_id)).map(r=>r.part_id).join('，')]),{left:6}):'<div class="note">部品と製品の対応（調達表の「使う製品」列，または BOM）がないため，依存SKUは出せない。</div>'};
+  $('#r4s').onchange=run;$('#r4ss').onchange=run;run()};
+ // equipment helpers
+ function lineSpeedBase(ln){if(DATA.LITE)return DATA.EQL[ln].base;const v=(DATA.EQ[ln]||[]).filter(e=>e[3]>0&&e[4]>0).map(e=>e[4]/e[3]).sort((a,b)=>a-b);return v.length?v[Math.floor(.95*(v.length-1))]:null}
+ function eqAgg(ln,bucket){const B=BUCK[bucket];if(DATA.LITE){const M=DATA.EQL[ln].m;if(bucket==='m')return M.map(r=>Float64Array.from(r));const a=Array.from({length:B.n},()=>new Float64Array(7));M.forEach((r,m)=>{const x=a[B.f(m)];r.forEach((v,j)=>x[j]+=v)});return a}const a=Array.from({length:B.n},()=>new Float64Array(7));(DATA.EQ[ln]||[]).forEach((e,i)=>{if(DAYM[i]<0)return;const t=a[B.f(DAYM[i])];for(let j=0;j<6;j++)t[j]+=e[j];t[6]++});return a}
+ ROUND.r5=b=>{b.innerHTML=(SAMPLE?`<div class="see"><b>H6：需要の伸びに生産能力が追いついていない</b>――正しければ，負荷の高いラインでOTIFや未充足量が悪化し，受注の伸びに生産が追いつかないはず。</div>`:`<div class="see">負荷の高いラインで OTIF や未充足量が悪化しているか，受注の伸びに生産が追いついているかを見る。</div>`)+`<div class="grid2" id="r5o"></div><div class="card" id="r5t"></div>`;const o=$('#r5o');
+  const ly=aggregate('ord',{by:'line',bucket:'y',flt:MTSF()});
+  if(HAS('ord','otif')){chart(o,{title:`ライン別のOTIF（${MTSL?MTSL+'，':''}年別）`,type:'bar',x:ly.x,series:ly.keys.map(k=>({name:k,data:ly.get(k,'otif'),color:k===WORST?'#C8553D':undefined})),unit:'％',yMin:SAMPLE?50:undefined,labels:1});
+  chart(o,{title:`ライン別の約束納期時点の未充足数量（${MTSL?MTSL+'，':''}年別）`,type:'bar',x:ly.x,series:ly.keys.map(k=>({name:k,data:ly.get(k,'uf'),color:k===WORST?'#C8553D':undefined})),unit:'個'})}
+  const oy=aggregate('ord',{by:'line',bucket:'y'}),py=HAS('prd')?aggregate('prd',{by:'line',bucket:'y'}):null;
+  const gr=(a,k,mk)=>{if(!a.keys.includes(k))return null;const v=a.get(k,mk);const f=YCNT[0],l=YCNT[NY-1];return v[0]&&NY>1?((v[NY-1]/l)/(v[0]/f)-1)*100:null};
+  if(NY>1)chart(o,{title:`${YR}の増加率：受注数量${py?'と生産実績':''}（ライン別）`,type:'bar',x:LINES,series:[{name:'受注数量',data:LINES.map(l=>gr(oy,l,'q'))},...(py?[{name:'生産実績',data:LINES.map(l=>gr(py,l,'ac'))}]:[])],unit:'％',labels:1,foot:YCNT[0]<12||YCNT[NY-1]<12?'月数の違う年は1か月あたりに直して比べた。':''});
+  if(!AV.eq){o.insertAdjacentHTML('beforeend',nodata('設備（equipment）'));$('#r5t').innerHTML='';return}
+  const lm=LINES.map(l=>{const base=lineSpeedBase(l);return eqAgg(l,'m').map(t=>t[3]&&base?t[4]/base/t[3]*100:null)});
+  chart(o,{title:'負荷率（月別）＝ 生産数量 ÷ 基準処理速度 ÷ 稼働時間',x:MON,series:LINES.map((l,i)=>({name:l,data:lm[i],w:l===WORST?3:1.6,color:l===WORST?'#C8553D':undefined})),unit:'％',tight:true,foot:'基準処理速度：各ラインの日別処理速度（生産数量／稼働時間）の95パーセンタイル。'});
+  const yr=LINES.map(l=>eqAgg(l,'y'));const LY=NY-1;
+  chart(o,{title:`${YEARS[LY]}年の時間の内訳（計画時間に占める割合）`,type:'stack',x:LINES,series:[{name:'稼働',data:yr.map(a=>a[LY][0]?a[LY][3]/a[LY][0]*100:null),color:'#0F7C8C'},...(AV.eq_setup?[{name:'段取り',data:yr.map(a=>a[LY][0]?a[LY][2]/a[LY][0]*100:null),color:'#E8A33D'}]:[]),...(AV.eq_down?[{name:'停止',data:yr.map(a=>a[LY][0]?a[LY][1]/a[LY][0]*100:null),color:'#C8553D'}]:[])],unit:'％',yMax:100});
+  const rho=[.5,.6,.7,.75,.8,.85,.9,.95];chart(o,{title:'待ち時間の目安 ρ／(1−ρ)：負荷率が上がると急増する',type:'bar',x:rho.map(r=>r.toFixed(2)),series:[{name:'ρ/(1−ρ)',data:rho.map(r=>r/(1-r))}],labels:1,lab:false,foot:'ρが0.70→0.85で約2.4倍。（データではなく理論の目安）'});
+  $('#r5t').innerHTML=`<div class="ctitle"><span>ライン別の設備の年間集計（計画・停止・段取り・稼働は時間）</span></div>`+tableHTML(['ライン','年','計画','停止','段取り','稼働','生産数量','処理速度（個/時）','稼働率（稼働／計画，％）'],LINES.flatMap((l,i)=>yr[i].map((t,y)=>[l,YEARS[y],t[0],t[1],t[2],t[3],t[4],t[3]?t[4]/t[3]:null,t[0]?t[3]/t[0]*100:null])),{left:2,hl:r=>r[0]===WORST})};
+ // ---------- equipment tab
+ RENDER.eq=(()=>{let done=false;return()=>{if(done)return;done=true;const h=$('#eq');if(!AV.eq){h.innerHTML=nodata('設備（equipment）');return}
+  h.innerHTML=`<h2>生産ライン・設備：日々の稼働時間と生産数量</h2><div class="card"><div class="ctl"><label>ライン</label><select id="eql">${LINES.map(l=>`<option ${l===WORST?'selected':''}>${esc(l)}</option>`).join('')}</select><label>集計単位</label><select id="eqb">${DATA.LITE?'':'<option value="d">日</option>'}<option value="w" selected>週</option><option value="m">月</option></select><span class="note" id="eqn"></span></div></div><div id="eqo"></div>`;
+  const run=()=>{const l=$('#eql').value,bk=$('#eqb').value;const E=DATA.LITE?null:(DATA.EQ[l]||[]);const o=$('#eqo');o.innerHTML='';
+   let x,rows,cut=0;const NW=Math.floor(NDAY/7);
+   if(DATA.LITE){rows=bk==='w'?DATA.EQL[l].w:DATA.EQL[l].m;x=bk==='w'?rows.map((_,i)=>dstr(i*7)):MON}else if(bk==='d'){x=E.map((_,i)=>dstr(i));rows=E.map(e=>[...e,1])}else{const f=bk==='w'?i=>Math.floor(i/7):i=>DAYM[i];const n=bk==='w'?NW:NM;rows=Array.from({length:n},()=>new Array(7).fill(0));E.forEach((e,i)=>{const t=rows[f(i)];if(!t)return;for(let j=0;j<6;j++)t[j]+=e[j];t[6]++});x=bk==='w'?rows.map((_,i)=>dstr(i*7)):MON;cut=bk==='w'?NDAY-NW*7:0}
+   const base=lineSpeedBase(l);$('#eqn').textContent=`${DATA.PLANT&&DATA.PLANT[l]?DATA.PLANT[l]+'　':''}基準処理速度（95パーセンタイル）：${fmtN(base,1)}個/時${cut?`　※最後の${cut}日は1週に満たないため週の集計から除いた`:''}`;
+   const g=document.createElement('div');g.className='grid2';o.appendChild(g);const per=bk==='w'?'week':bk==='d'?'day':'month';
+   chart(g,{title:`${l}：時間の内訳（${bk==='d'?'日':'合計'}）`,type:'stack',x,period:per,series:[{name:'稼働',data:rows.map(r=>r[3]),color:'#0F7C8C'},...(AV.eq_setup?[{name:'段取り',data:rows.map(r=>r[2]),color:'#E8A33D'}]:[]),...(AV.eq_down?[{name:'停止',data:rows.map(r=>r[1]),color:'#C8553D'}]:[])],unit:'時間',rot:true});
+   chart(g,{title:`${l}：生産数量${AV.eq_defect?'と不良数量':''}`,x,period:per,series:[{name:'生産数量',data:rows.map(r=>r[4])},...(AV.eq_defect?[{name:'不良数量',data:rows.map(r=>r[5])}]:[])],unit:'個',rot:true});
+   chart(g,{title:`${l}：処理速度（生産数量／稼働時間）`,x,period:per,series:[{name:'処理速度',data:rows.map(r=>r[3]&&r[4]?r[4]/r[3]:null)}],unit:'個/時',tight:true,rot:true,ref:[{y:base,label:'基準（95％点）'}]});
+   const inv=DATA.INVD&&DATA.INVD[l];if(inv&&inv.length){let iy;if(bk==='d')iy=inv.map(v=>v||[null,null,null,null]);else{const f=bk==='w'?i=>Math.floor(i/7):i=>DAYM[i];const n=rows.length;const s=Array.from({length:n},()=>[0,0,0,0,0]);inv.forEach((v,i)=>{const t=s[f(i)];if(!t||!v)return;for(let j=0;j<4;j++)t[j]+=v[j];t[4]++});iy=s.map(t=>t.slice(0,4).map(v=>t[4]?v/t[4]:null))}
+    chart(g,{title:SAMPLE?`${l} の見込生産品の在庫（DC合計）`:`${l} の品目の在庫（${MTSL?MTSL+'，':''}合計）`,x,period:per,series:[{name:'手持在庫',data:iy.map(v=>v[0])},...(AV.inv_oo?[{name:'入荷待ち',data:iy.map(v=>v[1])}]:[]),...(AV.inv_bo?[{name:'出荷待ち',data:iy.map(v=>v[2])}]:[])],unit:'個',rot:true})}};
+  $('#eql').onchange=run;$('#eqb').onchange=run;run()}})();
+ // ---------- procurement tab
+ RENDER.pc=(()=>{let done=false;return()=>{if(done)return;done=true;const h=$('#pc');if(!AV.proc){h.innerHTML=nodata('部品調達（procurement）');return}
+  const rows=SUP.map(s=>{const P=DATA.PROC.filter(p=>p[0]===s.supplier_id);const dl=P.map(p=>p[4]-p[3]).sort((a,b)=>a-b);const lt=P.map(p=>p[4]);const q=p=>dl.length?dl[Math.min(dl.length-1,Math.floor(p*dl.length))]:null;
+   const parts=PS.filter(r=>r.supplier_id===s.supplier_id);const qq=P.reduce((a,p)=>a+p[5],0);return [s.supplier_id,s.country||'',P.length,parts.length,parts.filter(r=>r.single_source===true||r.single_source==='True').length,s.lead_time_mean_days,lt.length?lt.reduce((a,c)=>a+c,0)/lt.length:null,dl.length?dl.reduce((a,c)=>a+c,0)/dl.length:null,q(.9),dl.length?dl.filter(v=>v>0).length/dl.length*100:null,DATA.LITE?DATA.SUPDEF[s.supplier_id]:AV.proc_defect===0||!qq?null:P.reduce((a,p)=>a+p[7],0)/Math.max(1,qq)*100]});
+  h.innerHTML=`<h2>部品調達：サプライヤごとの納入の遅れ</h2><div class="card"><div class="ctitle"><span>サプライヤ一覧（列名をクリックで並べ替え）</span></div>${tableHTML(['サプライヤ','国','発注件数','部品数','うち単一調達',SAMPLE?'基準LT（日）':'約束LT（平均，日）','実調達日数（平均）','納入日差（平均）','納入日差（90％点）','遅延率（％）','不良率（％）'],rows,{left:2,hl:r=>r[0]===WSUP,dec:[0,0,0,0,0,SAMPLE?0:1,1,1,0,1,2]})}</div><div class="grid2" id="pco"></div>`;sortable(h);
+  const o=$('#pco');const bySup=SUP.map(s=>s.supplier_id);
+  chart(o,{title:'サプライヤ別の納入日差（平均と90％点）',type:'bar',x:bySup,series:[{name:'平均',data:rows.map(r=>r[7])},{name:'90％点',data:rows.map(r=>r[8])}],unit:'日',rot:true});
+  const mon=Array.from({length:NM},()=>[0,0]);DATA.PROC.forEach(p=>{const m=DAYM[Math.min(p[2],NDAY-1)];if(m==null||m<0)return;mon[m][0]+=p[4]-p[3];mon[m][1]++});
+  chart(o,{title:'全サプライヤの月別平均納入日差（発注月）',x:MON,series:[{name:'平均納入日差',data:mon.map(v=>v[1]?v[0]/v[1]:null)}],unit:'日',vbands:SAMPLE?[]:VB()})}})();
+ // ---------- SKU tab
+ RENDER.sk=(()=>{let done=false;return()=>{if(done)return;done=true;const h=$('#sk');
+  const oy=aggregate('ord',{by:'sku',bucket:'y',topN:1e9,metric:'q'});const ot=HAS('ord','otif');const LY=NY-1;
+  const rows=SKU.map(s=>{const has=oy.keys.includes(s.sku);const q=has?oy.get(s.sku,'q'):new Array(NY).fill(0),o=has&&ot?oy.get(s.sku,'otif'):new Array(NY).fill(null);return [s.sku,s.product_group,s.make_mode,s.line,s.abc_class,s.production_lt_days??'',s.unit_price??'',q[0],q[LY],q[0]&&NY>1?((q[LY]/YCNT[LY])/(q[0]/YCNT[0])-1)*100:null,...(ot?o:[])]});
+  h.innerHTML=`<h2>製品（SKU）：一覧から選ぶと，受注・生産・在庫・OTIF・部品構成を表示</h2><div class="card"><div class="ctl"><input type="search" id="skq" placeholder="SKU・製品群・ラインで検索"><span class="note">行をクリックで詳細</span></div><div id="skt"></div></div><div id="skudet"></div>`;
+  const draw=()=>{const q=$('#skq').value.trim();$('#skt').innerHTML=tableHTML(['SKU','製品群','方式','ライン','ABC','生産LT','単価（円）','受注 '+YEARS[0],'受注 '+YEARS[LY],'増加率（％）',...(ot?YEARS.map(y=>'OTIF '+y):[])],rows.filter(r=>!q||r.slice(0,5).join(' ').includes(q)),{left:5,hl:r=>r[3]===WORST&&(!HASMTS||r[2]==='MTS'),dec:[0,0,0,0,0,0,0,0,0,1,...YEARS.map(()=>1)]});sortable($('#skt'));
+   $('#skt').querySelectorAll('tr').forEach((tr,i)=>{if(!i)return;tr.style.cursor='pointer';tr.onclick=()=>skuDetail(tr.children[0].textContent)})};
+  $('#skq').oninput=draw;draw()}})();
+ function skuDetail(sku){const d=$('#skudet');d.style.display='block';const s=SKU[SKUI[sku]];d.innerHTML=`<h3>${esc(sku)}　<span class="pill">${esc(s.product_group)}</span><span class="pill">${esc(s.make_mode)}</span><span class="pill">${esc(s.line)}</span><span class="pill">ABC ${esc(s.abc_class)}</span>${s.production_lt_days!=null?`<span class="pill">生産LT ${s.production_lt_days}日</span>`:''}</h3><div class="grid2" id="sdg"></div><div class="card" id="sdb"></div>`;
+  const one=new Set([sku]);const sk={sku:one};
+  const o=aggregate('ord',{by:'sku',bucket:'m',topN:1e9,metric:'q'}),p=HAS('prd')?aggregate('prd',{by:'sku',bucket:'m',topN:1e9,metric:'ac'}):null,iv=HAS('inv')?aggregate('inv',{by:'sku',bucket:'m',topN:1e9,metric:'oh'}):null;const g=$('#sdg');
+  const has=(a)=>a&&a.keys.includes(sku);
+  chart(g,{title:'受注数量と生産実績（月別）',x:MON,series:[{name:'受注数量',data:has(o)?o.get(sku,'q'):[]},...(p?[{name:'生産実績',data:has(p)?p.get(sku,'ac'):[]}]:[]),...(p&&HAS('prd','pl')?[{name:'生産計画',data:has(p)?p.get(sku,'pl'):[],dash:true}]:[])],unit:'個'});
+  if(HAS('ord','otif'))chart(g,{title:'OTIFと初回充足率（月別）',x:MON,series:[{name:'OTIF',data:has(o)?o.get(sku,'otif'):[]},{name:'初回充足率',data:has(o)?o.get(sku,'ff'):[],dash:true}],unit:'％',tight:true,vbands:VB()});
+  if(has(iv))chart(g,{title:'在庫（DC合計，月平均）',x:MON,series:[{name:'手持在庫',data:iv.get(sku,'oh')},...(HAS('inv','oo')?[{name:'入荷待ち',data:iv.get(sku,'oo')}]:[]),...(HAS('inv','bo')?[{name:'出荷待ち',data:iv.get(sku,'bo')}]:[])],unit:'個',vbands:VB()});
+  const parts=BOM.filter(r=>r.sku===sku);$('#sdb').innerHTML=parts.length||SAMPLE?`<div class="ctitle"><span>部品構成（BOM）と調達先</span></div>`+tableHTML(['部品','必要数','調達先','単一調達','単価（円）','MOQ','サプライヤの国','基準LT（日）'],parts.flatMap(b=>PS.filter(r=>r.part_id===b.part_id).map(r=>{const su=SUP.find(x=>x.supplier_id===r.supplier_id)||{};return [b.part_id,b.qty_per_unit,r.supplier_id,(r.single_source===true||r.single_source==='True')?'単一':'',r.unit_price,r.moq,su.country,su.lead_time_mean_days]})),{left:4,hl:r=>r[2]===WSUP}):'<div class="note">この品目の部品構成（BOM）・調達先の情報はない。</div>';
+  d.scrollIntoView({behavior:'smooth'})}
+ // ---------- dictionary
+ RENDER.dc=(()=>{let done=false;return()=>{if(done)return;done=true;
+  if(SAMPLE){$('#mdbox').innerHTML=typeof README==='undefined'?'<div class="note">この軽量版にはデータ辞書（README）を入れていません。完全版のHTML，またはNotionの解説ページを見てください。</div>':'<div class="note">配布データに付属のREADME（データ辞書）をそのまま表示しています。</div>'+md(README);return}
+  const T=(DATA.META&&DATA.META.tables)||[];
+  $('#mdbox').innerHTML=`<h2>データ辞書：読み込んだ業務データの対応づけ</h2><div class="note">「${esc(APP.name)}」を読み込んだときの，表・列の対応と単位。対応づけは「データ読込」タブの「対応づけを保存」で JSON に保存でき，翌月の再読込に使える（データそのものは含まない）。</div>`+
+   T.map(t=>`<h3>${esc(t.label)}（${esc(t.key)}）</h3><div class="note">${esc(t.desc)}　${t.src?'シート：'+esc(t.src)+'　行数：'+fmtN(t.rows)+'（集計に使った行：'+fmtN(t.used)+'）　期間：'+esc(t.from||'')+'〜'+esc(t.to||''):'<b>読み込まれていない</b>'}</div>`+(t.map?tableHTML(['項目','意味','必須','元の列','単位'],t.fields.map(f=>[f.label,f.desc||'',f.req?'必須':'任意',t.map[f.key]||'（なし）',f.unit?(t.units&&t.units[f.key])||f.base:'']),{left:5}):'')).join('')+
+   `<h3>指標の定義</h3>`+tableHTML(['指標','定義'],[['OTIF','注文行（受注番号×品番）ごとに，約束納期までの納品数量の合計が注文数量以上なら OTIF。取消のある注文行は分母から除く。受注月で集計。'],['初回充足率','最初の納品が約束納期までで，かつ全量だった注文行の割合（分母は OTIF と同じ）。'],['取消率','取消の印がある注文行の割合（分母はすべての注文行）。'],['約束納期時点の未充足数量','取消のない注文行の，約束納期までに届かなかった数量の合計。'],['受注→初回出荷／初回出荷→初回納品','出荷表に受注番号があるときだけ計算する（日数の平均）。'],['特急便の比率','出荷数量に占める特急の出荷数量。'],['在庫（月平均）','在庫の記録（日次・週次）を品番×DCごとに月で平均し，合計したもの。'],['負荷率','生産数量 ÷ 基準処理速度（そのラインの日別処理速度の95パーセンタイル）÷ 稼働時間。'],['ABC区分',(DATA.META&&DATA.META.abcComputed)?'製品マスタに区分がないため，受注金額（金額がなければ数量）の累積構成比で計算した（A：〜80％，B：〜95％，C：残り）。':'製品マスタの値。']],{left:2})}})();
+ // ---------- causal link verification
+ const CV=(()=>{
+  let V=null;
+  function build(){if(V)return V;V={};const nul=()=>new Array(NM).fill(null);const per=(a,mk)=>Object.fromEntries(LINES.map(l=>[l,a&&a.keys.includes(l)?a.get(l,mk):nul()]));
+   const o=aggregate('ord',{by:'line',flt:MTSF()}),s=HAS('shp')?aggregate('shp',{by:'line',flt:MTSF()}):null,iv=HAS('inv')?aggregate('inv',{by:'line'}):null,p=HAS('prd')?aggregate('prd',{by:'line'}):null;
+   const eq={};if(AV.eq)LINES.forEach(l=>{const base=lineSpeedBase(l);const a=eqAgg(l,'m');eq[l]={load:a.map(t=>t[3]&&base?t[4]/base/t[3]*100:null),cap:a.map((t,m)=>base?t[3]*base/mdays(m):null),setup:a.map((t,m)=>t[6]?t[2]/t[6]:null),out:a.map((t,m)=>t[4]/mdays(m))}});
+   const fromEq=k=>Object.fromEntries(LINES.map(l=>[l,eq[l][k]]));
+   const prodDay=p?Object.fromEntries(LINES.map(l=>[l,(p.keys.includes(l)?p.get(l,'ac'):nul()).map((v,m)=>v==null?null:v/mdays(m))])):null;
+   const def=(k,name,unit,data,note)=>V[k]={k,name,unit,data,note};
+   def('dem','需要','個/月',per(o,'q'),MTSL?'見込生産品の受注数量（受注月）':'受注数量（受注月）');
+   if(AV.eq){def('load','ライン負荷率','％',fromEq('load'),'生産数量÷基準処理速度（95％点）÷稼働時間');if(AV.eq_setup)def('setup','段取り時間','時間/日',fromEq('setup'),'設備の段取り時間の日平均');def('cap','生産能力','個/日',fromEq('cap'),'稼働時間×基準処理速度の日平均')}
+   if(prodDay)def('prod','生産','個/日',prodDay,'ラインの全品目の生産実績の日平均');else if(AV.eq)def('prod','生産','個/日',fromEq('out'),'設備の生産数量の日平均（生産表がないため）');
+   if(iv&&HAS('inv','oo'))def('wait','生産待ち','個',per(iv,'oo'),'代用：DCの入荷待ち（on_order）の月平均');
+   if(iv&&HAS('inv','bo')){const bo0=per(iv,'bo'),dq=per(o,'q');def('rlt','補充リードタイム','日',Object.fromEntries(LINES.map(l=>[l,bo0[l].map((v,m)=>dq[l][m]&&v!=null?v/(dq[l][m]/mdays(m)):null)])),'代用：出荷待ち（backorder）÷1日あたり需要（リトルの法則で「待っている日数」）')}
+   if(iv)def('inv','在庫','個',per(iv,'oh'),'DCの手持在庫の月平均');
+   if(HAS('ord','uf'))def('short','欠品','個/月',per(o,'uf'),'約束納期時点の未充足数量（受注月）');
+   if(iv&&HAS('inv','bo'))def('bo','受注残','個',per(iv,'bo'),'DCの出荷待ち（backorder）の月平均');
+   if(HAS('ord','otif')){def('otif','OTIF','％',per(o,'otif'),'取消を除く注文行');def('ff','初回充足率','％',per(o,'ff'),'')}
+   if(s&&HAS('shp','xr'))def('exp','特急便','％',per(s,'xr'),'出荷数量に占める特急便の比率（出荷月）');
+   if(s&&HAS('shp','cpu'))def('frt','物流費','円/個',per(s,'cpu'),'1個あたり運賃（出荷月）');
+   if(HAS('ord','cr'))def('cxl','顧客の取消','％',per(o,'cr'),'取消のある注文行の割合');
+   if(HAS('ord','s2d')){def('dlv','配送日数','日',per(o,'s2d'),'初回出荷→初回納品の平均');def('o2s','出荷までの日数','日',per(o,'o2s'),'受注→初回出荷の平均')}
+   if(SAMPLE){// サンプル専用：シナリオの設定値（データではない）
+    const ab=aggregate('ord',{by:'line',flt:{mode:new Set(['MTS']),abc:new Set(['A','B'])}}),cc=aggregate('ord',{by:'line',flt:{mode:new Set(['MTS']),abc:new Set(['C'])}});
+    def('ss','安全在庫の設定','日',Object.fromEntries(LINES.map(l=>{const qa=ab.keys.includes(l)?ab.get(l,'q'):new Array(NM).fill(0),qc=cc.keys.includes(l)?cc.get(l,'q'):new Array(NM).fill(0);return [l,qa.map((a,m)=>{const t=(a||0)+(qc[m]||0);return t?((a||0)*(m<15?18:24)+(qc[m]||0)*18)/t:null})]})),'A・B区分は2024年4月に18→24日。ラインの品目構成で加重平均（サンプルのシナリオの設定値）')}
+   if(AV.sp&&AV.sp_fc&&SP.length){const spi={};SP.forEach(r=>spi[r.month+'|'+r.product_group]=r);
+    def('fe','予測誤差','％',Object.fromEntries(LINES.map(l=>{const a=aggregate('ord',{by:'pg',flt:{...MTSF(),line:new Set([l])}});const pgk=DIMS.pg?a.keys:null;return [l,MON.map((mo,m)=>{let w=0,e=0;(DIMS.pg?a.keys:['_all']).forEach(pg=>{const q=DIMS.pg?(a.get(pg,'q')[m]||0):1;const r=spi[mo+'|'+(DIMS.pg?pg:PGS[0])];if(!r||!r.actual_qty||r.forecast_qty==null)return;e+=q*Math.abs(r.actual_qty-r.forecast_qty)/r.actual_qty*100;w+=q});return w?e/w:null})]})),'製品群×月の|実績−予測|÷実績を，ラインの製品群構成で加重')}
+   if(AV.proc&&DATA.PROC&&DATA.PROC.length){const pl={};BOM.forEach(b=>{const s=SKU[SKUI[b.sku]];if(!s||(HASMTS&&s.make_mode!=='MTS'))return;(pl[b.part_id]=pl[b.part_id]||new Set()).add(s.line)});const allL=!BOM.length;
+    const sd=Object.fromEntries(LINES.map(l=>[l,Array.from({length:NM},()=>[0,0])]));DATA.PROC.forEach(p=>{const ls=allL?LINES:pl[p[1]];if(!ls)return;const di=p[2]+p[3];if(di<0||di>=NDAY)return;const m=DAYM[di];if(m<0)return;ls.forEach(l=>{sd[l][m][0]+=Math.max(0,p[4]-p[3]);sd[l][m][1]++})});
+    def('sup','部品の納入遅延','日',Object.fromEntries(LINES.map(l=>[l,sd[l].map(a=>a[1]?a[0]/a[1]:null)])),allL?'全サプライヤの平均遅延日数（約束入荷月，早着は0）。部品と製品の対応がないため，全ラインで同じ系列':'そのラインの'+(MTSL||'品目')+'が使う部品の平均遅延日数（約束入荷月，早着は0）')}
+   return V}
+  const ID=new Set(['cap>prod','setup>cap','prod>inv','wait>rlt','prod>rlt']);
+  const PRE=[['dem','load','+'],['dem','prod','+'],['setup','cap','-'],['cap','prod','+'],['load','wait','+'],['load','rlt','+'],['rlt','short','+'],['inv','short','-'],['short','otif','-'],['short','exp','+'],['exp','frt','+'],['short','cxl','+'],['dem','short','+'],['ss','inv','+'],['ss','wait','+'],['fe','short','+'],['sup','short','+'],['dlv','otif','-'],['load','otif','-']];
+  function key(name){const V=build();const n=nrm(name);const hit=Object.values(V).find(v=>nrm(v.name)===n);if(hit)return hit.k;for(const [k,al] of Object.entries(CV_ALIAS))if(V[k]&&al.some(a=>nrm(a)===n))return k;return null}
+  function zline(a){const v=a.filter(x=>x!=null&&!isNaN(x));if(!v.length)return a.map(()=>null);const m=v.reduce((p,c)=>p+c,0)/v.length;const sd=Math.sqrt(v.reduce((p,c)=>p+(c-m)**2,0)/Math.max(1,v.length-1))||1;return a.map(x=>x==null||isNaN(x)?null:(x-m)/sd)}
+  function resid(data,lines){const Z=Object.fromEntries(lines.map(l=>[l,zline(data[l])]));const mm=Array.from({length:NM},(_,t)=>{const v=lines.map(l=>Z[l][t]).filter(x=>x!=null);return v.length?v.reduce((p,c)=>p+c,0)/v.length:0});
+   return Object.fromEntries(lines.map(l=>[l,Z[l].map((x,t)=>x==null?null:x-mm[t])]))}
+  function corr(pairs){const n=pairs.length;if(n<6)return {r:null,n};let sx=0,sy=0;pairs.forEach(([x,y])=>{sx+=x;sy+=y});const mx=sx/n,my=sy/n;let a=0,b=0,c=0;pairs.forEach(([x,y])=>{a+=(x-mx)*(y-my);b+=(x-mx)**2;c+=(y-my)**2});return {r:b&&c?a/Math.sqrt(b*c):null,n}}
+  function pairs(X,Y,lines,lag,filt){const P=[];lines.forEach(l=>{for(let t=Math.max(lag,0);t<NM;t++){const x=X[l][t-lag],y=Y[l][t];if(x==null||y==null)continue;if(filt&&!filt(l,t))continue;P.push([x,y])}});return P}
+  function test(xk,yk,pol,opt){const V=build();const lines=opt.lines;const fe=opt.fe&&lines.length>1;const X=fe?resid(V[xk].data,lines):Object.fromEntries(lines.map(l=>[l,zline(V[xk].data[l])])),Y=fe?resid(V[yk].data,lines):Object.fromEntries(lines.map(l=>[l,zline(V[yk].data[l])]));
+   const sg=pol==='+'?1:-1;const lag={};for(let L=-3;L<=3;L++){lag[L]=L>=0?corr(pairs(X,Y,lines,L)):corr(pairs(Y,X,lines,-L))}
+   let best=0;for(let L=1;L<=3;L++)if(lag[L].r!=null&&Math.abs(lag[L].r)>Math.abs(lag[best].r||0)+0.05)best=L;
+   const r=lag[best].r,n=lag[best].n,crit=n?2/Math.sqrt(n):null;const rev=Math.max(...[1,2,3].map(L=>Math.abs(lag[-L].r||0)));
+   const LD=V.load?V.load.data:null;const hi=(l,t)=>LD[l][t]!=null&&LD[l][t]>=95,lo=(l,t)=>LD[l][t]!=null&&LD[l][t]<95;
+   const rh=LD?corr(pairs(X,Y,lines,best,hi)):{r:null,n:0},rl=LD?corr(pairs(X,Y,lines,best,lo)):{r:null,n:0};
+   // cross-line change（最初の年→最後の年）
+   const ch=lines.map(l=>{const a=V[xk].data[l],b=V[yk].data[l];const rc=(v)=>{if(NY<2)return null;const a0=ymean(v,0),a2=ymean(v,NY-1);return a0&&a2!=null?((a2-a0)/Math.abs(a0)*100):null};return {l,dx:rc(a),dy:rc(b)}});
+   const agree=ch.filter(c=>c.dx!=null&&c.dy!=null&&Math.sign(c.dx)*Math.sign(c.dy)===sg).length;
+   const isQ=k=>/^個|^個\//.test(V[k].unit)||V[k].unit==='個';
+   const lv=k=>{const pts=[];lines.forEach(l=>{const a=V[k].data[l];const b=ymean(a,0);YEARS.forEach((_,y)=>{let v=ymean(a,y);if(v!=null&&isQ(k))v=b?v/b*100:null;pts.push(v)})});return pts};
+   const lx=lv(xk),ly=lv(yk);const dm=a=>{const out=a.slice();YEARS.forEach((_,y)=>{const idx=lines.map((_,i)=>i*NY+y).filter(i=>a[i]!=null);const m=idx.reduce((p,i)=>p+a[i],0)/idx.length;idx.forEach(i=>out[i]=a[i]-m)});return out};
+   const LP=[];const dx=dm(lx),dy=dm(ly);dx.forEach((x,i)=>{if(x!=null&&dy[i]!=null)LP.push([x,dy[i]])});const lr=corr(LP.length>=6?LP:[]);lr.n=LP.length;
+   let v,cls;const sig=x=>x.r!=null&&Math.abs(x.r)>2/Math.sqrt(x.n);
+   if(ID.has(xk+'>'+yk)){v='定義から決まる';cls='id'}
+   else if(r!=null&&Math.abs(r)>crit&&Math.sign(r)===sg){v=(sig(rh)&&!sig(rl))?'条件付きで支持（負荷率95％以上のとき）':(sig(rl)&&!sig(rh)&&rh.n>=6)?'条件付きで支持（負荷率95％未満のとき）':'支持';cls='ok'}
+   else if(sig(lr)&&Math.sign(lr.r)===sg){v='ライン間の差として支持（月々の動きでは見えない）';cls='ok'}
+   else if(r!=null&&Math.abs(r)>crit){v='逆の極性の関係（フィードバックや共通の原因を疑う）';cls='ng'}
+   else if(sig(rh)&&Math.sign(rh.r)===sg){v='条件付きで支持（負荷率95％以上のとき）';cls='ok'}
+   else if(sig(rl)&&Math.sign(rl.r)===sg){v='条件付きで支持（負荷率95％未満のとき）';cls='ok'}
+   else{v='判定不能（データでは関係が見えない）';cls='na'}
+   const notes=[];if(rev>Math.abs(r||0)+0.1&&crit!=null&&rev>crit)notes.push('結果側が先に動いている（逆向きの矢印・フィードバックを疑う）');if(best>0)notes.push(`${best}か月の遅れで最も強い`);
+   if(sig(lr)&&Math.sign(lr.r)!==sg)notes.push('ライン間の水準では逆の向き');if(opt.fe&&!fe)notes.push('ラインが1つのため「共通の動きを除く」は使わない');return {xk,yk,pol,r,n,crit,best,lag,rh,rl,ch,agree,v,cls,notes,X,Y,lr,LP,lines,fe}}
+  return {build,test,PRE,ID,key,zline}})();
+ APP.cvKeyFn=CV.key;
+ RENDER.cv=(()=>{let done=false;const st={fe:true,cands:null,sel:0,banner:''};return()=>{if(done)return;done=true;const h=$('#cv');const V=CV.build();
+  if(!st.cands)st.cands=CV.PRE.filter(c=>V[c[0]]&&V[c[1]]).map(c=>c.slice());
+  const opts=Object.values(V).map(v=>`<option value="${v.k}">${esc(v.name)}</option>`).join('');
+  const miss=SAMPLE?[]:Object.entries(CV_ALIAS).filter(([k])=>!V[k]&&k!=='ss').map(([k,a])=>a[0]);
+  h.innerHTML=`<h2>矢印の検証：因果関係の候補を，データで「支持・反証・判定不能」に仕分ける</h2>
+  <div class="see">変数はすべて <b>ライン×月</b>（${LINES.length}ライン×${NM}か月）の系列。各ラインの中で標準化したうえで，<b>同じ月の全ラインの平均を差し引く</b>（季節の山など全ラインに共通の動きを除く。ラインが1つのときは使えない）。この「月々の動き」の相関（原因を0〜3か月ずらす）${V.load?'，負荷率95％以上／未満に分けた相関':''}に加えて，<b>ライン×年の水準</b>（年ごとにライン間の差を見る。数量は${YEARS[0]}年＝100の指数）の相関と，${YR}の変化の向きがそろうライン数から判定する。<b>相関は因果の証明ではない</b>。判定は「この矢印を残すか・条件を付けるか・別の説明を探すか」を決める材料。判定の目安 ±2/√n は自己相関を考えないゆるい目安（ふるい分け用）。</div>
+  ${miss.length?`<div class="note">データなし（読み込んだ表にないため使えない変数）：${miss.map(esc).join('，')}</div>`:''}
+  <div id="cvbn"></div>
+  <div class="card"><div class="ctl"><label><input type="checkbox" id="cvfe" ${st.fe?'checked':''}> 全ラインに共通の動き（季節など）を除く</label><span class="note" id="cvfen"></span><span id="cvl"></span><button class="btn" id="cvcsv">ワークベンチ用に書き出す</button><button class="btn" id="cvres">判定表をCSVで保存</button><button class="btn" id="cvwb" title="判定（支持・判定不能など），r，遅れを付けて，システム分析ワークベンチのCLDに照合・追加してもらう">ワークベンチへ結果を返す</button></div>
+  <div class="ctl"><label>候補を追加：原因</label><select id="cvx">${opts}</select><label>結果</label><select id="cvy">${opts}</select><label>極性</label><select id="cvp"><option>+</option><option>-</option></select><button class="btn solid" id="cvadd" style="background:#0F7C8C;color:#fff">追加して検証</button></div>
+  <div id="cvt"></div></div><div id="cvd"></div><div class="card"><div class="ctitle"><span>変数の定義（データからの作り方）</span></div>${tableHTML(['変数','単位','作り方'],Object.values(V).map(v=>[v.name,v.unit,v.note]),{left:3})}</div>`;
+  const lh=$('#cvl');lh.innerHTML='<label>使うライン</label>';st.ln=new Set();msel(lh,'ln','ライン',LINES,st,()=>{run()});
+  $('#cvfe').onchange=e=>{st.fe=e.target.checked;run()};
+  $('#cvadd').onclick=()=>{const x=$('#cvx').value,y=$('#cvy').value;if(x===y)return;st.cands.push([x,y,$('#cvp').value]);st.sel=st.cands.length-1;run()};
+  let R=[];
+  const run=()=>{const lines=st.ln&&st.ln.size?LINES.filter(l=>st.ln.has(l)):LINES;const one=lines.length<2;
+   $('#cvfe').disabled=one;$('#cvfen').textContent=one?'（ラインが1つなので使わない。ライン内で標準化した値の相関で判定する）':'';
+   R=st.cands.map(c=>CV.test(c[0],c[1],c[2],{fe:st.fe,lines}));
+   const col={ok:'#0F7C8C',ng:'#C8553D',na:'#7A8C99',id:'#17384A'};
+   $('#cvt').innerHTML=`<div class="tw" style="max-height:520px"><table class="t"><tr><th class="l">#</th><th class="l">原因 → 結果</th><th>想定の極性</th><th>相関 r</th><th>遅れ（月）</th><th>判定の目安 ±2/√n</th><th>負荷率≥95％のr</th><th>＜95％のr</th><th>ライン×年の水準 r</th><th>変化の向きが合うライン</th><th class="l">判定</th><th class="l">補足</th><th></th></tr>${R.map((t,i)=>`<tr data-i="${i}" style="cursor:pointer;${i===st.sel?'background:#E6F2F3':''}"><td class="l">${i+1}</td><td class="l">${esc(V[t.xk].name)} → ${esc(V[t.yk].name)}</td><td style="text-align:center">${t.pol}</td><td>${fmtN(t.r,2)}</td><td>${t.best}</td><td>${fmtN(t.crit,2)}</td><td>${fmtN(t.rh.r,2)}（${t.rh.n}）</td><td>${fmtN(t.rl.r,2)}（${t.rl.n}）</td><td>${fmtN(t.lr.r,2)}（${t.lr.n}）</td><td>${t.agree}／${lines.length}</td><td class="l"><b style="color:${col[t.cls]}">${t.v}</b></td><td class="l" style="white-space:normal;min-width:180px">${t.notes.join('。')}</td><td><button class="btn" data-del="${i}">削除</button></td></tr>`).join('')}</table></div><div class="note">行をクリックすると下に詳細を表示。（ ）内は月の数。</div>`;
+   $('#cvt').querySelectorAll('tr[data-i]').forEach(tr=>tr.onclick=e=>{if(e.target.dataset.del!=null){st.cands.splice(+e.target.dataset.del,1);st.sel=0;run();return}st.sel=+tr.dataset.i;run()});
+   detail(R[st.sel],lines)};
+  function detail(t,lines){const d=$('#cvd');d.innerHTML='';if(!t)return;const V=CV.build();const g=document.createElement('div');g.className='grid2';d.appendChild(g);
+   const xn=V[t.xk].name,yn=V[t.yk].name;
+   chart(g,{title:`ずらした相関：${xn} → ${yn}`,type:'bar',x:['結果が3か月先','2','1','同じ月','原因が1か月先','2','3'],series:[{name:'r',data:[-3,-2,-1,0,1,2,3].map(L=>t.lag[L].r)}],ref:t.crit?[{y:t.crit,label:'+2/√n',c:'#7A8C99'},{y:-t.crit,label:'−2/√n',c:'#7A8C99'}]:[],yMin:-1,yMax:1,labels:2,foot:'右側（原因が先）で想定の符号に強ければ矢印を支持。左側（結果が先）の方が強ければ，逆向きの矢印やフィードバックを疑う。'});
+   const LD=V.load?V.load.data:null;const hi=[],lo=[];lines.forEach(l=>{for(let tt=t.best;tt<NM;tt++){const x=t.X[l][tt-t.best],y=t.Y[l][tt];if(x==null||y==null)continue;(LD&&LD[l][tt]>=95?hi:lo).push([x,y,`${l} ${MON[tt]}`])}});
+   chart(g,{title:`散布図（${t.fe?'共通の動きを除いた':'ライン内で標準化した'}値，遅れ${t.best}か月）`,type:'scatter',series:LD?[{name:'負荷率95％以上の月',data:hi,color:'#C8553D'},{name:'95％未満の月',data:lo,color:'#0F7C8C'}]:[{name:'ライン×月',data:lo,color:'#0F7C8C'}],xLabel:xn,yLabel:yn,forceLegend:true});
+   [WORST,lines.find(l=>l!==WORST)].filter(Boolean).forEach(l=>{if(!lines.includes(l))return;chart(g,{title:`${l}：${xn}（${V[t.xk].unit}）と${yn}（${V[t.yk].unit}）`,x:MON,unit:'（標準化）',series:[{name:xn,data:CV.zline(V[t.xk].data[l])},{name:yn,data:CV.zline(V[t.yk].data[l]),color:'#C8553D'}],sub:'それぞれライン内で標準化（平均0，標準偏差1）して重ねた。「ラボへ送る」は元の単位の値を送る',vbands:VB()});
+    const last=g.lastElementChild.querySelector('[data-a=lab]');if(last)last.onclick=()=>sendSeries(`${l}：${xn}と${yn}`,MON,[{name:xn,unit:V[t.xk].unit,data:V[t.xk].data[l]},{name:yn,unit:V[t.yk].unit,data:V[t.yk].data[l]}],'','month')});
+   chart(g,{title:`ライン×年の水準（年ごとにライン間の平均を差し引いた値）`,type:'scatter',series:[{name:'ライン×年',data:t.LP.map((p,i)=>[p[0],p[1],''])}],xLabel:xn,yLabel:yn,r:5,foot:`各点が1つのライン・1つの年。右上がりなら＋，右下がりなら−の関係。数量は各ラインの${YEARS[0]}年＝100の指数。`+(t.LP.length<6?' 点が6つ未満のため相関は出さない。':'')});
+   chart(g,{title:`${YR}の変化率（ライン別，年平均どうし）`,type:'bar',x:t.ch.map(c=>c.l),series:[{name:xn+'の変化',data:t.ch.map(c=>c.dx)},{name:yn+'の変化',data:t.ch.map(c=>c.dy),color:'#C8553D'}],unit:'％',foot:`変化の向き（符号）を見る。想定の極性（${t.pol}）どおりの向きのライン：${t.agree}／${t.ch.length}`});}
+  const delayed=t=>t.best>0||['prod>inv','wait>rlt'].includes(t.xk+'>'+t.yk);
+  $('#cvcsv').onclick=()=>{const V=CV.build();const keep=R.filter(t=>t.cls==='ok'||t.cls==='id');
+   const txt='# データブラウザ「矢印の検証」から書き出し（支持・条件付きで支持・定義から決まる矢印のみ）\n'+SCMIO.toCsv([['原因','結果','極性','遅れ']]).replace(/^﻿/,'')+'\r\n'+keep.map(t=>`# ${V[t.xk].name}→${V[t.yk].name}：${t.v}（r=${fmtN(t.r,2)}，遅れ${t.best}か月）\r\n`+SCMIO.toCsv([[V[t.xk].name,V[t.yk].name,t.pol,delayed(t)?'遅れ':'']]).replace(/^﻿/,'')).join('\r\n');
+   dl(FN('矢印の検証-CLD用','csv'),'﻿'+txt,'text/csv')};
+  $('#cvres').onclick=()=>{const V=CV.build();const r3=v=>v==null?'':+v.toFixed(3);dl(FN('矢印の検証-判定表','csv'),SCMIO.toCsv([['原因','結果','想定の極性','r','遅れ（月）','判定の目安','負荷率95%以上のr','95%未満のr','ライン×年の水準r','向きが合うライン数','判定','補足'],...R.map(t=>[V[t.xk].name,V[t.yk].name,t.pol,r3(t.r),t.best,r3(t.crit),r3(t.rh.r),r3(t.rl.r),r3(t.lr.r),t.agree,t.v,t.notes.join('。')])]),'text/csv')};
+  $('#cvwb').onclick=()=>{const V=CV.build();if(!R.length){toast('候補がない');return}const title=(st.title||'矢印の検証')+'（'+APP.name+'）';
+   const arrows=R.map(t=>({c:V[t.xk].name,e:V[t.yk].name,p:t.pol,d:delayed(t),verdict:t.v.replace(/（.*$/,''),detail:t.v,r:t.r==null?null:+t.r.toFixed(3),lag:t.best,n:t.n}));
+   SCMIO.sendTo('workbench',SCMIO.envelope('arrows','data',{title,arrows,dataset:APP.name},title),{done:r=>toast(r==='delivered'?'ワークベンチに判定の結果を返した':'ワークベンチに直接届かなかったため .scm.json を保存した（ワークベンチの「開く」で読み込む）')})};
+  // 外から矢印を並べる（URLの #cv= ・ワークベンチからの封筒）
+  APP.cvApi={add(list,title,replace,from){const V=CV.build();const miss=[];const add=[];list.forEach(([x,y,p])=>{const a=CV.key(x),c=CV.key(y);if(!a||!c||a===c){miss.push(x+' → '+y);return}add.push([a,c,p==='-'?'-':'+'])});
+    if(replace)st.cands=[];add.forEach(c=>{if(!st.cands.some(o=>o[0]===c[0]&&o[1]===c[1]&&o[2]===c[2]))st.cands.push(c)});st.sel=replace?0:Math.max(0,st.cands.length-add.length);st.title=title;
+    $('#cvbn').innerHTML=`<div class="card" style="border:2px solid #7B3FA0;background:#F6F1FB"><b>${esc(from||'ワークベンチの経路から開いた')}</b>：${esc(title||'')}<br>矢印 ${add.length} 本を下の表に並べた${replace?'（例題の候補は外した。戻すときはこのページを開き直す）':'（いまの候補に追加）'}。行をクリックすると，その矢印の原因と結果のデータ（ライン×月）と判定が下に出る。「ワークベンチへ結果を返す」で判定をワークベンチに戻せる。${miss.length?'<br><span style="color:#C8553D">データにない矢印：'+miss.map(esc).join('，')+'</span>':''}</div>`;
+    run();return {added:add.length,miss}}};
+  run()}})();
+ // dataset-meta（取り込んだデータにある変数の一覧。データそのものは含めない）
+ APP.datasetMeta=()=>{const V=CV.build();return {name:APP.name,period:{from:MON[0],to:MON[NM-1],months:NM},lines:LINES.length,variables:Object.values(V).map(v=>({name:v.name,unit:v.unit,aliases:(CV_ALIAS[v.k]||[]).filter(a=>a!==v.name),note:v.note}))}};
+ APP.MON=MON;
+}
 
+BOOT(DATA,'sample');APP.RENDER.ov();
 </script><script>// ===== 使い方の例題：目的を選ぶと，タブ・表・指標・切り口・絞り込みを自動で設定する =====
 (function(){
 const RX=[
@@ -924,29 +1059,345 @@ document.addEventListener('click',async e=>{const c=e.target.closest('[data-rxid
  if(b.dataset.st!=null){p.querySelectorAll('.rxs button').forEach(x=>x.classList.toggle('on',x===b));await apply(CUR.steps[+b.dataset.st][1]);return;}
  const k=b.dataset.rx;if(k==='close')p.style.display='none';else if(k==='min')p.classList.toggle('min');else if(k==='list')tab('rx');else if(k==='again')run(CUR);else if(k==='next')run(RX.find(r=>r.id===CUR.id+1));else if(k==='prev')run(RX.find(r=>r.id===CUR.id-1));});
 // ---- 例題タブ
-const nav=$1('nav');const nb=document.createElement('button');nb.dataset.t='rx';nb.textContent='★ 使い方の例題';nb.className='rxnavbtn';nav.insertBefore(nb,nav.firstChild);
+const nav=$1('nav');const nb=document.createElement('button');nb.dataset.t='rx';nb.textContent='★ 使い方の例題';nb.title='サンプルデータ（ブルーマウンテン社）用';nb.className='rxnavbtn';nav.insertBefore(nb,nav.firstChild);
 const sec=document.createElement('section');sec.id='rx';$1('main').insertBefore(sec,$1('main').firstChild);
 const groups=[...new Set(RX.map(r=>r.g))];
-sec.innerHTML=`<h2>使い方の例題：目的を選ぶと，画面の設定を自動で行う</h2><div class="see">選択肢が多いので，まず<b>何を確かめたいか</b>を選ぶ。例題をクリックすると，タブ・表・指標・切り口・絞り込みが自動で設定され，右下に「見えること」と「読み方」が出る。そこから先は自由に選び直してよい。<br>迷ったときの順番：①概要で全体をつかむ → ②エクスプローラで偏りを探す → ③ラウンド別で仮説ごとの図を見る → ④矢印の検証で CLD の矢印を検算する → ⑤必要な図を SVG で保存する（月報のサマリー → ドリルダウン → 論点ごとの分析 → 経験則の検算 → 報告書の順）。</div>`+
+sec.innerHTML=`<h2>使い方の例題：目的を選ぶと，画面の設定を自動で行う <span class="pill">サンプルデータ用</span></h2><div class="see umonly"><b>いまは読み込んだ自社データを表示している。</b>この例題（H1〜H9 と「見えること」の数字）はサンプルデータ（ブルーマウンテン社）用のため使えない。「データ読込」タブの「サンプルデータに戻す」で戻ると使える。</div><div class="see">選択肢が多いので，まず<b>何を確かめたいか</b>を選ぶ。例題をクリックすると，タブ・表・指標・切り口・絞り込みが自動で設定され，右下に「見えること」と「読み方」が出る。そこから先は自由に選び直してよい。<br>迷ったときの順番：①概要で全体をつかむ → ②エクスプローラで偏りを探す → ③ラウンド別で仮説ごとの図を見る → ④矢印の検証で CLD の矢印を検算する → ⑤必要な図を SVG で保存する（月報のサマリー → ドリルダウン → 論点ごとの分析 → 経験則の検算 → 報告書の順）。</div>`+
  groups.map(g=>`<h3 class="rxg">${g}</h3><div class="rxgrid">${RX.filter(r=>r.g===g).map(r=>`<div class="rxcard" data-rxid="${r.id}"><div class="rxn">${r.id}</div><div><b>${r.t}</b><small>${r.how}</small><span class="rxu">使うページ：${r.use}</span></div></div>`).join('')}</div>`).join('');
 nb.onclick=()=>{$$('nav button,main>section').forEach(x=>x.classList.remove('on'));nb.classList.add('on');sec.classList.add('on');window.scrollTo(0,0);};
 })();
 
 // 最初に例題タブを開く
 (function(){const b=document.querySelector('nav button[data-t="rx"]');if(b)b.click();})();</script><script>
-// ===== ワークベンチの「仮説の検証：経路を求める」から開いたとき，経路の矢印を「矢印の検証」に並べる =====
-(function(){const h=location.hash||'';if(!/[#&]cv=/.test(h))return;
- const q=new URLSearchParams(h.slice(1));const arr=(q.get('cv')||'').split('|').filter(Boolean).map(s=>{const m=s.match(/^(.+)>(.+):([+-])$/);return m?[m[1],m[2],m[3]]:null;}).filter(Boolean);const title=q.get('t')||'';
- const go=()=>{const b=document.querySelector('nav button[data-t="cv"]');if(!b)return;b.click();
-  const sx=document.getElementById('cvx'),sy=document.getElementById('cvy'),sp=document.getElementById('cvp');if(!sx){setTimeout(go,200);return;}
-  const key=n=>{const o=[...sx.options].find(o=>o.text===n);return o?o.value:null;};
-  let g=0;while(document.querySelector('#cvt [data-del]')&&g++<80)document.querySelector('#cvt [data-del]').click();
-  const miss=[];let n=0;arr.forEach(([x,y,p])=>{const a=key(x),c=key(y);if(!a||!c||a===c){miss.push(x+' → '+y);return;}sx.value=a;sy.value=c;sp.value=p;document.getElementById('cvadd').click();n++;});
-  const f=document.querySelector('#cvt tr[data-i="0"]');if(f)f.click();
-  const cv=document.getElementById('cv');const bn=document.createElement('div');bn.className='card';bn.style.cssText='border:2px solid #7B3FA0;background:#F6F1FB';
-  bn.innerHTML='<b>ワークベンチの経路から開いた</b>：'+title.replace(/[<>&]/g,'')+'<br>経路の矢印 '+n+' 本を下の表に並べた（例題の候補は外した。戻すときはこのページを開き直す）。行をクリックすると，その矢印の原因と結果のデータ（ライン×月）と判定が下に出る。'+(miss.length?'<br><span style="color:#C8553D">データにない矢印：'+miss.join('，')+'</span>':'');
-  const h2=cv.querySelector('h2');if(h2)h2.after(bn);else cv.prepend(bn);
-  const g2=document.getElementById('rxguide');if(g2)g2.style.display='none';window.scrollTo(0,0);};
- if(document.readyState==='complete')setTimeout(go,300);else window.addEventListener('load',()=>setTimeout(go,300));
+// ===== データ読込：自社の業務データ（Excel / CSV）を読み込み，サンプルと同じ形（DATA）に集計する =====
+// すべてこのブラウザの中で処理する（外部には何も送らない）
+(function(){
+const SKUA=['品番','SKU','品目コード','品目番号','製品コード','製品番号','商品コード','品目','item','itemcode','itemno','productcode','productid','sku_id','型番'];
+const LINEA=['生産ライン','ライン','ライン名','ラインコード','製造ライン','line','lineid','linename','workcenter','ワークセンタ','ワークセンター'];
+const DCA=['担当DC','DC','出荷DC','出荷倉庫','倉庫','物流センター','出荷拠点','dc','warehouse','拠点'];
+const MONEY={base:'円',opts:{'円':1,'千円':1000,'万円':10000}},HOURS={base:'時間',opts:{'時間':1,'分':1/60}};
+const f=(key,label,type,o)=>Object.assign({key,label,type},o||{});
+const TABLES=[
+ {k:'product_master',t:'製品マスタ',need:true,kw:['製品マスタ','品目マスタ','マスタ','master','product','品目','製品','sku'],desc:'品番ごとの属性（1行＝1品番）。どのラインで作るかが，ライン×月で比べる「矢印の検証」の基礎になる',f:[
+  f('sku','品番','id',{req:1,aliases:SKUA,desc:'品番（SKU）。ほかの表と結びつけるキー',ex:['A-100','A-200','B-300']}),
+  f('line','生産ライン','text',{req:1,aliases:LINEA.concat(['工程']),desc:'その品番を作るライン',ex:['L1','L1','L2']}),
+  f('product_group','製品群','text',{aliases:['製品グループ','品目グループ','商品群','カテゴリ','カテゴリー','分類','品種','productgroup','category'],desc:'製品のまとまり（需要・予測の表と結びつける）',ex:['ポンプ','ポンプ','バルブ']}),
+  f('make_mode','生産方式（MTS/MTO）','text',{aliases:['生産方式','MTS/MTO','見込受注区分','生産区分','makemode'],desc:'MTS（見込生産）か MTO（受注生産）。空欄はすべて MTS',ex:['MTS','MTS','MTO']}),
+  f('unit_cost','単位原価','num',{unit:MONEY,aliases:['原価','標準原価','単位原価','製造原価','unitcost','cost'],desc:'1個あたりの原価（在庫金額に使う）',ex:[800,1200,5000]}),
+  f('unit_price','販売単価','num',{unit:MONEY,aliases:['販売単価','売価','標準売価','単価','販売価格','unitprice','price'],desc:'1個あたりの売価（受注金額に使う。受注表の単価が優先）',ex:[1000,1500,7000]}),
+  f('abc_class','ABC区分','text',{aliases:['ABC区分','ABC','abcclass','ABCランク','重要度区分'],desc:'空欄なら受注金額の累積構成比で自動計算（A〜80％，B〜95％）',ex:['A','B','C']}),
+  f('plant','工場','text',{aliases:['工場','plant','製造拠点','事業所'],desc:'',ex:['本社工場','本社工場','第2工場']}),
+  f('production_lt_days','生産リードタイム（日）','num',{aliases:['生産LT','生産リードタイム','製造リードタイム','productionltdays'],desc:'',ex:[5,5,10]})]},
+ {k:'orders',t:'受注',need:true,kw:['受注','注文','order'],desc:'受注明細（1行＝受注番号×品番）。OTIF・初回充足率・取消・欠品の分母',f:[
+  f('order_id','受注番号','id',{req:1,aliases:['受注番号','注文番号','オーダー番号','受注No','注文No','受注伝票番号','伝票番号','orderid','orderno','ordernumber','sono'],desc:'納品・出荷と結びつけるキー',ex:['SO-0001','SO-0001','SO-0002']}),
+  f('order_date','受注日','date',{req:1,aliases:['受注日','注文日','受付日','受注年月日','orderdate'],desc:'',ex:['2024-04-01','2024-04-01','2024-04-02']}),
+  f('sku','品番','id',{req:1,aliases:SKUA,desc:'',ex:['A-100','B-300','A-200']}),
+  f('qty','受注数量','num',{req:1,aliases:['受注数量','受注数','注文数量','注文数','数量','qty','quantity','orderqty'],desc:'',ex:[120,10,300]}),
+  f('promised_date','約束納期','date',{req:1,aliases:['約束納期','納期','回答納期','希望納期','指定納期','納入期日','納入指定日','promiseddate','duedate','promiseddeliverydate','requesteddate'],desc:'この日までに全量届けば OTIF',ex:['2024-04-08','2024-04-15','2024-04-09']}),
+  f('customer','顧客','text',{aliases:['顧客','顧客コード','得意先','得意先コード','取引先','customer','customerid'],desc:'',ex:['C001','C001','C002']}),
+  f('rank','顧客ランク','text',{aliases:['顧客ランク','得意先ランク','ランク','顧客区分','customerrank','rank'],desc:'S/A/B/C など（切り口に使う）',ex:['A','A','B']}),
+  f('dc','担当DC・倉庫','text',{aliases:DCA,desc:'',ex:['東日本DC','東日本DC','西日本DC']}),
+  f('unit_price','受注単価','num',{unit:MONEY,aliases:['受注単価','販売単価','単価','unitprice','price'],desc:'',ex:[1000,7000,1500]}),
+  f('amount','受注金額','num',{unit:MONEY,aliases:['受注金額','金額','売上金額','amount','value'],desc:'単価がないときに使う',ex:[120000,70000,450000]}),
+  f('cancel','取消','flag',{aliases:['取消','取消フラグ','キャンセル','キャンセルフラグ','cancel','cancelflag','状態','ステータス','status'],desc:'1・TRUE・「取消」「キャンセル」なら取消。取消の注文行は OTIF の分母から除く',ex:[0,0,'取消']}),
+  f('delivered_date','納品日（納品表がないとき）','date',{aliases:['納品日','納入日','実納品日','着荷日','delivereddate','deliverydate'],desc:'納品表がないときの1回納品の日',ex:['','','']}),
+  f('delivered_qty','納品数量（納品表がないとき）','num',{aliases:['納品数量','納品数','納入数','納入数量','deliveredqty'],desc:'空欄なら受注数量を全量納品とみなす',ex:['','','']})]},
+ {k:'deliveries',t:'納品',kw:['納品','納入','着荷','deliver'],desc:'顧客への納品の記録（1行＝1回の納品。分納は複数行）',f:[
+  f('order_id','受注番号','id',{req:1,aliases:['受注番号','注文番号','オーダー番号','受注No','注文No','伝票番号','orderid','orderno'],desc:'',ex:['SO-0001','SO-0001','SO-0002']}),
+  f('sku','品番','id',{req:1,aliases:SKUA,desc:'',ex:['A-100','B-300','A-200']}),
+  f('delivery_date','納品日','date',{req:1,aliases:['納品日','納入日','着荷日','実納品日','deliverydate','delivereddate','日付','date'],desc:'',ex:['2024-04-07','2024-04-16','2024-04-09']}),
+  f('delivered_qty','納品数量','num',{req:1,aliases:['納品数量','納品数','納入数量','納入数','数量','deliveredqty','qty'],desc:'',ex:[120,10,300]}),
+  f('cancel','取消','flag',{aliases:['取消','取消フラグ','キャンセル','cancel','cancelflag','状態','ステータス','status','区分'],desc:'取消の印（1・TRUE・「取消」）',ex:[0,0,0]})]},
+ {k:'shipments',t:'出荷',kw:['出荷','出庫','ship'],desc:'倉庫からの出荷（1行＝1回の出荷）。特急便の比率・運賃',f:[
+  f('ship_date','出荷日','date',{req:1,aliases:['出荷日','出庫日','shipdate','日付','date'],desc:'',ex:['2024-04-05','2024-04-12','2024-04-08']}),
+  f('sku','品番','id',{req:1,aliases:SKUA,desc:'',ex:['A-100','B-300','A-200']}),
+  f('qty','出荷数量','num',{req:1,aliases:['出荷数量','出荷数','出庫数','数量','qty','shippedqty'],desc:'',ex:[120,10,300]}),
+  f('order_id','受注番号','id',{aliases:['受注番号','注文番号','オーダー番号','受注No','伝票番号','orderid','orderno'],desc:'あれば「受注→出荷」「出荷→納品」の日数が出る',ex:['SO-0001','SO-0001','SO-0002']}),
+  f('dc','出荷DC・倉庫','text',{aliases:DCA,desc:'',ex:['東日本DC','東日本DC','西日本DC']}),
+  f('express','特急便','flag',{aliases:['特急','特急便','特急フラグ','輸送区分','配送方法','輸送手段','便種','express','transportmode'],desc:'1・TRUE・「特急」「航空」なら特急',ex:[0,1,0]}),
+  f('freight','運賃','num',{unit:MONEY,aliases:['運賃','送料','輸送費','物流費','freight','freightcost'],desc:'',ex:[3000,12000,5000]})]},
+ {k:'inventory',t:'在庫',kw:['在庫','inventory','stock'],desc:'在庫の記録（日次・週次・月末など。1行＝日付×品番×倉庫）',f:[
+  f('date','日付','date',{req:1,aliases:['日付','在庫日','基準日','棚卸日','date','snapshotdate'],desc:'',ex:['2024-04-01','2024-04-01','2024-04-01']}),
+  f('sku','品番','id',{req:1,aliases:SKUA,desc:'',ex:['A-100','A-200','B-300']}),
+  f('on_hand','手持在庫','num',{req:1,aliases:['手持在庫','在庫数','在庫数量','現在庫','有効在庫','在庫','onhand','stock'],desc:'',ex:[500,800,20]}),
+  f('dc','DC・倉庫','text',{aliases:DCA,desc:'',ex:['東日本DC','東日本DC','西日本DC']}),
+  f('on_order','入荷待ち','num',{aliases:['入荷待ち','入荷予定','発注残','注残','生産待ち','onorder'],desc:'補充を手配したがまだ入っていない数量',ex:[200,0,0]}),
+  f('backorder','出荷待ち（受注残）','num',{aliases:['出荷待ち','受注残','バックオーダー','欠品数','backorder','backlog'],desc:'受注したが在庫がなく出せていない数量',ex:[0,50,0]})]},
+ {k:'production',t:'生産実績',kw:['生産','製造','production'],desc:'品番ごとの生産（1行＝日付×品番）',f:[
+  f('date','生産日','date',{req:1,aliases:['生産日','製造日','完成日','日付','date','productiondate'],desc:'',ex:['2024-04-01','2024-04-01','2024-04-02']}),
+  f('sku','品番','id',{req:1,aliases:SKUA,desc:'',ex:['A-100','A-200','B-300']}),
+  f('actual_qty','生産数量','num',{req:1,aliases:['生産数量','生産数','生産実績','実績数','完成数','actualqty','producedqty','qty'],desc:'',ex:[400,600,15]}),
+  f('line','ライン','text',{aliases:LINEA,desc:'参考（集計は製品マスタのラインを使う）',ex:['L1','L1','L2']}),
+  f('plan_qty','計画数量','num',{aliases:['計画数量','計画数','生産計画','planqty','plannedqty'],desc:'',ex:[420,600,20]})]},
+ {k:'equipment',t:'設備稼働',kw:['設備','稼働','equipment','machine'],desc:'ラインの日々の稼働（1行＝日付×ライン）。負荷率・段取り・生産能力',f:[
+  f('date','日付','date',{req:1,aliases:['日付','稼働日','date'],desc:'',ex:['2024-04-01','2024-04-01','2024-04-02']}),
+  f('line','ライン','text',{req:1,aliases:LINEA,desc:'製品マスタのラインと同じ名前',ex:['L1','L2','L1']}),
+  f('run_hours','稼働時間','num',{req:1,unit:HOURS,aliases:['稼働時間','運転時間','実稼働時間','runhours','runtime'],desc:'',ex:[14.5,7,15]}),
+  f('output_qty','生産数量','num',{req:1,aliases:['生産数量','生産数','出来高','output','outputqty','qty'],desc:'',ex:[1000,15,1050]}),
+  f('planned_hours','計画時間','num',{unit:HOURS,aliases:['計画時間','計画稼働時間','負荷時間','plannedhours'],desc:'空欄なら 稼働＋段取り＋停止',ex:[16,8,16]}),
+  f('downtime_hours','停止時間','num',{unit:HOURS,aliases:['停止時間','故障時間','停止','downtimehours','downtime'],desc:'',ex:[0.5,0,0]}),
+  f('setup_hours','段取り時間','num',{unit:HOURS,aliases:['段取り時間','段取時間','段取り','段取','setuphours','setup'],desc:'',ex:[1,1,1]}),
+  f('defect_qty','不良数量','num',{aliases:['不良数量','不良数','defectqty','scrap'],desc:'',ex:[12,0,8]})]},
+ {k:'procurement',t:'部品調達',kw:['調達','購買','発注','購入','procure','purchase'],desc:'部品の発注と入荷（1行＝発注明細）。納入の遅れ',f:[
+  f('order_date','発注日','date',{req:1,aliases:['発注日','注文日','orderdate','podate'],desc:'',ex:['2024-03-01','2024-03-05','2024-03-10']}),
+  f('part_id','部品番号','id',{req:1,aliases:['部品番号','部品コード','部品','材料コード','partid','partno','material'],desc:'',ex:['P-01','P-02','P-01']}),
+  f('supplier_id','仕入先','id',{req:1,aliases:['仕入先','仕入先コード','サプライヤ','サプライヤー','購入先','supplier','supplierid','vendor'],desc:'',ex:['S-A','S-B','S-A']}),
+  f('promised_arrival','約束入荷日','date',{req:1,aliases:['約束入荷日','入荷予定日','回答納期','納期','promisedarrival','duedate','promiseddate'],desc:'',ex:['2024-03-20','2024-03-25','2024-03-29']}),
+  f('actual_arrival','実入荷日','date',{req:1,aliases:['実入荷日','入荷日','受入日','actualarrival','receiptdate','arrivaldate'],desc:'空欄（未入荷）の行は除く',ex:['2024-03-22','2024-03-25','2024-04-05']}),
+  f('qty','発注数量','num',{aliases:['発注数量','発注数','数量','qty'],desc:'',ex:[1000,500,1000]}),
+  f('unit_price','購入単価','num',{unit:MONEY,aliases:['購入単価','単価','unitprice','price'],desc:'',ex:[120,300,120]}),
+  f('defect_qty','不良数量','num',{aliases:['不良数量','不良数','defectqty'],desc:'',ex:[0,5,0]}),
+  f('sku','使う製品（品番）','id',{aliases:['使う製品','使用製品','製品','品番','SKU'],desc:'あれば部品の遅れと製品の OTIF を結びつけられる',ex:['A-100','B-300','A-200']})]},
+ {k:'demand',t:'需要・予測',kw:['需要','予測','計画','forecast','demand','plan'],desc:'月ごとの需要予測・計画と実績（1行＝期間×品番または製品群）',f:[
+  f('period','年月','period',{req:1,aliases:['年月','対象月','期間','月','period','month','日付','date'],desc:'2024-04・2024/4・2024年4月 など',ex:['2024-04','2024-04','2024-05']}),
+  f('key','品番または製品群','id',{req:1,aliases:['製品群','品番','SKU','品目','キー','key','productgroup'],desc:'製品マスタの品番か製品群と同じ名前',ex:['ポンプ','バルブ','ポンプ']}),
+  f('actual','実績','num',{req:1,aliases:['実績','需要実績','販売実績','出荷実績','actual','actualqty','sales'],desc:'',ex:[9000,400,9500]}),
+  f('forecast','予測','num',{aliases:['予測','需要予測','統計予測','forecast','forecastqty'],desc:'',ex:[8800,450,9100]}),
+  f('sales_plan','販売計画','num',{aliases:['販売計画','salesplan','salesplanqty'],desc:'',ex:[9500,450,9800]}),
+  f('production_plan','生産計画','num',{aliases:['生産計画','productionplan','productionplanqty'],desc:'',ex:[9300,420,9600]})]}
+];
+const TB=Object.fromEntries(TABLES.map(t=>[t.k,t]));
+// ---------- 値の変換
+const S0=v=>v==null||v===''?null:(String(v).trim()||null);
+const FLAG0=/^(0|false|no|n|なし|無|無し|-|－|通常|正常|ok|normal|standard|陸送|普通|no cancel)$/i,FLAG1=/^(1|true|yes|y|○|◯|●|有|あり|有り|x|✓)$/i;
+function flag(v){if(v==null||v==='')return 0;if(typeof v==='boolean')return v?1:0;if(typeof v==='number')return v?1:0;const s=String(v).trim();if(!s||FLAG0.test(s))return 0;if(FLAG1.test(s))return 1;if(/取消|取り消|キャンセル|cancel|特急|急便|express|air|航空|チャーター|緊急/i.test(s))return 1;return 0}
+const dcache=new Map();
+function dt(v){if(v==null||v==='')return null;if(typeof v==='string'&&dcache.has(v))return dcache.get(v);let d=SCMIO.toDate(v);if(d&&(+d.slice(0,4)<1990||+d.slice(0,4)>2100||!(Date.parse(d+'T00:00:00Z')>0)))d=null;if(typeof v==='string'&&dcache.size<200000)dcache.set(v,d);return d}
+function conv(fl,v,fac){switch(fl.type){case 'id':case 'text':return S0(v);case 'num':{const n=SCMIO.toNum(v);return n==null?null:n*(fac||1)}case 'date':return dt(v);case 'period':{const d=dt(v);return d?d.slice(0,7):null}case 'flag':return flag(v)}return v}
+const natural=(a,b)=>String(a).localeCompare(String(b),'ja',{numeric:true});
+// ---------- 状態
+const ST={sheets:[],assign:{},maps:{},units:{},name:'',report:null,dirty:true,pendingMap:null};
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let SID=0;
+// ---------- シートの割り当て（見出しの一致度）
+function scoreSheet(sh,T){const m=SCMIO.guessMapping(sh.columns,T.f);let s=0,rq=0,rqn=0;T.f.forEach(fl=>{if(fl.req){rqn++;if(m[fl.key]){rq++;s+=3}}else if(m[fl.key])s+=1});const nm=(sh.name+' '+sh.file).toLowerCase();if(T.kw.some(k=>nm.includes(k.toLowerCase())))s+=4;return {s,ok:rq===rqn,rq,rqn,map:m}}
+function autoAssign(sh){if(/^(説明|readme|使い方|注意)/i.test(sh.name))return '';let best='',bs=0;TABLES.forEach(T=>{const r=scoreSheet(sh,T);if(r.ok&&r.s>bs){bs=r.s;best=T.k}});return best}
+function columnsFor(tk){const sh=ST.sheets.filter(s=>ST.assign[s.id]===tk);const c=[];sh.forEach(s=>s.columns.forEach(x=>{if(!c.includes(x))c.push(x)}));return c}
+function ensureMap(tk){if(ST.maps[tk])return;const cols=columnsFor(tk);ST.maps[tk]=SCMIO.guessMapping(cols,TB[tk].f);const U=ST.units[tk]=ST.units[tk]||{};TB[tk].f.forEach(fl=>{const c=ST.maps[tk][fl.key];if(!fl.unit||!c||U[fl.key])return;const u=/千円/.test(c)?'千円':/万円/.test(c)?'万円':/[(（\[［]\s*分\s*[)）\]］]|分$|_min|minutes?/i.test(c)?'分':null;if(u&&fl.unit.opts[u])U[fl.key]=u})}
+// ---------- 読み込み
+async function addFiles(files){const st=$('#iostat');for(const file of files){if(/\.json$/i.test(file.name)){await openJson(file);continue}
+  st.textContent=`読み込み中：${file.name} …`;await new Promise(r=>setTimeout(r,20));const t0=performance.now();
+  try{const sheets=await SCMIO.readFile(file);for(const s of sheets){if(!s.rows||!s.rows.length)continue;const hr=SCMIO.findHeaderRow(s.rows);const ob=SCMIO.toObjects(s.rows,hr);if(!ob.rows.length)continue;
+    const sh={id:'s'+(++SID),file:file.name,name:s.name,columns:ob.columns,rows:ob.rows,headerRow:hr};ST.sheets.push(sh);ST.assign[sh.id]=autoAssign(sh);}
+   st.textContent=`読み込んだ：${file.name}（${((performance.now()-t0)/1000).toFixed(1)}秒）`}catch(e){st.innerHTML=`<span class="err">読めなかった：${esc(file.name)}：${esc(e.message||e)}</span>`}}
+ Object.keys(ST.maps).forEach(k=>{if(!ST.sheets.some(s=>ST.assign[s.id]===k))delete ST.maps[k]});
+ if(ST.pendingMap)applyMapping(ST.pendingMap,true);
+ if(!ST.name&&ST.sheets.length)ST.name=ST.sheets[0].file.replace(/\.[^.]+$/,'');ST.dirty=true;render()}
+// ---------- 画面
+function render(){renderSheets();renderMaps();renderActions()}
+function renderSheets(){const h=$('#iosheets');if(!ST.sheets.length){h.innerHTML='<div class="note">まだファイルを読み込んでいない。</div>';return}
+ h.innerHTML=`<div class="ctitle"><span>2. シートを表に割り当てる（見出しから自動で推定。違っていれば選び直す）</span></div><div class="tw"><table class="t"><tr><th class="l">ファイル</th><th class="l">シート</th><th>行数</th><th class="l">見出し（先頭）</th><th class="l">割り当て</th><th></th></tr>${ST.sheets.map(s=>`<tr><td class="l">${esc(s.file)}</td><td class="l">${esc(s.name)}</td><td>${s.rows.length.toLocaleString()}</td><td class="l" style="white-space:normal;max-width:420px">${esc(s.columns.slice(0,10).join('，'))}${s.columns.length>10?' …':''}</td><td class="l"><select data-sh="${s.id}"><option value="">（使わない）</option>${TABLES.map(T=>`<option value="${T.k}" ${ST.assign[s.id]===T.k?'selected':''}>${T.t}${T.need?'（必須）':''}</option>`).join('')}</select></td><td><button class="btn" data-rm="${s.id}">外す</button></td></tr>`).join('')}</table></div>
+ <div class="note">同じ表に複数のシート（例：月ごとのファイル）を割り当てると，つなげて1つの表として読む（列の名前をそろえる）。必須：製品マスタ・受注（＋納品，または受注表の納品日の列）。</div>`;
+ h.querySelectorAll('select[data-sh]').forEach(s=>s.onchange=()=>{const old=ST.assign[s.dataset.sh];ST.assign[s.dataset.sh]=s.value;[old,s.value].forEach(k=>{if(k)delete ST.maps[k]});ST.dirty=true;render()});
+ h.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{const id=b.dataset.rm;const k=ST.assign[id];ST.sheets=ST.sheets.filter(s=>s.id!==id);delete ST.assign[id];if(k)delete ST.maps[k];ST.dirty=true;render()})}
+function sampleVals(tk,fl){const sh=ST.sheets.filter(s=>ST.assign[s.id]===tk);const col=ST.maps[tk][fl.key];if(!col)return '';const out=[];let bad=0,seen=0;const fac=fl.unit?fl.unit.opts[(ST.units[tk]||{})[fl.key]||fl.unit.base]:1;
+ for(const s of sh){for(const r of s.rows){const raw=r[col];if(raw==null||raw==='')continue;seen++;const v=conv(fl,raw,fac);if(v==null)bad++;if(out.length<3)out.push(v==null?`<span class="err">×${esc(raw)}</span>`:esc(fl.type==='num'?(+v.toFixed(4)):v));if(seen>=200)break}if(seen>=200)break}
+ return out.join('，')+(bad?`　<span class="err">先頭${seen}件中 ${bad}件 読めない</span>`:'')}
+function renderMaps(){const h=$('#iomap');const used=TABLES.filter(T=>ST.sheets.some(s=>ST.assign[s.id]===T.k));
+ if(!used.length){h.innerHTML='';return}
+ h.innerHTML=`<h3>3. 列の対応づけ（左が必要な項目，右が読み込んだ表の列）</h3>`+used.map(T=>{ensureMap(T.k);const cols=columnsFor(T.k);const M=ST.maps[T.k];const sh=ST.sheets.filter(s=>ST.assign[s.id]===T.k);
+  const prev=sh[0];const pc=prev.columns.slice(0,14);
+  return `<div class="card iomapc" data-tk="${T.k}"><div class="ctitle"><span>${T.t}（${sh.map(s=>esc(s.name)).join('，')}：${sh.reduce((a,s)=>a+s.rows.length,0).toLocaleString()}行）</span></div><div class="note">${esc(T.desc)}</div>
+  <div class="tw" style="max-height:none"><table class="t iomt"><tr><th class="l">項目</th><th class="l">元の列</th><th class="l">単位</th><th class="l">読み取った値（先頭）</th></tr>${T.f.map(fl=>`<tr class="${fl.req&&!M[fl.key]?'miss':''}"><td class="l"><b>${esc(fl.label)}</b>${fl.req?' <span class="req">必須</span>':''}<div class="note" style="white-space:normal;max-width:330px">${esc(fl.desc||'')}</div></td><td class="l"><select data-f="${fl.key}"><option value="">（なし）</option>${cols.map(c=>`<option ${M[fl.key]===c?'selected':''}>${esc(c)}</option>`).join('')}</select></td><td class="l">${fl.unit?`<select data-u="${fl.key}">${Object.keys(fl.unit.opts).map(u=>`<option ${((ST.units[T.k]||{})[fl.key]||fl.unit.base)===u?'selected':''}>${u}</option>`).join('')}</select>`:fl.type==='date'?'<span class="note">日付</span>':fl.type==='flag'?'<span class="note">印</span>':''}</td><td class="l" style="white-space:normal;max-width:360px">${sampleVals(T.k,fl)}</td></tr>`).join('')}</table></div>
+  <details><summary class="note" style="cursor:pointer">元の表の先頭5行を見る（見出しは${prev.headerRow+1}行目と判定）</summary><div class="tw"><table class="t"><tr>${pc.map(c=>`<th class="l">${esc(c)}</th>`).join('')}</tr>${prev.rows.slice(0,5).map(r=>`<tr>${pc.map(c=>`<td class="l">${esc(r[c])}</td>`).join('')}</tr>`).join('')}</table></div></details></div>`}).join('');
+ h.querySelectorAll('.iomapc').forEach(card=>{const tk=card.dataset.tk;card.querySelectorAll('select[data-f]').forEach(s=>s.onchange=()=>{const k=s.dataset.f;if(s.value){Object.keys(ST.maps[tk]).forEach(x=>{if(x!==k&&ST.maps[tk][x]===s.value)delete ST.maps[tk][x]});ST.maps[tk][k]=s.value}else delete ST.maps[tk][k];ST.dirty=true;renderMaps();renderActions()});
+  card.querySelectorAll('select[data-u]').forEach(s=>s.onchange=()=>{(ST.units[tk]=ST.units[tk]||{})[s.dataset.u]=s.value;ST.dirty=true;renderMaps();renderActions()})})}
+function renderActions(){const b=$('#ioapply');if(!b)return;b.disabled=!ST.sheets.length;$('#iovalid').disabled=!ST.sheets.length;$('#iosavemap').disabled=!Object.keys(ST.maps).length;const n=$('#ioname');if(n&&document.activeElement!==n)n.value=ST.name||'';if(ST.dirty)$('#iorep').innerHTML=ST.sheets.length?'<div class="note">「検証する」で，読めない値・重複・マスタにない品番などを確かめてから取り込む。</div>':''}
+// ---------- 変換と検証
+function convertAll(){const R={},iss=[],stat={};const add=(lv,tk,msg,samples)=>iss.push({lv,tk,msg,samples:samples||[]});
+ TABLES.forEach(T=>{const sh=ST.sheets.filter(s=>ST.assign[s.id]===T.k);if(!sh.length){R[T.k]=null;if(T.need)add('error',T.k,`${T.t}の表が割り当てられていない`);return}
+  ensureMap(T.k);const M=ST.maps[T.k],U=ST.units[T.k]||{};const miss=T.f.filter(fl=>fl.req&&!M[fl.key]);if(miss.length){add('error',T.k,`必須の列が対応づけられていない：${miss.map(x=>x.label).join('，')}`);R[T.k]=null;return}
+  const flds=T.f.filter(fl=>M[fl.key]).map(fl=>({fl,col:M[fl.key],fac:fl.unit?fl.unit.opts[U[fl.key]||fl.unit.base]:1}));
+  sh.forEach(s=>{const lack=flds.filter(x=>!s.columns.includes(x.col)&&x.fl.req);if(lack.length)add('error',T.k,`シート「${s.name}」に列がない：${lack.map(x=>x.col).join('，')}`)});
+  const recs=[];let rows=0;const bad={},empty={};const samp={};
+  sh.forEach(s=>{const off=s.headerRow+2;s.rows.forEach((r,ri)=>{rows++;const o={};let ok=true;for(const {fl,col,fac} of flds){const raw=r[col];const v=conv(fl,raw,fac);o[fl.key]=v;if(v==null&&raw!=null&&raw!==''&&fl.type!=='flag'){bad[fl.key]=(bad[fl.key]||0)+1;(samp[fl.key]=samp[fl.key]||[]).length<3&&samp[fl.key].push(`${s.name} ${ri+off}行目：「${raw}」`)}if(fl.req&&v==null){ok=false;if(raw==null||raw==='')empty[fl.key]=(empty[fl.key]||0)+1}}
+    if(ok){o._s=s.name;o._r=ri+off;recs.push(o)}})});
+  Object.entries(bad).forEach(([k,n])=>{const fl=T.f.find(x=>x.key===k);add(n>rows*.2&&fl.req?'error':'warn',T.k,`「${fl.label}」（列「${M[k]}」）に読めない値が ${n.toLocaleString()}件${fl.req?'（その行は除く）':'（空欄として扱う）'}${fl.type==='date'?'。日付は 2024-04-01・2024/4/1・2024年4月1日・Excelの日付 を読める（和暦は西暦に直す）':''}`,samp[k])});
+  Object.entries(empty).forEach(([k,n])=>{const fl=T.f.find(x=>x.key===k);add('warn',T.k,`必須の「${fl.label}」が空欄の行が ${n.toLocaleString()}行（除く）`)});
+  if(rows&&!recs.length)add('error',T.k,`${T.t}：使える行が1行もない`);
+  R[T.k]=recs;stat[T.k]={rows,used:recs.length,src:sh.map(s=>s.file+' / '+s.name).join('，')}});
+ return {R,iss,stat,add}}
+function validate(){const t0=performance.now();const {R,iss,stat,add}=convertAll();const info={};
+ const pm=R.product_master,od=R.orders;
+ if(pm){const seen=new Set(),dup=[];pm.forEach(r=>{if(seen.has(r.sku))dup.push(r.sku);seen.add(r.sku)});if(dup.length)add('warn','product_master',`品番の重複 ${dup.length}件（最初の行を使う）`,dup.slice(0,3));info.lines=[...new Set(pm.map(r=>r.line))];if(info.lines.length<2)add('info','product_master',`ラインが ${info.lines.length} つ。「矢印の検証」はライン内の月々の動きだけで判定する（ライン間の比較・共通の動きの除去は使えない）`)}
+ if(pm&&od){const ms=new Set(pm.map(r=>r.sku));const orph=new Map();let neg=0,pbo=0;const keys=new Map();let dup=0;let dmin='9999',dmax='0000';
+  od.forEach(r=>{if(!ms.has(r.sku)){orph.set(r.sku,(orph.get(r.sku)||0)+1);return}if(!(r.qty>0)){neg++;return}if(r.promised_date<r.order_date)pbo++;const k=r.order_id+'\u0001'+r.sku;if(keys.has(k))dup++;keys.set(k,1);if(r.order_date<dmin)dmin=r.order_date;if(r.order_date>dmax)dmax=r.order_date});
+  if(orph.size){const n=[...orph.values()].reduce((a,c)=>a+c,0);add(n>od.length*.5?'error':'warn','orders',`製品マスタにない品番の注文行 ${n.toLocaleString()}行（${orph.size}品番，集計から除く）`,[...orph.keys()].slice(0,5))}
+  if(neg)add('warn','orders',`数量が0以下の注文行 ${neg}行（除く）`);if(pbo)add('warn','orders',`約束納期が受注日より前の注文行 ${pbo}行`);if(dup)add('warn','orders',`受注番号×品番の重複 ${dup}行（数量を合計して1行にする）`);
+  if(dmax>'0000'){const m0=dmin.slice(0,7),m1=dmax.slice(0,7);const nm=(+m1.slice(0,4)-+m0.slice(0,4))*12+(+m1.slice(5)-+m0.slice(5))+1;info.months=nm;info.from=m0;info.to=m1;
+   add(nm<3?'error':nm<12?'warn':'info','orders',`受注の期間 ${m0}〜${m1}（${nm}か月）${nm<12?'：12か月に満たないため，季節や年の比較は読みにくい':''}${nm<24?'。矢印の検証（ライン×月の相関）は24か月以上あると安定する':''}`);
+   const lm={};const skl=new Map(pm.map(r=>[r.sku,r.line]));od.forEach(r=>{const l=skl.get(r.sku);if(!l)return;(lm[l]=lm[l]||new Set()).add(r.order_date.slice(0,7))});const few=Object.entries(lm).filter(([l,s])=>s.size<12).map(([l,s])=>`${l}（${s.size}か月）`);if(few.length)add('warn','orders',`受注のある月が12か月に満たないライン：${few.join('，')}`);const nol=(info.lines||[]).filter(l=>!lm[l]);if(nol.length)add('info','orders',`受注のないライン：${nol.join('，')}`)}
+  const dl=R.deliveries;if(dl){let orl=0,bef=0,ng=0;const ex=[];dl.forEach(r=>{const k=r.order_id+'\u0001'+r.sku;if(!keys.has(k)){orl++;if(ex.length<3)ex.push(`${r._s} ${r._r}行目：${r.order_id} / ${r.sku}`)}if(r.delivered_qty<0)ng++});const odd=new Map();od.forEach(r=>odd.set(r.order_id+'\u0001'+r.sku,r.order_date));dl.forEach(r=>{const d=odd.get(r.order_id+'\u0001'+r.sku);if(d&&r.delivery_date<d)bef++});
+   if(orl)add('warn','deliveries',`受注にない納品（受注番号×品番が一致しない）${orl.toLocaleString()}行（除く）`,ex);if(bef)add('warn','deliveries',`受注日より前の納品 ${bef}行`);if(ng)add('warn','deliveries',`数量がマイナスの納品 ${ng}行（0として扱う）`)}
+  else if(!ST.maps.orders||!ST.maps.orders.delivered_date)add('warn','deliveries','納品の表がなく，受注表にも納品日の列がない：OTIF・初回充足率・欠品は出せない（受注数量などは見られる）')}
+ ['shipments','inventory','production','procurement'].forEach(tk=>{const r=R[tk];if(!r||!pm)return;if(tk==='procurement'){if(!r.some(x=>x.sku))add('info',tk,'「使う製品（品番）」の列がないため，部品の遅れは全ライン共通の系列として扱う');return}const ms=new Set(pm.map(x=>x.sku));const o=new Map();r.forEach(x=>{if(!ms.has(x.sku))o.set(x.sku,(o.get(x.sku)||0)+1)});if(o.size)add('warn',tk,`製品マスタにない品番 ${[...o.values()].reduce((a,c)=>a+c,0).toLocaleString()}行（除く）`,[...o.keys()].slice(0,5))});
+ if(R.equipment&&info.lines){const el=new Set(R.equipment.map(r=>r.line));const nin=[...el].filter(l=>!info.lines.includes(l));if(nin.length)add('warn','equipment',`製品マスタにないライン：${nin.slice(0,5).join('，')}（除く）`);const noeq=info.lines.filter(l=>!el.has(l));if(noeq.length)add('info','equipment',`設備の記録がないライン：${noeq.join('，')}（負荷率などは空欄）`)}
+ if(R.procurement){const nb=R.procurement.filter(r=>r.actual_arrival<r.order_date).length;if(nb)add('warn','procurement',`発注日より前の入荷 ${nb}行`)}
+ // 期間（表ごと）
+ const dateKey={orders:'order_date',deliveries:'delivery_date',shipments:'ship_date',inventory:'date',production:'date',equipment:'date',procurement:'order_date',demand:'period'};
+ Object.entries(dateKey).forEach(([tk,k])=>{const r=R[tk];if(!r||!r.length)return;let a='9999',b='0000';r.forEach(x=>{const v=x[k];if(v<a)a=v;if(v>b)b=v});stat[tk].from=a.slice(0,7);stat[tk].to=b.slice(0,7);if(info.from&&tk!=='orders'&&(b.slice(0,7)<info.from||a.slice(0,7)>info.to))add('warn',tk,`期間 ${stat[tk].from}〜${stat[tk].to} が受注の期間（${info.from}〜${info.to}）と重ならない`)});
+ TABLES.forEach(T=>{if(!R[T.k]&&!iss.some(i=>i.tk===T.k))add('info',T.k,`${T.t}：なし（関係する指標・タブ・矢印の変数は表示しない）`)});
+ const err=iss.filter(i=>i.lv==='error').length;ST.report={iss,stat,info,R:err?null:R,ms:performance.now()-t0};ST.dirty=false;return ST.report}
+function renderReport(){const rp=ST.report;const h=$('#iorep');if(!rp){h.innerHTML='';return}const ic={error:'<span class="lv e">要修正</span>',warn:'<span class="lv w">注意</span>',info:'<span class="lv i">情報</span>'};const ord={error:0,warn:1,info:2};
+ const err=rp.iss.filter(i=>i.lv==='error').length,wr=rp.iss.filter(i=>i.lv==='warn').length;
+ h.innerHTML=`<div class="ctitle"><span>検証の結果：${err?`<span class="err">要修正 ${err}件</span>（直すまで取り込めない）`:'取り込める'}，注意 ${wr}件</span></div>
+ ${tableHTML_(['','表','内容','例'],rp.iss.slice().sort((a,b)=>ord[a.lv]-ord[b.lv]).map(i=>[ic[i.lv],(TB[i.tk]||{t:i.tk}).t,esc(i.msg),esc(i.samples.join(' ／ '))]))}
+ <div class="tw" style="margin-top:8px"><table class="t"><tr><th class="l">表</th><th class="l">シート</th><th>行数</th><th>使える行</th><th>期間</th></tr>${TABLES.map(T=>{const s=rp.stat[T.k];return `<tr><td class="l">${T.t}</td><td class="l">${s?esc(s.src):'—'}</td><td>${s?s.rows.toLocaleString():'—'}</td><td>${s?s.used.toLocaleString():'—'}</td><td>${s&&s.from?s.from+'〜'+s.to:'—'}</td></tr>`}).join('')}</table></div><div class="note">検証 ${(rp.ms/1000).toFixed(1)}秒。</div>`}
+function tableHTML_(cols,rows){return `<div class="tw"><table class="t"><tr>${cols.map(c=>`<th class="l">${c}</th>`).join('')}</tr>${rows.map(r=>`<tr>${r.map(c=>`<td class="l" style="white-space:normal">${c}</td>`).join('')}</tr>`).join('')}</table></div>`}
+// ---------- 集計（オフラインの Python 集計を JS に移したもの。サンプルの DATA と同じ形を作る）
+function build(R,name){const t0=performance.now();
+ const pmR=R.product_master,seen=new Map();pmR.forEach(r=>{if(!seen.has(r.sku))seen.set(r.sku,r)});let SK=[...seen.values()];
+ const LINES=[...new Set(SK.map(r=>r.line))].sort(natural);
+ const mode=v=>{const s=String(v||'').toUpperCase();return /MTO|受注|BTO|ETO|個別/.test(s)?'MTO':'MTS'};
+ const SKI=new Map(SK.map((r,i)=>[r.sku,i]));
+ // 暦：受注の期間（受注日の最初の月〜最後の月）
+ const ORDS=R.orders.filter(r=>SKI.has(r.sku)&&r.qty>0);let a='9999',b='0000';ORDS.forEach(r=>{if(r.order_date<a)a=r.order_date;if(r.order_date>b)b=r.order_date});
+ const y0=+a.slice(0,4),m0=+a.slice(5,7)-1,y1=+b.slice(0,4),m1=+b.slice(5,7)-1;const MON=[];for(let y=y0,m=m0;y<y1||(y===y1&&m<=m1);){MON.push(`${y}-${String(m+1).padStart(2,'0')}`);if(++m>11){m=0;y++}}
+ const NM=MON.length,MI=new Map(MON.map((m,i)=>[m,i]));const D0=Date.UTC(y0,m0,1),DEND=Date.UTC(y1,m1+1,1);const NDAY=Math.round((DEND-D0)/864e5);
+ const dc_=new Map();const day=d=>{if(d==null)return null;let v=dc_.get(d);if(v===undefined){v=Math.round((Date.parse(d+'T00:00:00Z')-D0)/864e5);dc_.set(d,v)}return v};const mon=d=>d==null?-1:(MI.has(d.slice(0,7))?MI.get(d.slice(0,7)):-1);
+ const AV={dlv:0,cancel:0,ship:0,rank:0,dc:0,price:0,plt:1,shp:0,shp_dc:0,shp_x:0,shp_frt:0,prd:0,prd_plan:0,inv:0,inv_oo:0,inv_bo:0,inv_dc:0,cost:0,eq:0,eq_setup:0,eq_down:0,eq_defect:0,proc:0,proc_defect:0,sp:0,sp_fc:0,sp_plan:0,fin:0,bom:0};
+ const MO=ST.maps.orders||{};
+ // DC・顧客ランク
+ const DCset=new Set();const nz=v=>v!=null&&v!=='';ORDS.forEach(r=>nz(r.dc)&&DCset.add(r.dc));(R.shipments||[]).forEach(r=>nz(r.dc)&&DCset.add(r.dc));(R.inventory||[]).forEach(r=>nz(r.dc)&&DCset.add(r.dc));
+ let DCS=[...DCset].sort(natural);if(!DCS.length)DCS=['全体'];else AV.dc=1;const DCI=new Map(DCS.map((d,i)=>[d,i]));
+ const rk=[...new Set(ORDS.map(r=>r.rank).filter(nz))];const RO=['S','A','B','C','D','E'];rk.sort((x,y)=>{const i=RO.indexOf(String(x).toUpperCase()),j=RO.indexOf(String(y).toUpperCase());return i>=0&&j>=0?i-j:i>=0?-1:j>=0?1:natural(x,y)});
+ const RANKS=rk.length?rk:['—'];if(rk.length)AV.rank=1;const RI=new Map(RANKS.map((r,i)=>[r,i]));
+ // 注文行
+ const L=new Map();ORDS.forEach(r=>{const k=r.order_id+'\u0001'+r.sku;let o=L.get(k);const pr=r.unit_price!=null?r.qty*r.unit_price:r.amount!=null?r.amount:null;
+  if(!o){o={i:SKI.get(r.sku),od:day(r.order_date),m:mon(r.order_date),pd:day(r.promised_date),q:0,v:0,hv:false,rank:nz(r.rank)?RI.get(r.rank):0,dc:nz(r.dc)?DCI.get(r.dc):-1,cx:0,dels:null,shp:null};L.set(k,o)}
+  o.q+=r.qty;if(pr!=null){o.v+=pr;o.hv=true}if(r.cancel)o.cx=1;if(o.pd==null&&r.promised_date)o.pd=day(r.promised_date)});
+ // 単価がない行はマスタの販売単価
+ L.forEach(o=>{if(!o.hv&&SK[o.i].unit_price!=null){o.v=o.q*SK[o.i].unit_price;o.hv=true}if(o.hv)AV.price=1;if(o.cx)AV.cancel=1});
+ let asof=null;
+ if(R.deliveries){AV.dlv=1;R.deliveries.forEach(r=>{const o=L.get(r.order_id+'\u0001'+r.sku);if(!o)return;(o.dels=o.dels||[]).push([day(r.delivery_date),Math.max(0,r.delivered_qty),r.cancel?1:0]);if(r.cancel){o.cx=1;AV.cancel=1}if(!asof||r.delivery_date>asof)asof=r.delivery_date})}
+ else if(MO.delivered_date){AV.dlv=1;ORDS.forEach(r=>{if(!r.delivered_date)return;const o=L.get(r.order_id+'\u0001'+r.sku);(o.dels=o.dels||[]).push([day(r.delivered_date),r.delivered_qty!=null?Math.max(0,r.delivered_qty):r.qty,0]);if(!asof||r.delivered_date>asof)asof=r.delivered_date})}
+ if(R.orders.some(r=>r.cancel)||MO.cancel||(ST.maps.deliveries||{}).cancel)AV.cancel=1;
+ const ASOF=asof?day(asof):null;
+ if(R.shipments&&ST.maps.shipments&&ST.maps.shipments.order_id){R.shipments.forEach(r=>{if(!r.order_id)return;const o=L.get(r.order_id+'\u0001'+r.sku);if(!o)return;(o.shp=o.shp||[]).push([day(r.ship_date),r.qty,r.express?1:0]);if(o.dc<0&&nz(r.dc))o.dc=DCI.get(r.dc)});AV.ship=1}
+ // ORD：品番×受注月×ランク×DC
+ const OA=new Map();let open=0;
+ L.forEach(o=>{if(o.m<0)return;if(o.dc<0)o.dc=0;const key=o.i+'|'+o.m+'|'+o.rank+'|'+o.dc;let t=OA.get(key);if(!t){t=[o.i,o.m,o.rank,o.dc,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];OA.set(key,t)}
+  t[4]++;t[5]+=o.q;t[6]+=o.v/1e4;const D=o.dels||[];D.sort((x,y)=>x[0]-y[0]);const tot=D.reduce((s,d)=>s+d[1],0);
+  if(o.cx){t[10]++;t[11]+=Math.max(0,o.q-tot)}
+  else if(AV.dlv&&o.pd!=null){const undecided=ASOF!=null&&o.pd>ASOF&&tot<o.q;if(undecided)open++;else{t[7]++;let s=0;D.forEach(d=>{if(d[0]<=o.pd)s+=d[1]});const ot=s>=o.q;if(ot)t[8]++;let fq=0;if(D.length){const fd=D[0][0];D.forEach(d=>{if(d[0]===fd)fq+=d[1]});if(fd<=o.pd&&fq>=o.q)t[9]++}t[12]+=Math.max(0,o.q-s);
+    if(!ot){const split=D.length>1||(D.length&&fq<o.q)||(o.shp&&o.shp.length>1)||tot<o.q;if(split)t[13]++;else t[14]++}
+    if(o.shp&&o.shp.some(x=>x[2]))t[18]++}}
+  if(o.shp&&o.shp.length&&D.length){const fs=Math.min(...o.shp.map(x=>x[0])),fd=D[0][0];t[15]+=Math.max(0,fs-o.od);t[16]+=Math.max(0,fd-fs);t[17]++}
+  if(o.pd!=null)t[19]+=o.pd-o.od});
+ const ORD=[...OA.values()].map(r=>r.map((v,j)=>j===6?Math.round(v*1000)/1000:v));
+ // 製品マスタ（ABC区分がなければ受注金額の累積構成比）
+ const hasABC=SK.some(r=>nz(r.abc_class));const val=new Float64Array(SK.length);ORD.forEach(r=>val[r[0]]+=AV.price?r[6]:r[5]);let abc=null;
+ if(!hasABC){const ord=[...SK.keys()].sort((x,y)=>val[y]-val[x]);const T=val.reduce((s,v)=>s+v,0)||1;let c=0;abc=new Array(SK.length);ord.forEach(i=>{const pre=c/T;c+=val[i];abc[i]=pre<0.8?'A':pre<0.95?'B':'C'})}
+ if(SK.some(r=>r.unit_cost!=null))AV.cost=1;
+ const SKUc=['sku','product_group','make_mode','unit_price','unit_cost','plant','line','production_lt_days','abc_class'];
+ const SKUr=SK.map((r,i)=>[r.sku,nz(r.product_group)?r.product_group:'（製品群なし）',mode(r.make_mode),r.unit_price,r.unit_cost,r.plant||'',r.line,r.production_lt_days,hasABC?(nz(r.abc_class)?String(r.abc_class).toUpperCase():'—'):abc[i]]);
+ const isMTS=SKUr.map(r=>r[2]==='MTS');const anyMTS=isMTS.some(Boolean);
+ // SHP：品番×出荷月×DC×特急
+ const SA=new Map();let shpOut=0;
+ if(R.shipments){AV.shp=1;const MS=ST.maps.shipments||{};AV.shp_x=MS.express?1:0;AV.shp_frt=MS.freight?1:0;AV.shp_dc=MS.dc||MS.order_id&&MO.dc?1:0;
+  R.shipments.forEach(r=>{const i=SKI.get(r.sku);if(i==null)return;const m=mon(r.ship_date);if(m<0){shpOut++;return}let dc=nz(r.dc)?DCI.get(r.dc):-1;if(dc<0&&r.order_id){const o=L.get(r.order_id+'\u0001'+r.sku);if(o)dc=o.dc}if(dc<0)dc=0;const x=r.express?1:0;const key=i+'|'+m+'|'+dc+'|'+x;let t=SA.get(key);if(!t){t=[i,m,dc,x,0,0,0];SA.set(key,t)}t[4]++;t[5]+=r.qty;t[6]+=(r.freight||0)/1e4})}
+ const SHP=[...SA.values()].map(r=>{r[6]=Math.round(r[6]*1e4)/1e4;return r});
+ // PRD：品番×月
+ const PA=new Map();if(R.production){AV.prd=1;AV.prd_plan=ST.maps.production.plan_qty?1:0;R.production.forEach(r=>{const i=SKI.get(r.sku);if(i==null)return;const m=mon(r.date);if(m<0)return;const k=i+'|'+m;let t=PA.get(k);if(!t){t=[i,m,0,0];PA.set(k,t)}t[2]+=r.plan_qty||0;t[3]+=r.actual_qty})}
+ const PRD=[...PA.values()];
+ // INV：品番×DC×月の平均（その月の記録日の平均），INVD：ライン×日（見込生産品の合計，記録のない日は直前の値）
+ const INV=[],INVD={};if(R.inventory){AV.inv=1;const MI_=ST.maps.inventory;AV.inv_oo=MI_.on_order?1:0;AV.inv_bo=MI_.backorder?1:0;AV.inv_dc=MI_.dc?1:0;
+  const snap=new Map();R.inventory.forEach(r=>{const i=SKI.get(r.sku);if(i==null)return;const d=day(r.date);if(d<0||d>=NDAY)return;const dc=nz(r.dc)?DCI.get(r.dc):0;const k=i+'|'+dc+'|'+d;let t=snap.get(k);if(!t){t=[i,dc,d,0,0,0];snap.set(k,t)}t[3]+=r.on_hand;t[4]+=r.on_order||0;t[5]+=r.backorder||0});
+  const MA=new Map(),dsum={};LINES.forEach(l=>dsum[l]=new Array(NDAY).fill(null));const useAll=!anyMTS;
+  snap.forEach(t=>{const m=mon(new Date(D0+t[2]*864e5).toISOString().slice(0,10));const k=t[0]+'|'+t[1]+'|'+m;let a=MA.get(k);if(!a){a=[t[0],t[1],m,0,0,0,0];MA.set(k,a)}a[3]+=t[3];a[4]+=t[4];a[5]+=t[5];a[6]++;
+   if(useAll||isMTS[t[0]]){const l=SK[t[0]].line;const ds=dsum[l];const v=ds[t[2]]||(ds[t[2]]=[0,0,0,0]);v[0]+=t[3];v[1]+=t[4];v[2]+=t[5];v[3]+=t[3]*(SK[t[0]].unit_cost||0)/1e4}});
+  MA.forEach(a=>{const n=a[6];INV.push([a[0],a[1],a[2],a[3]/n,a[4]/n,a[5]/n].map((v,j)=>j<3?v:Math.round(v*100)/100))});
+  LINES.forEach(l=>{const ds=dsum[l];let last=null;let any=false;for(let d=0;d<NDAY;d++){if(ds[d]){last=ds[d];any=true;ds[d]=ds[d].map(v=>Math.round(v*100)/100)}else if(last)ds[d]=last.map(v=>Math.round(v*100)/100)}if(any)INVD[l]=ds})}
+ // EQ：ライン×日 [計画, 停止, 段取り, 稼働, 生産数量, 不良]
+ const EQ={},PLANT={};LINES.forEach(l=>{const p=SK.find(r=>r.line===l&&r.plant);PLANT[l]=p?p.plant:''});
+ if(R.equipment){AV.eq=1;const ME=ST.maps.equipment;AV.eq_setup=ME.setup_hours?1:0;AV.eq_down=ME.downtime_hours?1:0;AV.eq_defect=ME.defect_qty?1:0;
+  LINES.forEach(l=>EQ[l]=Array.from({length:NDAY},()=>[0,0,0,0,0,0]));R.equipment.forEach(r=>{const E=EQ[r.line];if(!E)return;const d=day(r.date);if(d<0||d>=NDAY)return;const e=E[d];const su=r.setup_hours||0,dn=r.downtime_hours||0;e[0]+=r.planned_hours!=null?r.planned_hours:r.run_hours+su+dn;e[1]+=dn;e[2]+=su;e[3]+=r.run_hours;e[4]+=r.output_qty;e[5]+=r.defect_qty||0});
+  LINES.forEach(l=>{EQ[l]=EQ[l].map(e=>e.map(v=>Math.round(v*1000)/1000))})}
+ // PROC・SUP・PS・BOM
+ const PROC=[],supS=new Map(),psM=new Map(),bom=new Map();
+ if(R.procurement){const MPc=ST.maps.procurement;AV.proc_defect=MPc.defect_qty?1:0;R.procurement.forEach(r=>{const od=day(r.order_date);if(od<0||od>=NDAY)return;const pa=day(r.promised_arrival),aa=day(r.actual_arrival);PROC.push([r.supplier_id,r.part_id,od,pa-od,aa-od,r.qty||0,r.unit_price||0,r.defect_qty||0]);
+   const s=supS.get(r.supplier_id)||{n:0,lt:0,lt2:0,q:0,d:0};s.n++;s.lt+=pa-od;s.lt2+=(pa-od)**2;s.q+=r.qty||0;s.d+=r.defect_qty||0;supS.set(r.supplier_id,s);
+   const k=r.part_id+'\u0001'+r.supplier_id;const p=psM.get(k)||{part:r.part_id,sup:r.supplier_id,pr:0,n:0};if(r.unit_price!=null){p.pr+=r.unit_price;p.n++}psM.set(k,p);
+   if(r.sku&&SKI.has(r.sku))bom.set(r.sku+'\u0001'+r.part_id,[r.sku,r.part_id,1])});
+  if(PROC.length)AV.proc=1;if(bom.size)AV.bom=1}
+ const partN=new Map();psM.forEach(p=>partN.set(p.part,(partN.get(p.part)||0)+1));
+ const SUPr=[...supS.entries()].sort((x,y)=>natural(x[0],y[0])).map(([k,s])=>{const m=s.lt/s.n;return [k,'',Math.round(m*10)/10,Math.round(Math.sqrt(Math.max(0,s.lt2/s.n-m*m))*10)/10,s.q?s.d/s.q:null,null]});
+ const PSr=[...psM.values()].map(p=>[p.part,p.sup,p.n?Math.round(p.pr/p.n*100)/100:null,'',partN.get(p.part)===1]);
+ // SP：月×製品群
+ let SPr=[];if(R.demand){const MD=ST.maps.demand;AV.sp=1;AV.sp_fc=MD.forecast?1:0;AV.sp_plan=MD.sales_plan||MD.production_plan?1:0;const pgOf=new Map(SK.map(r=>[r.sku,nz(r.product_group)?r.product_group:'（製品群なし）']));const pgs=new Set(SKUr.map(r=>r[1]));
+  const acc=new Map();const PGu=new Set();R.demand.forEach(r=>{const m=MI.get(r.period);if(m==null)return;const pg=pgOf.get(r.key)||(pgs.has(r.key)?r.key:r.key);PGu.add(pg);const k=m+'|'+pg;const t=acc.get(k)||[0,0,0,0,0];t[0]+=r.forecast||0;t[1]+=r.sales_plan||0;t[2]+=r.production_plan||0;t[3]+=r.actual;if(r.forecast!=null)t[4]++;acc.set(k,t)});
+  const PGl=[...PGu].sort(natural);MON.forEach((mo,m)=>PGl.forEach(pg=>{const t=acc.get(m+'|'+pg)||[0,0,0,0,0];SPr.push([mo,pg,AV.sp_fc&&t[4]?t[0]:null,t[1],t[2],t[3]])}));if(!SPr.length)AV.sp=0}
+ const T=(tk)=>{const T_=TB[tk],s=ST.report&&ST.report.stat[tk];return {key:tk,label:T_.t,desc:T_.desc,src:s?s.src:null,rows:s?s.rows:null,used:s?s.used:null,from:s?s.from:null,to:s?s.to:null,map:ST.maps[tk]&&s?Object.assign({},ST.maps[tk]):null,units:Object.assign({},ST.units[tk]||{}),fields:T_.f.map(x=>({key:x.key,label:x.label,desc:x.desc,req:!!x.req,unit:!!x.unit,base:x.unit?x.unit.base:''}))}};
+ const META={name,created:new Date().toISOString(),tables:TABLES.map(t=>T(t.k)),abcComputed:!hasABC,open,asof,shpOut,ms:0};
+ const DATA={SKU:{cols:SKUc,rows:SKUr},CUST:{cols:[],rows:[]},SUP:{cols:['supplier_id','country','lead_time_mean_days','lead_time_sd_days','defect_rate','price_index'],rows:SUPr},PS:{cols:['part_id','supplier_id','unit_price','moq','single_source'],rows:PSr},BOM:{cols:['sku','part_id','qty_per_unit'],rows:[...bom.values()]},
+  SP:{cols:['month','product_group','forecast_qty','sales_plan_qty','production_plan_qty','actual_qty'],rows:SPr},FIN:{cols:[],rows:[]},ORD,SHP,PRD,INV,INVD,EQ,PLANT,LINES,DCS,RANKS,PROC,NDAY,MON,D0:MON[0]+'-01',AVAIL:AV,META};
+ META.ms=performance.now()-t0;return DATA}
+// ---------- 反映
+function applyData(DATA,name,evi){APP.name=name||'自社データ';APP.evi=evi&&DATA.MON&&DATA.MON.includes(evi)?evi:null;BOOT(DATA,'user');showTab('ov');renderCur();toast(`読み込んだデータで表示している：${APP.name}`)}
+function doApply(){ST.name=($('#ioname').value||'').trim()||ST.name||'自社データ';if(ST.dirty||!ST.report)validate();renderReport();const rp=ST.report;if(!rp.R){$('#iorep').scrollIntoView({behavior:'smooth'});toast('要修正の項目があるため取り込めない');return}
+ const st=$('#iostat');st.textContent='集計中…';setTimeout(()=>{try{const D=build(rp.R,ST.name);st.textContent=`集計 ${(D.META.ms/1000).toFixed(1)}秒（注文行 ${D.ORD.reduce((a,r)=>a+r[4],0).toLocaleString()}）`;APP.lastBuild=D;applyData(D,ST.name,($('#ioevi')||{}).value)}catch(e){console.error(e);st.innerHTML=`<span class="err">集計できなかった：${esc(e.message)}</span>`}},30)}
+// ---------- 対応づけ（データは含まない）の保存・読み込み
+function mappingJson(){const tables={};TABLES.forEach(T=>{const sh=ST.sheets.filter(s=>ST.assign[s.id]===T.k);if(!sh.length)return;tables[T.k]={sheets:sh.map(s=>s.name),files:sh.map(s=>s.file),map:ST.maps[T.k]||{},units:ST.units[T.k]||{}}});return {scmDataBrowser:'mapping',v:1,created:new Date().toISOString(),name:ST.name||'',evi:APP.mode==='user'?APP.evi:null,note:'データブラウザの列の対応づけ（データそのものは含まない）',tables}}
+function applyMapping(mj,silent){let hit=0;Object.entries(mj.tables||{}).forEach(([tk,t])=>{if(!TB[tk])return;ST.sheets.forEach(s=>{if((t.sheets||[]).includes(s.name)||(t.files||[]).includes(s.file)){ST.assign[s.id]=tk;hit++}});if(ST.sheets.some(s=>ST.assign[s.id]===tk)){const cols=columnsFor(tk);const m={};Object.entries(t.map||{}).forEach(([k,c])=>{if(cols.includes(c))m[k]=c});const g=SCMIO.guessMapping(cols,TB[tk].f);ST.maps[tk]=Object.assign(g,m);ST.units[tk]=Object.assign({},t.units||{})}});
+ if(mj.name&&!ST.name)ST.name=mj.name;if(mj.evi&&$('#ioevi'))$('#ioevi').value=mj.evi;ST.pendingMap=ST.sheets.length?null:mj;ST.dirty=true;if(!silent)toast(ST.sheets.length?`対応づけを当てはめた（${hit}シート）`:'対応づけを読み込んだ。続けてデータのファイルを選ぶと当てはめる');render()}
+// ---------- テンプレート
+function template(){const sheets=TABLES.map(T=>({name:T.t,rows:[T.f.map(fl=>fl.label),...[0,1,2].map(i=>T.f.map(fl=>fl.ex?fl.ex[i]:''))]}));
+ const ex=[['表（シート名）','列（見出し）','必須／任意','意味','単位・書式']];TABLES.forEach(T=>{ex.push([T.t+(T.need?'（必須の表）':'（任意の表）'),'','',T.desc,'']);T.f.forEach(fl=>ex.push(['',fl.label,fl.req?'必須':'任意',fl.desc||'',fl.unit?Object.keys(fl.unit.opts).join('／')+'（読み込むときに選ぶ）':fl.type==='date'?'日付（2024-04-01 など）':fl.type==='period'?'年月（2024-04 など）':fl.type==='flag'?'1／0，TRUE／FALSE，「取消」「特急」など':fl.type==='num'?'数値':'文字']))});
+ ex.push(['','','','',''],['使い方','','','1つのブックに表ごとのシートを作るか，表ごとに別のファイルにする。見出しの名前は自社のままでよい（読み込むときに対応づける）。最低限：製品マスタ＋受注（＋納品，または受注表の納品日）。期間は24か月以上あると「矢印の検証」が安定する。','']);
+ SCMIO.download(SCMIO.writeXlsx([{name:'説明',rows:ex},...sheets]),FN('データブラウザ-取り込みテンプレート','xlsx'))}
+// ---------- 集計済みデータ（生データは含まない）
+function saveAgg(){if(APP.mode!=='user'){toast('自社データを読み込んだあとに保存できる');return}const o={scmDataBrowser:'aggregate',v:1,created:new Date().toISOString(),name:APP.name,evi:APP.evi,note:'データブラウザの集計済みデータ（品番×月などに集計した値。元の明細は含まない）。社外に出すときは社内の規程に従うこと',DATA:APP.data};SCMIO.download(JSON.stringify(o),FN('データブラウザ-集計済み-'+APP.name,'json'),'application/json')}
+async function openJson(file){const txt=await file.text();const env=SCMIO.envelopeFromText(txt);if(env){window.SCMDB_onEnvelope&&window.SCMDB_onEnvelope(env);return}
+ let o;try{o=JSON.parse(txt)}catch(e){toast('JSON として読めない');return}
+ if(o.scmDataBrowser==='aggregate'&&o.DATA&&o.DATA.ORD){applyData(o.DATA,o.name,o.evi);return}
+ if(o.scmDataBrowser==='mapping'){applyMapping(o);return}toast('データブラウザの対応づけ・集計済みデータ・.scm.json のどれでもない')}
+function renderCur(){const h=$('#iocur');if(!h)return;const u=APP.mode==='user';
+ h.innerHTML=`<div class="ctitle"><span>いま表示しているデータ：${u?esc(APP.name)+'（自社データ）':'サンプル（株式会社ブルーマウンテン）'}</span></div>${u?`<div class="note">期間 ${APP.MON[0]}〜${APP.MON[APP.MON.length-1]}　ライン ${APP.data.LINES.length}　SKU ${APP.data.SKU.rows.length}。元の明細はこのページを閉じると消える（保存されない）。</div>`:''}
+ <div class="ctl" style="margin-top:6px"><button class="btn" id="iosaveagg" ${u?'':'disabled'}>集計済みデータを保存</button><button class="btn" id="iometa" ${u?'':'disabled'} title="変数の名前・単位の一覧だけを送る（データは含まない）">ワークベンチに変数一覧を送る</button><button class="btn" id="iosample" ${u?'':'disabled'}>サンプルデータに戻す</button></div>`;
+ $('#iosaveagg').onclick=saveAgg;$('#iosample').onclick=()=>{APP.name='株式会社ブルーマウンテン（サンプル）';APP.evi='2024-04';BOOT(DATA,'sample');showTab('ov');renderCur();toast('サンプルデータに戻した')};
+ $('#iometa').onclick=()=>{const pl=APP.datasetMeta();SCMIO.sendTo('workbench',SCMIO.envelope('dataset-meta','data',pl,APP.name),{done:r=>toast(r==='delivered'?'ワークベンチに変数一覧を送った':'ワークベンチに直接届かなかったため .scm.json を保存した（ワークベンチの「開く」で読み込む）')})}}
+// ---------- タブ
+function init(){const nav=$('#nav');const b=document.createElement('button');b.dataset.t='io';b.className='ionavbtn';b.textContent='データ読込';nav.appendChild(b);
+ const sec=document.createElement('section');sec.id='io';$('main').appendChild(sec);
+ sec.innerHTML=`<h2>データ読込：自社の業務データ（Excel）で同じ分析をする</h2>
+ <div class="see"><b>データはこのブラウザの中だけで処理し，どこにも送らない</b>（インターネットにつながっていなくても動く）。ERP などから書き出した Excel（.xlsx）や CSV を読み込み，サンプルと同じ形（品番×月）に集計して，概要・エクスプローラ・矢印の検証・設備・部品・SKU の各タブで見る。<br>最低限：<b>製品マスタ</b>（品番・ライン）＋<b>受注</b>（受注番号・受注日・品番・数量・約束納期）＋<b>納品</b>（または受注表の納品日）。出荷・在庫・生産・設備・部品調達・需要予測の表があれば，その分の指標・タブが増える。見出しの名前は自社のままでよい。</div>
+ <div class="card"><div class="ctitle"><span>1. ファイルを選ぶ（複数可）</span></div>
+  <div id="iodrop" class="iodrop"><input type="file" id="iofile" multiple accept=".xlsx,.xlsm,.csv,.tsv,.txt,.json"><div>ここに .xlsx／.csv をドロップするか，上で選ぶ（.xls は Excel で .xlsx に保存し直す）</div></div>
+  <div class="ctl" style="margin-top:8px"><button class="btn" id="iotpl">テンプレート（Excel）を保存</button><label class="btn" style="display:inline-block">対応づけ・集計済みデータを開く<input type="file" id="iojson" accept=".json" style="display:none"></label><button class="btn" id="ioclear">読み込んだファイルを外す</button><span class="note" id="iostat"></span></div></div>
+ <div class="card" id="iosheets"></div><div id="iomap"></div>
+ <div class="card"><div class="ctitle"><span>4. 検証して取り込む</span></div><div class="ctl"><label>データの名前</label><input type="search" id="ioname" placeholder="例：A工場 2024-2025" style="min-width:220px"><label title="対策を始めた月。グラフに縦線を引き，「R3 介入の前後比較」で前後を比べる">介入日（任意）</label><input type="month" id="ioevi"><button class="btn" id="iovalid">検証する</button><button class="btn solid" id="ioapply">取り込む</button><button class="btn" id="iosavemap" title="どのシートのどの列を使ったか（データは含まない）を JSON に保存。翌月の読み込みで「開く」と同じ対応づけになる">対応づけを保存</button></div><div id="iorep"></div></div>
+ <div class="card" id="iocur"></div>`;
+ const fi=$('#iofile');fi.onchange=()=>{addFiles([...fi.files]);fi.value=''};
+ const dz=$('#iodrop');dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('on')});dz.addEventListener('dragleave',()=>dz.classList.remove('on'));dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('on');addFiles([...e.dataTransfer.files])});
+ $('#iotpl').onclick=template;const jf=$('#iojson');jf.onchange=()=>{if(jf.files[0])openJson(jf.files[0]);jf.value=''};
+ $('#ioclear').onclick=()=>{ST.sheets=[];ST.assign={};ST.maps={};ST.units={};ST.report=null;ST.dirty=true;render()};
+ $('#iovalid').onclick=()=>{ST.name=($('#ioname').value||'').trim()||ST.name;$('#iostat').textContent='検証中…';setTimeout(()=>{validate();renderReport();$('#iostat').textContent=''},20)};
+ $('#ioapply').onclick=doApply;$('#iosavemap').onclick=()=>{const mj=mappingJson();SCMIO.download(JSON.stringify(mj,null,1),FN('データブラウザ-対応づけ-'+(ST.name||'自社データ'),'json'),'application/json')};
+ $('#ioname').oninput=e=>{ST.name=e.target.value};
+ render();renderCur();
+ APP.RENDER_io=()=>renderCur();}
+init();
+// ヘッダの「介入日」
+const ev=document.getElementById('evi');if(ev)ev.onchange=()=>{const cur=(document.querySelector('nav button.on')||{dataset:{}}).dataset.t||'ov';APP.evi=ev.value||null;BOOT(APP.data,APP.mode);showTab(cur==='io'?'ov':cur);if(cur==='io')showTab('io')};
+window.SCMDB_IMPORT={ST,TABLES,validate,build,applyMapping,mappingJson,template};
+})();
+</script><script>
+// ===== ほかのツールから届いた矢印を「矢印の検証」に並べる（URL の #cv= と，SCMIO の封筒 kind:'arrows'）=====
+(function(){
+ function parseCv(raw){// 「原因>結果:+」を | でつなぐ。名前に > や : があっても，変数名として読める切れ目を探す
+  return raw.split('|').filter(Boolean).map(s=>{const m=s.match(/^(.*):\s*([+\-−?])\s*$/);const body=m?m[1]:s,p=m?(m[2]==='−'?'-':m[2]):'+';const cut=[];for(let i=body.indexOf('>');i>=0;i=body.indexOf('>',i+1))cut.push(i);
+   for(const i of cut){const x=body.slice(0,i).trim(),y=body.slice(i+1).trim();if(APP.cvKey&&APP.cvKey(x)&&APP.cvKey(y))return [x,y,p]}const i=cut[0];return i==null?null:[body.slice(0,i).trim(),body.slice(i+1).trim(),p]}).filter(Boolean)}
+ function place(arr,title,replace,from){if(!arr.length)return;showTab('cv');const go=(n)=>{if(!APP.cvApi){if(n<40)setTimeout(()=>go(n+1),100);return}const r=APP.cvApi.add(arr,title,replace,from);const g=document.getElementById('rxguide');if(g)g.style.display='none';window.scrollTo(0,0);if(r&&!r.added)toast('このデータにある変数と一致する矢印がなかった')};go(0)}
+ function fromHash(){const h=location.hash||'';if(!/[#&]cv=/.test(h))return;const q=new URLSearchParams(h.slice(1));place(parseCv(q.get('cv')||''),q.get('t')||'',true,'ワークベンチの経路から開いた')}
+ // 封筒：kind 'arrows'（ワークベンチ → データブラウザ：検証の依頼）
+ window.SCMDB_onEnvelope=env=>{if(!env)return;if(env.kind==='arrows'){const P=env.payload||{};const list=(P.arrows||[]).map(a=>[a.c,a.e,a.p==='-'?'-':'+']).filter(a=>a[0]&&a[1]);
+   if(!list.length){toast('届いた矢印が空だった');return}
+   const rep=confirm(`${SCMIO.TOOL_LABEL[env.from]||env.from||'ほかのツール'}から矢印 ${list.length} 本が届いた（${P.title||env.title||''}）。\nOK：いまの候補と入れ替えて検証する／キャンセル：いまの候補に追加する`);
+   place(list,P.title||env.title||'',rep,(SCMIO.TOOL_LABEL[env.from]||'ほかのツール')+'から届いた矢印');return}
+  toast(`この封筒（${env.kind}）はデータブラウザでは使わない`)};
+ APP.cvKey=n=>{try{return APP.cvKeyFn?APP.cvKeyFn(n):null}catch(e){return null}};
+ const start=()=>{fromHash();try{SCMIO.receive('data',env=>window.SCMDB_onEnvelope(env))}catch(e){}};
+ if(document.readyState==='complete')setTimeout(start,50);else window.addEventListener('load',()=>setTimeout(start,50));
+ window.addEventListener('hashchange',fromHash);
 })();
 </script></body></html>

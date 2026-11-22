@@ -4593,12 +4593,15 @@ async function onEnvelope(env,nm){const p=env.payload||{},src=nm||T('envFrom')(e
 // データブラウザの「矢印の検証」の結果：いまの CLD に照合して足す（置き換えない）
 function mergeVerdicts(p,src){const c=W('cld');const cur=c.edges();const dbn=n=>{try{return c.dbName(n)||n;}catch(e){return n;}};
   const find=a=>cur.find(x=>x.c===a.c&&x.e===a.e)||cur.find(x=>dbn(x.c)===dbn(a.c)&&dbn(x.e)===dbn(a.e));
+  // データブラウザの変数名 → いまの CLD の変数名（別名表で同じものがあればそちら）
+  const names=[...new Set(cur.flatMap(x=>[x.c,x.e]))];const back=n=>{n=String(n).trim();return names.includes(n)?n:(names.find(x=>dbn(x)===dbn(n))||n);};
   const add=[],notes=[];let hit=0,un=0;const neg=v=>/しない|されない|不支持|否定|反対|なし|弱い|not|no\b|reject|×/i.test(String(v||''));
   p.arrows.forEach(a=>{if(!a||!a.c||!a.e)return;const pp=NORMP(a.p);const ex=find({c:String(a.c).trim(),e:String(a.e).trim()});const v=String(a.verdict||'').trim();
     const info=[v,a.r!=null&&isFinite(+a.r)?'r='+(+a.r).toFixed(2):'',a.lag!=null&&a.lag!==''?(J()?'遅れ ':'lag ')+a.lag:''].filter(Boolean).join(' ');
     if(ex){hit++;notes.push({k:ex.c+'→'+ex.e,t:`# データ：${ex.c} → ${ex.e}（${pp==='-'?'−':pp}）${info||'—'}`});return;}
     if(neg(v)){un++;notes.push({k:a.c+'→'+a.e,t:`# データ：${a.c} → ${a.e}（${pp==='-'?'−':pp}）${info}（CLDにない。足さなかった）`});return;}
-    add.push({c:String(a.c).trim(),e:String(a.e).trim(),p:pp==='x'?'?':pp,d:!!a.d,dep:['データ']});notes.push({k:a.c+'→'+a.e,t:`# データ：${a.c} → ${a.e}（${pp==='-'?'−':pp}）${info}（データから足した）`});});
+    const c0=back(a.c),e0=back(a.e);if(c0===e0)return;if(add.some(x=>x.c===c0&&x.e===e0))return;
+    add.push({c:c0,e:e0,p:pp==='x'?'?':pp,d:!!a.d,dep:['データ']});notes.push({k:c0+'→'+e0,t:`# データ：${c0} → ${e0}（${pp==='-'?'−':pp}）${info}（データから足した${c0!==a.c||e0!==a.e?`：${a.c} → ${a.e}`:''}）`});});
   const keep=c.comments().filter(l=>{const m=l.match(/^# データ：(.+?) → (.+?)（/);return !(m&&notes.some(n=>n.k===m[1]+'→'+m[2]));});
   if(p.title)keep.push(`# データで確かめた：${p.title}（${new Date().toLocaleDateString(J()?'ja-JP':'en-US')}）`);
   c.setEdges(add,{},{append:true,comments:keep.concat(notes.map(n=>n.t)),commentsAll:true});setTab('loop');
