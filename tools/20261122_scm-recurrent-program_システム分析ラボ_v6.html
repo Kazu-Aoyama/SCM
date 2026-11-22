@@ -869,20 +869,30 @@ const std=a=>{const v=a.filter(x=>x!=null&&isFinite(x));if(v.length<2)return 0;c
 const mean=a=>{const v=a.filter(x=>x!=null&&isFinite(x));return v.length?v.reduce((p,c)=>p+c,0)/v.length:0;};
 // ---- 折れ線グラフ（SVG文字列）
 const PAL=['#0F7C8C','#C8553D','#7B3FA0','#B7791F','#2E8B57','#1F6FB2','#5F6E76','#D4A017'];
-function lineChart(o){const W=o.w||640,H=o.h||260,l=58,r=12,t=o.title?26:12,b=o.xl?40:28;const S=o.series.filter(s=>s.data&&s.data.length);let mn=o.ymin,mx=o.ymax;
-  const all=S.flatMap(s=>s.data.filter(v=>v!=null&&isFinite(v)));if(mn==null)mn=Math.min(0,...all);if(mx==null)mx=Math.max(...all,1e-9);if(mx===mn)mx=mn+1;const pad=(mx-mn)*.05;if(o.ymax==null)mx+=pad;
-  const n=Math.max(...S.map(s=>s.x?s.x[s.x.length-1]:s.data.length-1),1);const X=x=>l+(W-l-r)*x/n,Y=v=>t+(H-t-b)*(1-(v-mn)/(mx-mn));
-  let g=o.title?`<text x="${l}" y="16" font-size="13" font-weight="bold" fill="#1B3A4B">${esc(o.title)}</text>`:'';
+const LC={};let LCN=0;
+function lineChart(o){const W=o.w||640,H=o.h||260;const ym=String(o.title||'').match(/（([^（）]+)）\s*$/);const yl=o.yl!==undefined?o.yl:(ym?ym[1].split('，')[0]:'');
+  const l=yl?72:58,r=12,t=o.title?26:12,b=o.xl?40:28;const S=o.series.filter(s=>s.data&&s.data.length);let mn=o.ymin,mx=o.ymax;
+  const fin=v=>v!=null&&isFinite(v);const all=[];S.forEach(s=>{s.data.forEach(v=>{if(fin(v))all.push(v);});if(s.band)s.band.forEach(a=>a.forEach(v=>{if(fin(v))all.push(v);}));});
+  let lo=Infinity,hi=-Infinity;all.forEach(v=>{if(v<lo)lo=v;if(v>hi)hi=v;});if(!all.length){lo=0;hi=1;}
+  if(!fin(mn))mn=Math.min(0,lo);if(!fin(mx))mx=Math.max(hi,1e-9);if(!(mx>mn))mx=mn+1;const pad=(mx-mn)*.05;if(!fin(o.ymax))mx+=pad;
+  const xs=S.map(s=>s.x?s.x[s.x.length-1]:s.data.length-1).filter(fin);const n=Math.max(...xs,1);const X=x=>l+(W-l-r)*x/n,Y=v=>t+(H-t-b)*(1-(v-mn)/(mx-mn));
+  const id='lc'+(++LCN);let g=o.title?`<text x="${l}" y="16" font-size="13" font-weight="bold" fill="#1B3A4B">${esc(o.title)}</text>`:'';
   for(let k=0;k<=4;k++){const v=mn+(mx-mn)*k/4;g+=`<line x1="${l}" x2="${W-r}" y1="${Y(v)}" y2="${Y(v)}" stroke="#E3E9EC"/><text x="${l-5}" y="${Y(v)+4}" text-anchor="end" font-size="10.5" fill="#5F6E76">${fmt(v)}</text>`;}
+  if(yl)g+=`<text transform="rotate(-90)" x="${-(t+(H-t-b)/2)}" y="13" text-anchor="middle" font-size="11" fill="#5F6E76">${esc(yl)}</text>`;
   (o.xt||[]).forEach(([x,lab])=>g+=`<line x1="${X(x)}" x2="${X(x)}" y1="${t}" y2="${H-b}" stroke="#F1F4F5"/><text x="${X(x)}" y="${H-b+14}" text-anchor="middle" font-size="10.5" fill="#5F6E76">${esc(lab)}</text>`);
   (o.marks||[]).forEach(([x,lab])=>g+=`<line x1="${X(x)}" x2="${X(x)}" y1="${t}" y2="${H-b}" stroke="#B7791F" stroke-dasharray="4 3"/><text x="${X(x)+3}" y="${t+10}" font-size="10" fill="#B7791F">${esc(lab)}</text>`);
   if(o.xl)g+=`<text x="${(l+W-r)/2}" y="${H-4}" text-anchor="middle" font-size="11" fill="#5F6E76">${esc(o.xl)}</text>`;
-  S.forEach((s,i)=>{let p='';s.data.forEach((v,j)=>{if(v==null||!isFinite(v))return;const x=s.x?s.x[j]:j;p+=(p?'L':'M')+X(x).toFixed(1)+','+Y(v).toFixed(1);});const c=s.color||PAL[i%PAL.length];
-    if(s.step){p='';s.data.forEach((v,j)=>{const x0=s.x[j],x1=s.x[j+1]!=null?s.x[j+1]:x0+(s.x[1]-s.x[0]);p+=(p?'L':'M')+X(x0).toFixed(1)+','+Y(v).toFixed(1)+'L'+X(x1).toFixed(1)+','+Y(v).toFixed(1);});}
-    g+=`<path d="${p}" fill="none" stroke="${c}" stroke-width="${s.w||2}"${s.dash?` stroke-dasharray="${s.dash}"`:''} opacity="${s.op||1}"/>`;});
+  const cl=v=>Math.max(t-2,Math.min(H-b+2,Y(v)));
+  S.forEach((s,i)=>{if(!s.band)return;const c=s.color||PAL[i%PAL.length];let up='',dn='';s.band[1].forEach((v,j)=>{if(fin(v))up+=(up?'L':'M')+X(s.x?s.x[j]:j).toFixed(1)+','+cl(v).toFixed(1);});
+    for(let j=s.band[0].length-1;j>=0;j--){const v=s.band[0][j];if(fin(v))dn+='L'+X(s.x?s.x[j]:j).toFixed(1)+','+cl(v).toFixed(1);}if(up)g+=`<path d="${up+dn}Z" fill="${c}" opacity=".16" stroke="none"/>`;});
+  S.forEach((s,i)=>{let p='';s.data.forEach((v,j)=>{if(!fin(v))return;const x=s.x?s.x[j]:j;p+=(p?'L':'M')+X(x).toFixed(1)+','+cl(v).toFixed(1);});const c=s.color||PAL[i%PAL.length];
+    if(s.step){p='';s.data.forEach((v,j)=>{if(!fin(v))return;const x0=s.x[j],x1=s.x[j+1]!=null?s.x[j+1]:x0+(s.x[1]-s.x[0]);p+=(p?'L':'M')+X(x0).toFixed(1)+','+cl(v).toFixed(1)+'L'+X(x1).toFixed(1)+','+cl(v).toFixed(1);});}
+    if(p)g+=`<path d="${p}" fill="none" stroke="${c}" stroke-width="${s.w||2}"${s.dash?` stroke-dasharray="${s.dash}"`:''} opacity="${s.op||1}"/>`;});
+  const keys=Object.keys(LC);if(keys.length>400)keys.forEach(k=>{if(!document.getElementById(k))delete LC[k];});
+  LC[id]={W,H,l,r,t,b,n,yl,title:o.title||'',xl:o.xl||'',xfmt:o.xfmt||null,S:S.map((s,i)=>({name:s.name,color:s.color||PAL[i%PAL.length],x:s.x||null,data:s.data,band:s.band||null}))};
   const leg=S.map((s,i)=>`<span><i style="background:${s.color||PAL[i%PAL.length]}${s.dash?';background:repeating-linear-gradient(90deg,'+(s.color||PAL[i%PAL.length])+' 0 4px,transparent 4px 7px)':''}"></i>${esc(s.name)}</span>`).join('');
-  return `<div class="chartbox"><svg viewBox="0 0 ${W} ${H}" class="chart">${g}</svg><div class="leg">${leg}</div></div>`;}
-function fmt(v){const a=Math.abs(v);return a>=10000?(v/1000).toFixed(0)+'k':a>=100?Math.round(v).toString():a>=10?v.toFixed(1):v.toFixed(2);}
+  return `<div class="chartbox"><div class="lctool"><button data-lcsave="csv" data-lc="${id}" title="このグラフの数値をCSVで保存">CSV</button><button data-lcsave="svg" data-lc="${id}" title="図をSVGで保存">SVG</button><button data-lcsave="png" data-lc="${id}" title="図をPNGで保存">PNG</button></div><svg viewBox="0 0 ${W} ${H}" class="chart" id="${id}" data-lc="${id}">${g}</svg><div class="leg">${leg}</div></div>`;}
+function fmt(v){if(v==null||!isFinite(v))return '—';if(Math.abs(v)<1e-12)return '0';const a=Math.abs(v);return a>=10000?(v/1000).toFixed(0)+'k':a>=100?Math.round(v).toString():a>=10?v.toFixed(1):v.toFixed(2);}
 // ---- InsightMaker の書き出し（同じ部品リストから，ファイルとツールの中の図・式の一覧・組み立て手順を作る）
 function IMWriter(title,length,step,units){const P=[];let nid=3;const ids={};const disp=[];const q=s=>'"'+esc(s)+'"';
   const C=' Units="Unitless" MaxConstraintUsed="false" MinConstraintUsed="false" MaxConstraint="100" MinConstraint="0"';
@@ -910,20 +920,22 @@ function IMWriter(title,length,step,units){const P=[];let nid=3;const ids={};con
   return W;}
 function download(name,text,type){const b=new Blob([text],{type:type||'application/xml'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();a.remove();}
 const today=()=>{const d=new Date(),p=x=>String(x).padStart(2,'0');return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`;};
-const fname=(c,ext)=>`${today()}_scm-recurrent-program_${c}_v1.${ext}`;
+const fname=(c,ext)=>`${today()}_scm-recurrent-program_${String(c).replace(/[\\\/:*?"<>|]/g,'_')}.${ext}`;
 
 // ===== ①〜③ CLD → SD（どんなCLDでも動く「感度モデル」） =====
 const G={pos0:{},str:{},E:[],V:[],pos:{},src:null,title:'',ov:{},step:4,tau:{},elas:1,shock:null,shockSize:20,T:60,show:new Set()};
 const TYPES={stock:'ストック',aux:'補助変数',const:'定数'};
 function classify(E,ov){const V=[...new Set(E.flatMap(e=>[e.c,e.e]))];const inp={};V.forEach(v=>inp[v]=E.filter(e=>e.e===v));const T={},why={};
-  V.forEach(v=>{if(inp[v].some(e=>e.d)){T[v]='stock';why[v]=1;}});
+  const note={};V.forEach(v=>{if(!inp[v].some(e=>e.d))return;let tg=v;if(FLOWLIKE.test(v)&&!STOCKLIKE.test(v)){const c=[...E.filter(e=>e.c===v).map(e=>e.e),...inp[v].filter(e=>e.d).map(e=>e.c)].find(w=>STOCKLIKE.test(w));if(c){tg=c;note[c]=`‖ の先「${v}」は流れ（フロー）の名前なので，そのつながり先でたまる量の名前「${c}」をストックにした`;}}if(!T[tg]){T[tg]='stock';why[tg]=1;}});
   V.forEach(v=>{if(!T[v]&&!inp[v].length){T[v]='const';why[v]=3;}});
   const Ls=findLoops(E);Ls.forEach(L=>{if(L.vars.some(v=>T[v]==='stock'))return;const cand=L.vars.filter(v=>!T[v]).sort((a,b)=>Ls.filter(x=>x.vars.includes(b)).length-Ls.filter(x=>x.vars.includes(a)).length);if(cand[0]){T[cand[0]]='stock';why[cand[0]]=2;}});
   V.forEach(v=>{if(!T[v]){T[v]='aux';why[v]=4;}});
   const auto=Object.assign({},T);Object.entries(ov||{}).forEach(([v,t])=>{if(T[v]&&t)T[v]=t;});
   // ストックを外したことでストックのないループが残っていないか
   const bad=Ls.filter(L=>!L.vars.some(v=>T[v]==='stock'));
-  return{V,T,why,auto,inp,loops:Ls,bad};}
+  return{V,T,why,auto,inp,loops:Ls,bad,note};}
+const STOCKLIKE=/在庫|残|人数|累計|残高|蓄積|量$|水量|仕掛|待ち|backlog|inventory|stock|level|balance|人口|顧客数|社員数|従業員|台数|設備|能力|スキル|評判|信頼|知識|疲労|資金|現金|負債|ストック/i;
+const FLOWLIKE=/入荷|出荷|生産|発注|率|流入|流出|入金|出金|採用|退職|離職|受注$|^受注|納品|投入|消費|販売|購入|補充|変化|増加|減少|販売数|flow|rate|order|shipment|production/i;
 const WHY={1:'遅れ（‖）の付いた矢印の先：時間をかけてたまる量 → ストック',2:'ストックのないループ：ループには少なくとも1つストックが要る → ループに最も多く出てくる変数をストックに',3:'入ってくる矢印がない：人の判断・外の条件 → 定数（スライダーで動かす）',4:'残り：その時点の他の変数から決まる → 補助変数'};
 // ---- 図（SD）
 function sdDiagram(C,stage,hl,key){key=key||'sd';const P=G.pos;const V=C.V;const W=800,H=500;layoutMissing(V);let s=`<defs><marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 z" fill="#7A8A92"/></marker>${[['R','#C8553D'],['B','#1F6FB2'],['N','#B7791F']].map(([k,c])=>`<marker id="arF${k}" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="${c}"/></marker>`).join('')}<marker id="fl" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L12,6 L0,12 z" fill="#1B3A4B"/></marker></defs>`;
@@ -953,8 +965,10 @@ function simGeneric(C){const dt=0.25,N=Math.round(G.T/dt);const V=C.V,T=C.T;cons
     V.filter(v=>T[v]==='const').forEach(v=>val[v]=sh(v));
     auxOrder.order.forEach(v=>val[v]=target(v)*sh(v));for(let it=0;it<20&&auxOrder.cyc.length;it++)auxOrder.cyc.forEach(v=>val[v]=target(v)*sh(v));
     if(k%2===0){res.t.push(t);V.forEach(v=>res[v].push(val[v]));}
-    V.filter(v=>T[v]==='stock').forEach(v=>{const tg=(C.inp[v].length?target(v):1)*sh(v);val[v]+=dt*(tg-val[v])/(G.tau[v]||5);});}
+    V.filter(v=>T[v]==='stock').forEach(v=>{const tg=(C.inp[v].length?target(v):1)*sh(v);val[v]+=dt*(tg-val[v])/(G.tau[v]||5);});
+    const bv=V.find(v=>!isFinite(val[v])||Math.abs(val[v])>GEN_LIMIT);if(bv){res.blow={t:+t.toFixed(2),v:bv,x:val[bv]};if(k%2!==0){res.t.push(t);V.forEach(v=>res[v].push(isFinite(val[v])?val[v]:null));}break;}}
   res.cyc=auxOrder.cyc;return res;}
+const GEN_LIMIT=1e6;
 // ---- InsightMaker へ（式は「1＋強さ×効き方×（原因−1）」の足し算）
 function termOf(e){const s=G.str[e.c+'>'+e.e]??1;return `${e.p==='-'?'-':'+'} ${s!==1?s+' * ':''}[効き方] * ([${e.c}] - 1)`;}
 function buildGeneric(C){const m=IMWriter(G.title+'（CLDから作ったSDモデル）',G.T,0.25,'Days');const P=G.pos;const X=p=>Math.round((p[0]-60)*1.5+260),Y=p=>Math.round((p[1]-20)*1.5+120);
@@ -974,61 +988,83 @@ function buildGeneric(C){const m=IMWriter(G.title+'（CLDから作ったSDモデ
 function exportGeneric(C){return buildGeneric(C).xml();}
 
 // ===== ④ ブルーマウンテン社（LINE-3）のSDモデル：ブルウィップ効果と能力の制約 =====
-const MSTART=(()=>{const a=[0];REF.days.forEach(d=>a.push(a[a.length-1]+d));return a;})();
-const monthOf=t=>{let m=0;while(m<35&&MSTART[m+1]<=t)m++;return m;};
-const BMDEF={dem:'data',noise:20,seed:7,Tf:30,Ta:7,beta:1,ss0:18,raise:1,ss1:24,cyc:18,plan:13.7,down:0.36,setup:1.7,speed:184,LT:3,allow:200,
-  capData:1,share:0,pLT:20,pcov:10,pTf:7,setupCut:0,downCut:0,rope:0,buf:3,transfer:0,elev:0};
+// データセット：需要・計画時間・停止・段取り（入力）と，生産・在庫・受注残（実績：比べる・合わせる）。既定は埋め込みの LINE-3
+const DS0={id:'line3',name:'LINE-3（演習データ・埋め込み）',period:'month',m:REF.m,days:REF.days,dem:REF.dem,plan:REF.plan,down:REF.down,setup:REF.setup,prod:REF.prod,inv:REF.inv,bo:REF.bo,src:'ブルーマウンテン社 LINE-3（2023-01〜2025-12，月別）',units:{dem:'個/日',plan:'時間/日',down:'時間/日',setup:'時間/日',prod:'個/日',inv:'個',bo:'個'}};
+let DS=DS0;
+const dsStart=ds=>{const a=[0];ds.days.forEach(d=>a.push(a[a.length-1]+d));return a;};
+const dsDays=ds=>ds.days.reduce((a,b)=>a+b,0);
+function dsTicks(ds){const ST=dsStart(ds),n=ds.days.length;const step=n<=12?1:n<=24?3:n<=48?6:n<=120?12:Math.ceil(n/8);const idx=[];for(let i=0;i<n;i+=step)idx.push(i);return{MX:idx.map(i=>[ST[i],ds.m[i]]),MXM:idx.map(i=>[i,ds.m[i]])};}
+let MSTART=dsStart(DS);
+const monthOf=t=>{let m=0;while(m<MSTART.length-2&&MSTART[m+1]<=t)m++;return m;};
+const dayLabel=(d,ds)=>{ds=ds||DS;const ST=dsStart(ds);let m=0;while(m<ds.days.length-1&&ST[m+1]<=d)m++;return ds.m[m]||'';};
+const BMDEF={dem:'data',noise:20,seed:7,Tf:30,Ta:7,beta:1,ss0:18,raise:1,raiseDay:456,ss1:24,cyc:18,plan:13.7,down:0.36,setup:1.7,speed:184,LT:3,allow:200,
+  capData:1,share:0,pLT:20,pcov:10,pTf:7,setupCut:0,downCut:0,rope:0,buf:3,transfer:0,elev:0,initRef:0};
 const BMP=Object.assign({},BMDEF);
-function capOf(p,m){const pl=p.capData&&m!=null?REF.plan[m]:p.plan,dn=p.capData&&m!=null?REF.down[m]:p.down,su=p.capData&&m!=null?REF.setup[m]:p.setup;return Math.max(0,(pl-dn*(1-p.downCut/100)-su*(1-p.setupCut/100)))*p.speed*(1+p.elev/100);}
-function simBM(p){const dt=0.25,days=1095,N=days/dt;const r=rng(p.seed);let noise=1;
-  const dBase=t=>{const m=monthOf(t);const d=p.dem==='data'?REF.dem[m]:p.dem==='step'?(t<365?2040:2350):2040;return d*(1-p.transfer/100);};
-  const D0=p.dem==='data'?REF.dem[0]*(1-p.transfer/100):dBase(0);let cap=capOf(p,0);
-  let F=D0,I=D0*(p.ss0+p.cyc/2),B=D0,Q=0,W=D0*p.LT,F2=D0,PI=D0*p.pcov,PP=D0*p.pLT;
-  const R={t:[],D:[],O:[],PO:[],P:[],I:[],B:[],W:[],Q:[],ship:[],LT:[],PI:[],cap:[],ss:[]};const acc={};let n=0;const add=(k,v)=>acc[k]=(acc[k]||0)+v;
-  for(let k=0;k<N;k++){const t=k*dt;if(k%4===0)noise=Math.max(0,1+p.noise/100*gauss(r));
-    const D=dBase(t)*noise;if(k%4===0)cap=capOf(p,monthOf(t));const ss=p.raise&&t>=456?p.ss1:p.ss0;
+const dsVal=(ds,k,m,d)=>ds[k]&&ds[k][m]!=null&&isFinite(ds[k][m])?ds[k][m]:d;
+function capOf(p,m,ds){ds=ds||DS;const on=p.capData&&m!=null;const pl=on?dsVal(ds,'plan',m,p.plan):p.plan,dn=on?dsVal(ds,'down',m,p.down):p.down,su=on?dsVal(ds,'setup',m,p.setup):p.setup;return Math.max(0,(pl-dn*(1-p.downCut/100)-su*(1-p.setupCut/100)))*p.speed*(1+p.elev/100);}
+function bmBase(ds){return ds===DS0?2040:Math.round(mean(ds.dem));}
+// 日々の需要のばらつき（標準正規乱数）。種ごとに同じ並び。InsightMaker にも同じ表を渡す
+function bmZ(seed,days){const r=rng(seed);const Z=[];for(let d=0;d<Math.ceil(days);d++)Z.push(gauss(r));return Z;}
+function simBM(p){const ds=p.ds||DS,ST=dsStart(ds),NP=ds.days.length;const dt=0.25,days=ST[NP],N=Math.round(days/dt);const Z=bmZ(p.seed,days);let noise=1;
+  let mi=0;const mOf=t=>{if(t<ST[mi])mi=0;while(mi<NP-1&&ST[mi+1]<=t)mi++;return mi;};const base=bmBase(ds);
+  const dBase=t=>{const m=mOf(t);const d=p.dem==='data'?dsVal(ds,'dem',m,base):p.dem==='step'?(t<365?base:base*2350/2040):base;return d*(1-p.transfer/100);};
+  const D0=dBase(0);let cap=capOf(p,0,ds);
+  const I0=p.initRef&&ds.inv&&ds.inv[0]!=null?ds.inv[0]:D0*(p.ss0+p.cyc/2),B0=p.initRef&&ds.bo&&ds.bo[0]!=null?ds.bo[0]:D0;
+  let F=D0,I=I0,B=B0,Q=0,W=D0*p.LT,F2=D0,PI=D0*p.pcov,PP=D0*p.pLT;
+  const R={t:[],D:[],O:[],PO:[],P:[],I:[],B:[],W:[],Q:[],ship:[],LT:[],PI:[],cap:[],ss:[]};const acc={};let n=0,plim=0;const add=(k,v)=>acc[k]=(acc[k]||0)+v;
+  for(let k=0;k<N;k++){const t=k*dt;if(k%4===0)noise=Math.max(0,1+p.noise/100*Z[k/4]);
+    const D=dBase(t)*noise;if(k%4===0)cap=capOf(p,mOf(t),ds);const ss=p.raise&&t>=p.raiseDay?p.ss1:p.ss0;
     const tgtI=F*(ss+p.cyc/2),tgtPipe=F*p.LT;
     const O=Math.max(0,F+(tgtI-I)/p.Ta+p.beta*(tgtPipe-(Q+W))/p.Ta);
     Q+=O*dt;const Rel=p.rope?Math.min(Q/dt,Math.max(0,p.buf*cap-W)/dt+cap):Q/dt;Q-=Rel*dt;
-    const P=Math.min(W/p.LT,cap);W+=(Rel-P)*dt;
+    const arr=PP/p.pLT;const Pw=Math.min(W/p.LT,cap),Pp=Math.max(0,PI/dt+arr);const P=Math.min(Pw,Pp);if(Pp<Pw)plim++;   // 部品がなければ作れない（部品在庫はマイナスにならない）
+    W+=(Rel-P)*dt;
     const ship=Math.min(B,I)/1,canc=B/p.allow;B+=(D-ship-canc)*dt;I+=(P-ship)*dt;
     F+=(D-F)/p.Tf*dt;
-    const in2=p.share?D:O;F2+=(in2-F2)/p.pTf*dt;const PO=Math.max(0,F2+(F2*p.pcov-PI)/p.Ta+p.beta*(F2*p.pLT-PP)/p.Ta);const arr=PP/p.pLT;PP+=(PO-arr)*dt;PI+=(arr-P)*dt;
+    const in2=p.share?D:O;F2+=(in2-F2)/p.pTf*dt;const PO=Math.max(0,F2+(F2*p.pcov-PI)/p.Ta+p.beta*(F2*p.pLT-PP)/p.Ta);PP+=(PO-arr)*dt;PI=Math.max(0,PI+(arr-P)*dt);
     add('D',D);add('O',O);add('PO',PO);add('P',P);add('ship',ship);n++;
     if(n===4){R.t.push(Math.round(t));['D','O','PO','P','ship'].forEach(x=>R[x].push(acc[x]/4));R.I.push(I);R.B.push(B);R.W.push(W);R.Q.push(Q);R.LT.push((Q+W)/Math.max(P,1));R.PI.push(PI);R.cap.push(cap);R.ss.push(ss);for(const x in acc)acc[x]=0;n=0;}}
-  const sl=a=>a.slice(60);R.amp={O:std(sl(R.O))/Math.max(std(sl(R.D)),1e-9),PO:std(sl(R.PO))/Math.max(std(sl(R.D)),1e-9)};
-  // 月平均（実績と比べる）
-  const mon=k=>Array.from({length:36},(_,m)=>mean(R[k].slice(MSTART[m],MSTART[m+1])));R.M={D:mon('D'),P:mon('P'),I:mon('I'),B:mon('B'),WQ:Array.from({length:36},(_,m)=>mean(R.W.slice(MSTART[m],MSTART[m+1]).map((w,i)=>w+R.Q[MSTART[m]+i])))};
-  const nr=(a,b)=>Math.sqrt(mean(a.map((x,i)=>(x-b[i])**2)))/Math.max(mean(b),1);R.fit={P:nr(R.M.P,REF.prod),I:nr(R.M.I,REF.inv),B:nr(R.M.B,REF.bo)};
-  R.y3=k=>mean(R[k].slice(730));return R;}
-const MX=[0,6,12,18,24,30].map(m=>[MSTART[m],REF.m[m]]);const MXM=[0,6,12,18,24,30].map(m=>[m,REF.m[m]]);
+  const sl=a=>a.slice(60);R.amp={O:std(sl(R.O))/Math.max(std(sl(R.D)),1e-9),PO:std(sl(R.PO))/Math.max(std(sl(R.D)),1e-9)};R.partsDays=plim/4;
+  // 期間ごとの平均（実績と比べる）
+  const mon=k=>Array.from({length:NP},(_,m)=>mean(R[k].slice(ST[m],ST[m+1])));R.M={D:mon('D'),P:mon('P'),I:mon('I'),B:mon('B'),WQ:Array.from({length:NP},(_,m)=>mean(R.W.slice(ST[m],ST[m+1]).map((w,i)=>w+R.Q[ST[m]+i])))};
+  R.ds=ds;R.ST=ST;R.stats={P:fitStats(R.M.P,ds.prod),I:fitStats(R.M.I,ds.inv),B:fitStats(R.M.B,ds.bo)};
+  R.fit={P:R.stats.P?R.stats.P.nrmse:null,I:R.stats.I?R.stats.I.nrmse:null,B:R.stats.B?R.stats.B.nrmse:null};
+  R.y3=k=>mean(R[k].slice(-365));return R;}
+// 実績との当てはまり：NRMSE（RMSE÷実績の平均），平均のずれ，Theil の不一致係数 U_M（平均）・U_S（ばらつき）・U_C（動きの不一致）
+function fitStats(sim,ref){if(!ref)return null;const a=[],b=[];sim.forEach((x,i)=>{const y=ref[i];if(y!=null&&isFinite(y)&&x!=null&&isFinite(x)){a.push(x);b.push(y);}});const n=a.length;if(n<2)return null;
+  const ma=mean(a),mb=mean(b);const mse=a.reduce((q,x,i)=>q+(x-b[i])**2,0)/n;const sa=Math.sqrt(a.reduce((q,x)=>q+(x-ma)**2,0)/n),sb=Math.sqrt(b.reduce((q,y)=>q+(y-mb)**2,0)/n);
+  const cov=a.reduce((q,x,i)=>q+(x-ma)*(b[i]-mb),0)/n;const rr=sa&&sb?cov/(sa*sb):0;const den=Math.max(Math.abs(mb),1e-9);
+  return{n,nrmse:Math.sqrt(mse)/den,bias:(ma-mb)/den,r:rr,rmse:Math.sqrt(mse),UM:mse?(ma-mb)**2/mse:0,US:mse?(sa-sb)**2/mse:0,UC:mse?2*(1-rr)*sa*sb/mse:0};}
+let MX=dsTicks(DS).MX,MXM=dsTicks(DS).MXM;
+function setDS(ds){DS=ds||DS0;MSTART=dsStart(DS);const k=dsTicks(DS);MX=k.MX;MXM=k.MXM;if(BMP.raiseDay>=dsDays(DS))BMP.raise=0;}
 const week=a=>{const o=[],x=[];for(let i=0;i+7<=a.length;i+=7){o.push(mean(a.slice(i,i+7)));x.push(i);}return{o,x};};
 // ---- InsightMaker（上流 → 下流を左 → 右に並べる：部品サプライヤ｜LINE-3｜DC（SCM部）｜顧客）
 const BMSEC=[[0,'部品サプライヤ'],[430,'LINE-3（工場）'],[850,'DC（SCM部）'],[1330,'顧客']];
 const secOf=x=>{let s=BMSEC[0][1];BMSEC.forEach(([x0,n])=>{if(x>=x0)s=n;});return s;};
-function buildBM(p){const D0=Math.round((p.dem==='data'?REF.dem[0]:2040)*(1-p.transfer/100));const m=IMWriter('ブルーマウンテン社 LINE-3：ブルウィップ効果と能力の制約',1095,0.25,'Days');
+function buildBM(p){const ds=p.ds||DS,ST=dsStart(ds),NP=ds.days.length,days=ST[NP],base=bmBase(ds);const D0=Math.round((p.dem==='data'?dsVal(ds,'dem',0,base):base)*(1-p.transfer/100));const m=IMWriter((ds===DS0?'ブルーマウンテン社 LINE-3':ds.name)+'：ブルウィップ効果と能力の制約',days,0.25,'Days');
   BMSEC.forEach(([x,n],i)=>m.txt(['① ','② ','③ ','④ '][i]+n,x+20,0,380));
   m.txt('ものの流れ（左 → 右）：部品 → LINE-3 → DC → 顧客　／　注文の流れ（右 → 左）',20,640,800);m.txt('パラメータ（スライダーで動かす）',20,700,400);
   // ④ 顧客
-  const data=MSTART.slice(0,36).map((d,i)=>`${d},${REF.dem[i]}`).join('; ');
-  if(p.dem==='data')m.conv('需要（実績）',data,1380,80,'LINE-3の見込生産品の受注数量（個/日，月平均）。時刻ごとのデータ表');else m.v('需要（実績）',p.dem==='step'?'IfThenElse(Days() < 365, 2040, 2350)':'2040',1380,80,p.dem==='step'?'1年目の終わりに15％増える':'一定',null,'data');
+  const data=ST.slice(0,NP).map((d,i)=>`${d},${dsVal(ds,'dem',i,base)}`).join('; ');
+  if(p.dem==='data')m.conv('需要（実績）',data,1380,80,'LINE-3の見込生産品の受注数量（個/日，月平均）。時刻ごとのデータ表');else m.v('需要（実績）',p.dem==='step'?`IfThenElse(Days() < 365, ${base}, ${+(base*2350/2040).toFixed(1)})`:String(base),1380,80,p.dem==='step'?'1年目の終わりに15％増える':'一定',null,'data');
   m.v('需要のばらつき',p.noise/100,1500,160,'日々の需要の変動係数（0.2＝20％）',[0,0.5,0.05]);m.v('移管率',p.transfer/100,1500,240,'他のラインへ移す需要の割合（制約を高める）',[0,0.3,0.05]);
-  m.v('需要','[需要（実績）] * (1 - [移管率]) * Max(0, 1 + [需要のばらつき] * Fix(RandNormal(0, 1), 1))',1380,200,'顧客の需要（個/日）＝実績×（1−移管率）×日々のばらつき');
-  m.s('受注残',String(D0),1180,520,'顧客の注文のうち，まだ出荷していない量（個）');
+  m.conv('標準正規乱数（種'+p.seed+'）',bmZ(p.seed,days).map((z,d)=>`${d},${z.toFixed(5)}`).join('; '),1500,320,'このツールと同じ乱数（乱数の種 '+p.seed+'）を1日ごとに表にしたもの。RandNormal を使わないので，何度動かしてもツールと同じ結果になる');
+  m.v('需要','[需要（実績）] * (1 - [移管率]) * Max(0, 1 + [需要のばらつき] * [標準正規乱数（種'+p.seed+'）])',1380,200,'顧客の需要（個/日）＝実績×（1−移管率）×日々のばらつき（ツールと同じ乱数の表）');
+  m.s('受注残',String(Math.round(p.initRef&&ds.bo&&ds.bo[0]!=null?ds.bo[0]:D0)),1180,520,'顧客の注文のうち，まだ出荷していない量（個）');
   m.f('受注','[需要]',null,'受注残','顧客の注文が受注残に入る（個/日）',[1420,545]);m.f('受注の消化','[出荷]','受注残',null,'出荷した分だけ受注残が減る（個/日）',[1000,545]);m.f('取消','[受注残] / [許容日数]','受注残',null,'待ちきれない顧客の取消（個/日）',[1210,640]);
   // ③ DC（SCM部）
   m.v('需要予測',`Smooth([需要], [予測期間], ${D0})`,1180,160,'需要を「予測期間」で平滑化した予測（個/日）');
-  m.v('安全在庫日数','IfThenElse([引き上げる] = 1 and Days() >= 456, [安全在庫日数（引き上げ後）], [安全在庫日数（引き上げ前）])',1000,80,'2024年4月（456日目）に引き上げる');
+  m.v('安全在庫日数',`IfThenElse([引き上げる] = 1 and Days() >= ${p.raiseDay}, [安全在庫日数（引き上げ後）], [安全在庫日数（引き上げ前）])`,1000,80,`${dayLabel(p.raiseDay,ds)}（${p.raiseDay}日目）に引き上げる`);
   m.v('目標在庫','[需要予測] * ([安全在庫日数] + [サイクル在庫日数] / 2)',1000,180,'持ちたい在庫（個）＝予測×（安全在庫日数＋サイクル在庫日数÷2）');
   m.v('補充指示',`Max(0, [需要予測] + ([目標在庫] - [DC在庫]) / [調整時間] + [発注残の考慮度] * ([需要予測] * [生産LT] - [生産待ち] - [投入待ち]) / [調整時間])`,860,180,'DCからLINE-3への補充指示（個/日）＝予測＋在庫のずれ÷調整時間＋β×発注残のずれ÷調整時間');
   m.v('補充指示の増幅率','PastStdDev([補充指示]) / Max(PastStdDev([需要]), 0.0001)',860,80,'補充指示のばらつき÷需要のばらつき（1より大きいとブルウィップ効果）');
-  m.s('DC在庫',String(Math.round(D0*(p.ss0+p.cyc/2))),920,330,'DCの手持在庫（個）');
+  m.s('DC在庫',String(Math.round(p.initRef&&ds.inv&&ds.inv[0]!=null?ds.inv[0]:D0*(p.ss0+p.cyc/2))),920,330,'DCの手持在庫（個）');
   m.f('出荷','Min([受注残], [DC在庫]) / 1','DC在庫',null,'受注残を在庫の範囲で出荷する（個/日）',[1180,355]);
   // ② LINE-3
   m.s('投入待ち','0',470,330,'ロープ（DBR）で投入を止めている補充指示（個）。ロープがなければ0');m.s('生産待ち',String(D0*p.LT),660,330,'工場に投入され，生産を待っている量（個）');
   m.f('指示','[補充指示]',null,'投入待ち','DCからの補充指示が届く（個/日）',[530,250]);
   m.f('投入','IfThenElse([ロープ] = 1, Min([投入待ち] / 0.25, Max(0, [バッファ日数] * [生産能力] - [生産待ち]) / 0.25 + [生産能力]), [投入待ち] / 0.25)','投入待ち','生産待ち','ロープがなければすぐ投入。ロープがあれば，生産待ちがバッファ日数×能力を超えない分だけ投入');
-  m.f('生産','Min([生産待ち] / [生産LT], [生産能力])','生産待ち','DC在庫','LINE-3の生産（個/日）。能力を超えられない');
+  m.f('生産','Min(Min([生産待ち] / [生産LT], [生産能力]), Max(0, [部品在庫] / 0.25 + [部品発注残] / [部品LT]))','生産待ち','DC在庫','LINE-3の生産（個/日）。能力を超えられず，部品がなければ作れない（部品在庫はマイナスにならない）');
   m.v('生産能力','([計画時間] - [停止時間] * (1 - [停止削減率]) - [段取り時間] * (1 - [段取り短縮率])) * [処理速度] * (1 + [能力増強率])',660,180,'1日に作れる量（個/日）＝（計画−停止−段取り）×処理速度');
   m.v('補充リードタイム','([生産待ち] + [投入待ち]) / Max([生産], 1)',660,470,'補充指示から生産までの日数（リトルの法則）');
   // ① 部品サプライヤ
@@ -1040,19 +1076,19 @@ function buildBM(p){const D0=Math.round((p.dem==='data'?REF.dem[0]:2040)*(1-p.tr
   // パラメータ（下の段）
   const P=(n,v,x,y,no,sl)=>m.v(n,v,x,y,no,sl);
   P('部品の予測期間',p.pTf,20,740,'部品の予測の平滑化期間（日）',[1,60,1]);P('部品LT',p.pLT,150,740,'部品の調達日数',[1,60,1]);P('部品在庫カバー日数',p.pcov,280,740,'',[1,40,1]);P('情報共有',p.share,20,810,'1＝LINE-3も顧客の需要を見て部品を予測する',[0,1,1]);
-  const ser=a=>MSTART.slice(0,36).map((d,i)=>`${d},${a[i]}`).join('; ');
-  if(p.capData){m.conv('計画時間',ser(REF.plan),440,740,'実績（月別，時間/日）');m.conv('停止時間',ser(REF.down),570,740,'実績（月別，時間/日）');m.conv('段取り時間',ser(REF.setup),700,740,'実績（月別，時間/日）');}
+  const ser=(k,d)=>ST.slice(0,NP).map((x,i)=>`${x},${dsVal(ds,k,i,d)}`).join('; ');
+  if(p.capData){m.conv('計画時間',ser('plan',p.plan),440,740,'実績（期間別，時間/日）');m.conv('停止時間',ser('down',p.down),570,740,'実績（期間別，時間/日）');m.conv('段取り時間',ser('setup',p.setup),700,740,'実績（期間別，時間/日）');}
   else{P('計画時間',p.plan,440,740,'時間/日');P('停止時間',p.down,570,740,'時間/日');P('段取り時間',p.setup,700,740,'時間/日');}
   P('処理速度',p.speed,440,810,'1時間に作れる個数',[150,220,1]);P('段取り短縮率',p.setupCut/100,570,810,'',[0,0.8,0.1]);P('停止削減率',p.downCut/100,700,810,'',[0,1,0.1]);
   P('能力増強率',p.elev/100,440,880,'',[0,0.5,0.05]);P('生産LT',p.LT,570,880,'生産にかかる日数',[1,10,1]);P('ロープ',p.rope,700,880,'1＝DBR：投入を能力に合わせる',[0,1,1]);P('バッファ日数',p.buf,700,950,'生産待ちの上限（能力の何日分）',[1,10,1]);
   P('予測期間',p.Tf,860,740,'需要予測の平滑化期間（日）',[1,120,1]);P('調整時間',p.Ta,990,740,'在庫のずれを何日で埋めるか（日）',[1,30,1]);P('発注残の考慮度',p.beta,1120,740,'β：0＝発注残を無視，1＝完全に考慮',[0,1,0.1]);
   P('安全在庫日数（引き上げ前）',p.ss0,860,810,'',[0,40,1]);P('安全在庫日数（引き上げ後）',p.ss1,990,810,'',[0,40,1]);P('引き上げる',p.raise,1120,810,'1＝2024年4月に引き上げる',[0,1,1]);P('サイクル在庫日数',p.cyc,860,880,'',[0,40,1]);P('許容日数',p.allow,1380,740,'顧客が待てる日数の目安',[10,400,10]);
   const L=(a,bs)=>bs.forEach(x=>m.l(a,x));
-  L('需要（実績）',['需要']);L('需要のばらつき',['需要']);L('移管率',['需要']);L('需要',['需要予測','受注','部品の需要予測','補充指示の増幅率','部品発注の増幅率']);L('予測期間',['需要予測']);
+  L('需要（実績）',['需要']);L('標準正規乱数（種'+p.seed+'）',['需要']);L('需要のばらつき',['需要']);L('移管率',['需要']);L('需要',['需要予測','受注','部品の需要予測','補充指示の増幅率','部品発注の増幅率']);L('予測期間',['需要予測']);
   L('引き上げる',['安全在庫日数']);L('安全在庫日数（引き上げ前）',['安全在庫日数']);L('安全在庫日数（引き上げ後）',['安全在庫日数']);L('安全在庫日数',['目標在庫']);L('サイクル在庫日数',['目標在庫']);L('需要予測',['目標在庫','補充指示']);
   L('目標在庫',['補充指示']);L('DC在庫',['補充指示','出荷']);L('調整時間',['補充指示','部品発注']);L('発注残の考慮度',['補充指示','部品発注']);L('生産LT',['補充指示','生産']);L('生産待ち',['補充指示','生産','補充リードタイム','投入']);L('投入待ち',['補充指示','投入','補充リードタイム']);L('ロープ',['投入']);L('バッファ日数',['投入']);L('生産能力',['投入','生産']);L('補充指示',['指示','部品の需要予測','補充指示の増幅率']);
   ['計画時間','停止時間','段取り時間','処理速度','段取り短縮率','停止削減率','能力増強率'].forEach(x=>m.l(x,'生産能力'));L('生産',['補充リードタイム','部品の消費']);L('受注残',['出荷','取消']);L('出荷',['受注の消化']);L('許容日数',['取消']);
-  L('情報共有',['部品の需要予測']);L('部品の予測期間',['部品の需要予測']);L('部品の需要予測',['部品発注']);L('部品在庫カバー日数',['部品発注']);L('部品在庫',['部品発注']);L('部品LT',['部品発注','部品の入荷']);L('部品発注残',['部品発注','部品の入荷']);L('部品発注',['部品の発注','部品発注の増幅率']);
+  L('情報共有',['部品の需要予測']);L('部品の予測期間',['部品の需要予測']);L('部品の需要予測',['部品発注']);L('部品在庫カバー日数',['部品発注']);L('部品在庫',['部品発注','生産']);L('部品LT',['部品発注','部品の入荷','生産']);L('部品発注残',['部品発注','部品の入荷','生産']);L('部品発注',['部品の発注','部品発注の増幅率']);
   m.d('需要と発注（ブルウィップ効果）',['需要','補充指示','部品発注']);m.d('在庫と受注残',['DC在庫','受注残','生産待ち','投入待ち']);m.d('能力と生産',['生産能力','生産']);m.d('増幅率',['補充指示の増幅率','部品発注の増幅率']);
   m.secOf=secOf;return m;}
 function exportBM(p){return buildBM(p).xml();}
@@ -1074,8 +1110,8 @@ function simDice(o){const r=rng(o.seed*7919+13);const K=o.st;const neck=Math.flo
 // B ブルーマウンテン社で5つの集中ステップ
 const TOCS={exploit:{setupCut:50,downCut:50},subord:{rope:1,buf:3,raise:0},elev:{transfer:10}};
 const TOC={on:{exploit:0,subord:0,elev:0},setupCut:50,transfer:10};
-function tocParams(upto){const p=Object.assign({},BMDEF,{noise:0});if(upto>=2||TOC.on.exploit)Object.assign(p,{setupCut:TOC.setupCut,downCut:50});if(upto>=3||TOC.on.subord)Object.assign(p,TOCS.subord);if(upto>=4||TOC.on.elev)Object.assign(p,{transfer:TOC.transfer});return p;}
-function tocKPI(R,p){const y=a=>mean(a.slice(730));const moved=p&&p.transfer?y(R.D)*p.transfer/(100-p.transfer):0;return{T:y(R.ship)+moved,moved,I:y(R.I)+y(R.W),FG:y(R.I),WIP:y(R.W),Q:y(R.Q),LT:y(R.LT),B:y(R.B),cap:y(R.cap)};}
+function tocParams(upto){const p=Object.assign({},BMDEF,{noise:0,ds:DS0});if(upto>=2||TOC.on.exploit)Object.assign(p,{setupCut:TOC.setupCut,downCut:50});if(upto>=3||TOC.on.subord)Object.assign(p,TOCS.subord);if(upto>=4||TOC.on.elev)Object.assign(p,{transfer:TOC.transfer});return p;}
+function tocKPI(R,p){const y=a=>mean(a.slice(-365));const moved=p&&p.transfer?y(R.D)*p.transfer/(100-p.transfer):0;return{T:y(R.ship)+moved,moved,I:y(R.I)+y(R.W),FG:y(R.I),WIP:y(R.W),Q:y(R.Q),LT:y(R.LT),B:y(R.B),cap:y(R.cap)};}
 function loads2025(){if(typeof BMV==='undefined')return null;return ['LINE-1','LINE-2','LINE-3','LINE-4','LINE-5'].map(l=>[l,mean(BMV.load.data[l].slice(24)),mean(BMV.cap.data[l].slice(24)),mean(BMV.dem.data[l].slice(24))/30.4]);}
 
 // ===== ネットワーク図の操作：ホイールで拡大縮小・余白のドラッグで移動・ノードのドラッグで配置・自動配置・全体表示 =====
@@ -1243,7 +1279,7 @@ function render(){$('tabs').innerHTML=tabsHtml();
 const VIEW={
  cld:()=>{const opts=exOpts();const Ls=C?C.loops:[];
   return `<div class="row"><div class="col">
-   ${lesBanner()}<h2>① SDにするCLDを選ぶ</h2><p class="zl">例題：<select id="exSel">${opts}</select>　<button id="bOpen">ファイルを開く（draw.io・ナビ・ワークベンチ・JSON）</button><input type="file" id="fOpen" accept=".drawio,.xml,.svg,.json" style="display:none"> <small class="hint">ここへドラッグ＆ドロップでもよい</small></p>
+   ${lesBanner()}<h2>① SDにするCLDを選ぶ</h2><p class="zl">例題：<select id="exSel">${opts}</select>　<button id="bOpen">ファイルを開く（draw.io・ナビ・ワークベンチ・JSON・Excel）</button><input type="file" id="fOpen" accept=".drawio,.xml,.svg,.json,.scm.json,.xlsx,.xlsm,.csv,.tsv" style="display:none"> <button id="bToWb" title="いまのCLDを，システム分析ワークベンチへ渡す（届かなければ受け渡しファイルを保存）">ワークベンチへ戻す ↗</button> <small class="hint">ここへドラッグ＆ドロップでもよい（受け渡しファイル .scm.json も開ける。Excel・CSV は⑥データへ）</small></p>
    ${edBar()}<div id="cldMain">${ED.on?edMain():`${nvToolbar('cld0',{layout:1,reset:1})}<button id="bDxCld" class="dxb">このCLDを draw.io に書き出す</button><div class="card netbox" id="sd_cld0">${C?sdDiagram(C,0,null,'cld0'):''}</div><p class="hint">いまは CLD（因果ループ図）のまま。矢印の＋／−と ‖（遅れ）だけが描かれている。②で「たまる量」と「流れ」に分ける。</p>`}</div></div>
    <div class="col side"><div id="cldLoops">${cldLoopPanel()}</div>
    ${dxReport()}${lesCldSide()}${ED.on?edSide():''}<div class="tip"><b>自分のCLDを使う</b>：上の「＋ 新しいCLDを描く」「✎ このCLDを編集する」で，この画面でCLDを描ける（ブラウザに自動保存，ファイルにも保存できる）。draw.io で描いたCLD（.drawio），システム分析ワークベンチの保存ファイル，旧CLDアナライザの作業ファイル，このラボで保存したJSONは「ファイルを開く」で読み込める。<b>ブルーマウンテン社の本格的なSDは④</b>で扱う。${DXHELP}</div>
@@ -1258,7 +1294,7 @@ const VIEW={
   return `<div class="row"><div class="col"><h2>② CLDをSDに変換する（1手ずつ）</h2><div class="stepper">${steps.map((s,i)=>`<button data-stg="${i}" class="${i===STG?'on':''}">${s}</button>`).join('')}</div>
    <div class="bigmsg">${msg}</div>${nvToolbar('conv',{layout:1,reset:1})}<div class="card netbox" id="sd_conv">${sdDiagram(C,STG,hl,'conv')}</div>
    <p class="legend"><span class="lg st">ストック</span><span class="lg ax">補助変数</span><span class="lg cn">定数</span> 点線の矢印：ストックの「変化（フロー）」に入る情報</p></div>
-   <div class="col side"><h3>変数の種類（自動の判定を変えられる）</h3>${tbl(['変数','種類','理由'],C.V.map(v=>[`<b>${esc(v)}</b>`,`<select data-ov="${esc(v)}">${Object.entries(TYPES).map(([k,t])=>`<option value="${k}" ${C.T[v]===k?'selected':''}>${t}</option>`).join('')}</select>${G.ov[v]&&G.ov[v]!==C.auto[v]?' <small class="warn">変更</small>':''}`,`<small>${esc((WHY[C.why[v]]||'').split('：')[0])}</small>`]))}
+   <div class="col side"><h3>変数の種類（自動の判定を変えられる）</h3>${tbl(['変数','種類','理由'],C.V.map(v=>[`<b>${esc(v)}</b>`,`<select data-ov="${esc(v)}">${Object.entries(TYPES).map(([k,t])=>`<option value="${k}" ${C.T[v]===k?'selected':''}>${t}</option>`).join('')}</select>${G.ov[v]&&G.ov[v]!==C.auto[v]?' <small class="warn">変更</small>':''}`,`<small>${esc((WHY[C.why[v]]||'').split('：')[0])}${C.note&&C.note[v]?'<br><b>名前から</b>：'+esc(C.note[v]):''}</small>`]))}
    ${C.bad.length?`<p class="warn">ストックのないループが ${C.bad.length}本ある：${C.bad.map(L=>esc(L.vars.join('→'))).join('，')}。どれかをストックにする。</p>`:''}
    <div class="tip"><b>CLD → SD の3つのルール</b><ol><li>ストックに入る矢印はフローを通す</li><li>遅れはストックになる</li><li>人の判断は外から与える値にする</li></ol>ここで作るのは，<b>どの変数も基準値＝1</b>にそろえた「感度モデル」。量の単位や式は，④のブルーマウンテン社のモデルで本格的に扱う。</div>
    <button class="primary big" data-go="run">③ 動かしてみる ▶</button></div></div>`;},
@@ -1275,15 +1311,15 @@ const VIEW={
    <h3>グラフに出す変数</h3><div class="chk">${C.V.map(v=>`<label><input type="checkbox" data-show="${esc(v)}" ${G.show.has(v)?'checked':''}> ${esc(v)}</label>`).join('')}</div>
    <h3>ループ</h3>${C.loops.map(L=>`<div class="lp"><b class="${L.type}">${L.type}</b> ${esc(L.vars.join(' → '))}</div>`).join('')}
    <button id="bIM" class="primary big">InsightMaker のファイルを作る ⬇</button><p class="hint">InsightMaker（insightmaker.com）で「Import」→ ファイルを選ぶと，同じモデルを開いてスライダーで動かせる。</p></div></div>`;},
- bw:()=>{const p=BMP;const sl=(k,lab,mn,mx,st,u)=>`<p class="zl"><span class="sl">${lab}</span><input type="range" data-bm="${k}" min="${mn}" max="${mx}" step="${st}" value="${p[k]}"> <b>${p[k]}${u||''}</b></p>`;
+ bw:()=>{const p=BMP;const sl=(k,lab,mn,mx,st,u)=>`<p class="zl"><span class="sl">${lab}</span><input type="range" data-bm="${k}" min="${Math.min(mn,p[k])}" max="${Math.max(mx,p[k])}" step="${st}" value="${p[k]}"> <b>${+(+p[k]).toFixed(4)}${u||''}</b></p>`;
   const tg=(k,lab)=>`<label class="tg"><input type="checkbox" data-bmc="${k}" ${p[k]?'checked':''}> ${lab}</label>`;
-  return `<div class="row"><div class="col"><h2>④ ブルウィップ効果：ブルーマウンテン社（LINE-3）のSDモデル</h2>
+  return `<div class="row"><div class="col"><h2>④ ブルウィップ効果：ブルーマウンテン社（LINE-3）のSDモデル</h2>${resBar('bw')}
    <div class="presets">${[['now','現状（2024年4月に安全在庫を引き上げ）'],['bw','発注残をあまり見ない（β＝0.2）'],['share','情報共有（部品も最終需要で予測）'],['smooth','予測をゆっくり（90日）'],['reset','初期値に戻す']].map(([k,t])=>`<button data-pre="${k}">${t}</button>`).join('')}</div>
    <div id="bwCharts"></div><h3>InsightMaker で見る：このモデルの中身</h3><div id="imBw"></div></div>
-   <div class="col side"><h3>需要</h3><p class="zl"><select data-bms="dem"><option value="data" ${p.dem==='data'?'selected':''}>実績の需要（月別）</option><option value="step" ${p.dem==='step'?'selected':''}>1年目の終わりに15％増える</option><option value="flat" ${p.dem==='flat'?'selected':''}>一定</option></select></p>
+   <div class="col side"><div class="clsbox">データ：<b>${esc(DS.name)}</b><br><small class="hint">${DS.days.length}期間（${esc(DS.m[0])}〜${esc(DS.m[DS.m.length-1])}）・${dsDays(DS)}日</small> <button data-go="data" style="font-size:11.5px">⑥で自分のデータにする</button>${DS!==DS0?`<br>${tg('initRef','在庫・受注残の初期値を実績の最初の期間にそろえる')}`:''}</div><h3>需要</h3><p class="zl"><select data-bms="dem"><option value="data" ${p.dem==='data'?'selected':''}>実績の需要（${DS===DS0?'月別':'データ'}）</option><option value="step" ${p.dem==='step'?'selected':''}>1年目の終わりに15％増える</option><option value="flat" ${p.dem==='flat'?'selected':''}>一定</option></select></p>
    ${sl('noise','日々のばらつき',0,50,5,'％')}${sl('seed','乱数の種',1,50,1)}
-   <h3>DC（SCM部）の発注ルール</h3>${sl('Tf','予測期間',1,120,1,'日')}${sl('Ta','調整時間',1,30,1,'日')}${sl('beta','発注残の考慮度 β',0,1,0.1)}${sl('ss0','安全在庫日数',0,40,1,'日')}${tg('raise','2024年4月に引き上げる')}${sl('ss1','引き上げ後',0,40,1,'日')}${sl('cyc','サイクル在庫日数',0,40,1,'日')}
-   <h3>LINE-3（工場）</h3>${tg('capData','計画・停止・段取り時間は実績（月別）')}${sl('speed','処理速度',150,220,1,'個/時')}${sl('setupCut','段取り短縮率',0,80,10,'％')}${sl('LT','生産LT',1,10,1,'日')}${sl('allow','顧客が待てる日数',10,400,10,'日')}
+   <h3>DC（SCM部）の発注ルール</h3>${sl('Tf','予測期間',1,120,1,'日')}${sl('Ta','調整時間',1,30,1,'日')}${sl('beta','発注残の考慮度 β',0,1,0.1)}${sl('ss0','安全在庫日数',0,40,1,'日')}${tg('raise',esc(dayLabel(p.raiseDay))+'に引き上げる')}${p.raise?sl('raiseDay','引き上げる日',0,dsDays(DS)-1,1,'日目'):''}${sl('ss1','引き上げ後',0,40,1,'日')}${sl('cyc','サイクル在庫日数',0,40,1,'日')}
+   <h3>LINE-3（工場）</h3>${tg('capData','計画・停止・段取り時間は実績（期間別）')}${sl('speed','処理速度',150,220,1,'個/時')}${sl('setupCut','段取り短縮率',0,80,10,'％')}${sl('plan','計画時間（データがないとき）',0,24,0.1,'時間/日')}${sl('LT','生産LT',1,10,1,'日')}${sl('allow','顧客が待てる日数',10,400,10,'日')}
    <h3>部品サプライヤ（もう1段上流）</h3>${tg('share','情報共有（最終需要で部品を予測）')}${sl('pTf','部品の予測期間',1,60,1,'日')}${sl('pLT','部品の調達日数',1,60,1,'日')}
    <button id="bIMbm" class="primary big">InsightMaker のファイルを作る ⬇</button></div></div>`;},
  toc:()=>`<div class="subt">${[['dice','A マッチ棒ゲーム（ザ・ゴール）'],['five','B ブルーマウンテン社で5つの集中ステップ']].map(([k,t])=>`<button data-sub="${k}" class="${SUBT===k?'on':''}">${t}</button>`).join('')}</div>`+(SUBT==='dice'?VIEW.dice():VIEW.five()),
@@ -1312,8 +1348,9 @@ const sdH=key=>({node:'.nd',nameOf:n=>n.dataset.v,getPos:v=>G.pos[v]&&G.pos[v].s
 const imH=key=>({node:'.imp[data-k="n"]',nameOf:n=>n.dataset.imp,getPos:nm=>{const p=LASTW[key]&&LASTW[key].P.find(x=>x.name===nm);return p?[p.x,p.y]:null;},setPos:(nm,p)=>{IMPOS[key][nm]=[Math.round(p[0]),Math.round(p[1])];},
   redraw:()=>{if(key==='run')AFTER.run();else if(key==='lrun')AFTER.lrun();else renderImBw();},reset:()=>{IMPOS[key]={};}});
 const NVH={cld0:sdH('cld0'),conv:sdH('conv'),im_run:imH('run'),im_bw:imH('bw')};
-function renderImBw(){LASTW.bw=applyIMPOS(buildBM(BMP),'bw');const R0=simBM(Object.assign({},BMP,{noise:0}));const y=a=>mean(a.slice(730));
-  const ck=`<p>InsightMaker で「需要のばらつき」を <b>0</b> にしてから「Run Simulation」を押し，2025年（730〜1095日）の平均がこの表と同じくらいになるかを確かめる（ばらつきがあると乱数が違うので，値は少しずれる）。</p>${tbl(['部品','2025年の平均（ばらつき0）'],[['生産',y(R0.P).toFixed(0)+' 個/日'],['DC在庫',y(R0.I).toFixed(0)+' 個'],['受注残',y(R0.B).toFixed(0)+' 個'],['生産待ち',y(R0.W).toFixed(0)+' 個'],['補充指示',y(R0.O).toFixed(0)+' 個/日']])}<p class="hint">グラフ（Display）は4つ作ってある：需要と発注／在庫と受注残／能力と生産／増幅率。</p>`;
+function renderImBw(){LASTW.bw=applyIMPOS(buildBM(BMP),'bw');
+  const R1=simBM(BMP),ds=R1.ds,dd=dsDays(ds);const y=a=>mean(a.slice(-365));const R0=R1;
+  const ck=`<p>InsightMaker で「Run Simulation」を押し，最後の1年（${Math.max(0,dd-365)}〜${dd}日）の平均がこの表と同じになるかを確かめる。日々の需要のばらつきは，このツールと同じ乱数（種 ${BMP.seed}）を表（Converter）にして入れてあるので，<b>ばらつきがあっても同じ結果</b>になる（RandNormal は使っていない。乱数の種を変えたら，ファイルを作り直す）。</p>${tbl(['部品','最後の1年の平均（いまの設定）'],[['生産',y(R0.P).toFixed(0)+' 個/日'],['DC在庫',y(R0.I).toFixed(0)+' 個'],['受注残',y(R0.B).toFixed(0)+' 個'],['生産待ち',y(R0.W).toFixed(0)+' 個'],['補充指示',y(R0.O).toFixed(0)+' 個/日']])}<p class="hint">グラフ（Display）は4つ作ってある：需要と発注／在庫と受注残／能力と生産／増幅率。</p>`;
   const el=$('imBw');if(el)el.innerHTML=imPanel('bw',LASTW.bw,ck);}
 var FS=5;
 function fsTip(n){return {1:'<div class="tip"><b>ステップ1 制約を見つける</b>：右の「ライン別の負荷率（2025年）」で，負荷率がいちばん高いライン（95％以上は赤）を探す → <b>LINE-3</b>。このラインの1時間が会社全体の1時間になる。<br>カード2〜5を順に押すと，対策を1つずつ積み上げた結果がここに出る。</div>',
@@ -1322,19 +1359,22 @@ function fsTip(n){return {1:'<div class="tip"><b>ステップ1 制約を見つ�
  4:'<div class="tip"><b>ステップ4 制約を高める</b>：LINE-3 の需要の一部を LINE-4 へ移し，需要を能力の内側に入れる（移管率は右のスライダー）。移した先が新しい制約にならないかは，カード5で確かめる。</div>'}[n]||'';}
 const AFTER={
  run:()=>{if(!C)return;const R=simGeneric(C);const S=[...G.show].filter(v=>R[v]).map((v,i)=>({name:v+(C.T[v]==='stock'?'（ストック）':C.T[v]==='const'?'（定数）':''),data:R[v],x:R.t,w:C.T[v]==='stock'?2.6:1.6,dash:C.T[v]==='const'?'5 3':null}));
-  const allv=S.flatMap(s=>s.data);const lo=Math.min(...allv,1),hi=Math.max(...allv,1);const pd=Math.max((hi-lo)*0.1,0.02);$('runChart').innerHTML=lineChart({series:S,w:720,h:320,title:'基準値＝1からの変化',ymin:lo-pd,ymax:hi+pd,marks:[[10,'ここで変える']],xt:[0,10,20,30,40,50,60,80,100,150,200].filter(x=>x<=G.T).map(x=>[x,x+'日']),xl:'日'});
-  const fin=C.V.map(v=>[v,R[v][R[v].length-1]]).filter(([v])=>C.T[v]!=='const');const up=fin.filter(x=>x[1]>1.005).map(x=>x[0]),dn=fin.filter(x=>x[1]<0.995).map(x=>x[0]);
-  $('runNote').innerHTML=`${G.shock?`「${esc(G.shock)}」を${G.shockSize>0?'増やす':'減らす'}と，最後に増えた変数：${up.map(esc).join('，')||'なし'}／減った変数：${dn.map(esc).join('，')||'なし'}。`:''}${R.cyc.length?`<span class="warn">ストックのないループがあるので，繰り返し計算で近似した（${R.cyc.map(esc).join('，')}）。</span>`:''} Rのループが強いと増え続け（または減り続け），Bのループが強いと落ち着く。遅れ（時間）を長くすると，行き過ぎや振動が出ることがある。`;
+  const allv=S.flatMap(s=>s.data).filter(v=>v!=null&&isFinite(v));const lo=Math.min(...allv,1),hi=Math.max(...allv,1);const pd=Math.max((hi-lo)*0.1,0.02);$('runChart').innerHTML=lineChart({series:S,w:720,h:320,title:'基準値＝1からの変化',ymin:lo-pd,ymax:hi+pd,marks:[[10,'ここで変える']].concat(R.blow?[[R.blow.t,'発散']]:[]),yl:'基準値＝1 に対する比',xt:[0,10,20,30,40,50,60,80,100,150,200].filter(x=>x<=G.T).map(x=>[x,x+'日']),xl:'日'});
+  const fin=C.V.map(v=>[v,R[v][R[v].length-1]]).filter(([v,x])=>C.T[v]!=='const'&&x!=null&&isFinite(x));const up=fin.filter(x=>x[1]>1.005).map(x=>x[0]),dn=fin.filter(x=>x[1]<0.995).map(x=>x[0]);
+  $('runNote').innerHTML=(R.blow?`<div class="blow"><b>発散しました</b>（${R.blow.t}日目に「${esc(R.blow.v)}」が ${isFinite(R.blow.x)?'基準の'+fmt(R.blow.x)+'倍':'計算できない値'}になったので，そこで計算を止めた）：<b>効き方を下げる</b>，R（自己強化）ループの<b>矢印の強さを下げる</b>，<b>期間を短くする</b>，ショックを小さくする，のどれかを試す。強さ×効き方が1を超える自己強化ループは，この感度モデルでは際限なく増える。</div>`:'')+`${G.shock?`「${esc(G.shock)}」を${G.shockSize>0?'増やす':'減らす'}と，最後に増えた変数：${up.map(esc).join('，')||'なし'}／減った変数：${dn.map(esc).join('，')||'なし'}。`:''}${R.cyc.length?`<span class="warn">ストックのないループがあるので，繰り返し計算で近似した（${R.cyc.map(esc).join('，')}）。</span>`:''} Rのループが強いと増え続け（または減り続け），Bのループが強いと落ち着く。遅れ（時間）を長くすると，行き過ぎや振動が出ることがある。`;
   LASTW.run=applyIMPOS(buildGeneric(C),'run');const fin2=C.V.filter(v=>C.T[v]!=='const').map(v=>[v,R[v][R[v].length-1]]);
-  $('imRun').innerHTML=imPanel('run',LASTW.run,`<p>InsightMaker で「Run Simulation」を押し，${G.T}日目の値がこの表と同じになるかを確かめる（ツールと InsightMaker は同じ式で計算している）。</p>${tbl(['変数',G.T+'日目の値'],fin2.map(([v,x])=>[esc(v),x.toFixed(3)]))}`);},
- bw:()=>{const R=simBM(BMP);const wk=a=>week(a);const d=wk(R.D),o=wk(R.O),po=wk(R.PO);
-  const amp=`<div class="stat3"><div><b>1.00</b>顧客の需要</div><div><b class="${R.amp.O>1.2?'warn':''}">${R.amp.O.toFixed(2)}</b>DC → LINE-3 の補充指示</div><div><b class="${R.amp.PO>1.2?'warn':''}">${R.amp.PO.toFixed(2)}</b>LINE-3 → 部品サプライヤの発注</div></div><p class="hint">増幅率＝発注の標準偏差÷顧客の需要の標準偏差（日次，最初の60日を除く）。1より大きいほど，上流で発注が膨らんでいる（ブルウィップ効果）。</p>`;
-  const c1=lineChart({title:'顧客の需要と，上流への発注（個/日，週平均）',series:[{name:'顧客の需要',data:d.o,x:d.x,color:'#1B3A4B',w:2.4},{name:'DC → LINE-3 補充指示',data:o.o,x:o.x,color:'#0F7C8C'},{name:'LINE-3 → 部品サプライヤ 発注',data:po.o,x:po.x,color:'#C8553D'}],w:760,h:280,xt:MX,marks:[[456,'安全在庫の引き上げ']],ymin:0});
-  const cmp=(t,sim,ref,u)=>lineChart({title:t,series:[{name:'モデル',data:sim,x:REF.m.map((_,i)=>i),color:'#0F7C8C',w:2.4},{name:'実績',data:ref,x:REF.m.map((_,i)=>i),color:'#7A8A92',dash:'5 3'}],w:370,h:210,xt:MXM,ymin:0});
-  const c3=lineChart({title:'LINE-3：生産待ちと生産能力',series:[{name:'生産待ち（個）',data:R.W,x:R.t,color:'#7B3FA0'},{name:'DC在庫（個）',data:R.I,x:R.t,color:'#0F7C8C'},{name:'受注残（個）',data:R.B,x:R.t,color:'#C8553D'}],w:760,h:230,xt:MX,marks:[[456,'']],ymin:0});
-  renderImBw();
-  $('bwCharts').innerHTML=amp+c1+`<h3>実績と比べる（月平均）　<small>ずれ：生産 ${(R.fit.P*100).toFixed(0)}％・在庫 ${(R.fit.I*100).toFixed(0)}％・受注残 ${(R.fit.B*100).toFixed(0)}％</small></h3><div class="row2">${cmp('生産（個/日）',R.M.P,REF.prod)}${cmp('DC在庫（個）',R.M.I,REF.inv)}${cmp('受注残（個）',R.M.B,REF.bo)}${cmp('需要（個/日）',R.M.D,REF.dem)}</div>`+c3+
-   `<div class="tip"><b>読み方</b>：DCは「予測＋（目標在庫−在庫）÷調整時間＋β×（目標の発注残−発注残）÷調整時間」で補充を指示する。<b>β＝0（発注残を見ない）</b>だと，届く前の注文を忘れて同じ不足に何度も発注し，発注が膨らむ。LINE-3が部品を発注するときも同じことが起き，上流ほど膨らむ。能力いっぱいのLINE-3では，膨らんだ発注は<b>生産待ち</b>として積み上がり，補充が遅れる（システム分析ナビのCLDの R1「引き上げ → 混雑 → 補充の遅れ」）。</div>`;},
+  $('imRun').innerHTML=imPanel('run',LASTW.run,`<p>InsightMaker で「Run Simulation」を押し，${G.T}日目の値がこの表と同じになるかを確かめる（ツールと InsightMaker は同じ式で計算している）。</p>${tbl(['変数',(R.blow?R.blow.t:G.T)+'日目の値'],fin2.map(([v,x])=>[esc(v),x!=null&&isFinite(x)?x.toFixed(3):'—']))}`);},
+ bw:()=>{const R=simBM(BMP);const ds=R.ds;const tk=dsTicks(ds);const xf=d=>`${dayLabel(d,ds)}（${Math.round(d)}日目）`,xm=i=>ds.m[Math.round(i)]||'';const d=week(R.D),o=week(R.O),po=week(R.PO);
+  const amp=`<div class="stat3"><div><b>1.00</b>顧客の需要</div><div><b class="${R.amp.O>1.2?'warn':''}">${R.amp.O.toFixed(2)}</b>DC → LINE-3 の補充指示</div><div><b class="${R.amp.PO>1.2?'warn':''}">${R.amp.PO.toFixed(2)}</b>LINE-3 → 部品サプライヤの発注</div></div><p class="hint">増幅率＝発注の標準偏差÷顧客の需要の標準偏差（日次，最初の60日を除く）。1より大きいほど，上流で発注が膨らんでいる（ブルウィップ効果）。データ：<b>${esc(ds.name)}</b>（${ds.days.length}期間・${dsDays(ds)}日）</p>`;
+  const mk=BMP.raise&&BMP.raiseDay<dsDays(ds)?[[BMP.raiseDay,'安全在庫の引き上げ']]:[];
+  const c1=lineChart({title:'顧客の需要と，上流への発注（個/日，週平均）',series:[{name:'顧客の需要',data:d.o,x:d.x,color:'#1B3A4B',w:2.4},{name:'DC → LINE-3 補充指示',data:o.o,x:o.x,color:'#0F7C8C'},{name:'LINE-3 → 部品サプライヤ 発注',data:po.o,x:po.x,color:'#C8553D'}],w:760,h:280,xt:tk.MX,marks:mk,ymin:0,xfmt:xf});
+  const xi=ds.m.map((_,i)=>i);const has=a=>a&&a.some(v=>v!=null&&isFinite(v));
+  const cmp=(t,sim,ref)=>lineChart({title:t,series:[{name:'モデル',data:sim,x:xi,color:'#0F7C8C',w:2.4}].concat(has(ref)?[{name:'実績',data:ref,x:xi,color:'#7A8A92',dash:'5 3'}]:[]),w:370,h:210,xt:tk.MXM,ymin:0,xfmt:xm});
+  const c3=lineChart({title:'LINE-3：生産待ち・DC在庫・受注残（個）',series:[{name:'生産待ち（個）',data:R.W,x:R.t,color:'#7B3FA0'},{name:'DC在庫（個）',data:R.I,x:R.t,color:'#0F7C8C'},{name:'受注残（個）',data:R.B,x:R.t,color:'#C8553D'}],w:760,h:230,xt:tk.MX,marks:mk.map(m=>[m[0],'']),ymin:0,xfmt:xf});
+  renderImBw();const pc=v=>v==null?'—':(v*100).toFixed(0)+'％';const per={month:'月平均',week:'週平均',day:'日別'}[ds.period]||'期間平均';
+  $('bwCharts').innerHTML=amp+(R.partsDays>=1?`<p class="hint">部品在庫が足りず，生産を部品の入荷に合わせて抑えた日：約${Math.round(R.partsDays)}日（部品在庫はマイナスにしない）</p>`:'')+c1+`<h3>実績と比べる（${per}）　<small>ずれ（NRMSE）：生産 ${pc(R.fit.P)}・在庫 ${pc(R.fit.I)}・受注残 ${pc(R.fit.B)}</small></h3><div class="row2">${cmp('生産（個/日）',R.M.P,ds.prod)}${cmp('DC在庫（個）',R.M.I,ds.inv)}${cmp('受注残（個）',R.M.B,ds.bo)}${cmp('需要（個/日）',R.M.D,ds.dem)}</div>`+c3+
+   `<div class="tip"><b>読み方</b>：DCは「予測＋（目標在庫−在庫）÷調整時間＋β×（目標の発注残−発注残）÷調整時間」で補充を指示する。<b>β＝0（発注残を見ない）</b>だと，届く前の注文を忘れて同じ不足に何度も発注し，発注が膨らむ。LINE-3が部品を発注するときも同じことが起き，上流ほど膨らむ。能力いっぱいのLINE-3では，膨らんだ発注は<b>生産待ち</b>として積み上がり，補充が遅れる（システム分析ナビのCLDの R1「引き上げ → 混雑 → 補充の遅れ」）。</div>`+'<div id="bwFit"></div><div id="bwScen"></div>';
+  if(typeof bwExtras==='function')bwExtras(R);},
  toc:()=>{if(SUBT==='dice')AFTER.dice();else AFTER.five();},
  dice:()=>{const R=simDice(DG);const x=R.out.map((_,i)=>i+1);
   $('diceCharts').innerHTML=lineChart({title:'出来高の累計（本）',series:[{name:'実際の出来高',data:R.out,x,color:'#0F7C8C',w:2.6},{name:`平均どおりなら（1回 ${DG.mode==='neck'?2.5:3.5}本）`,data:R.exp,x,color:'#7A8A92',dash:'5 3'}],w:760,h:260,xl:'回',ymin:0})+lineChart({title:'工程のあいだの仕掛り（本）',series:[{name:'仕掛りの合計',data:R.wip,x,color:'#C8553D',w:2.4},...(DG.mode==='neck'?[{name:'ボトルネックの前',data:R.neckq,x,color:'#B7791F'}]:[])],w:760,h:220,xl:'回',ymin:0});
@@ -1342,7 +1382,7 @@ const AFTER={
  five:()=>{if(FS<=1){$('fiveOut').innerHTML=fsTip(1);return;}const sc=[['現状',1],['＋2 徹底活用',2],['＋3 従属（DBR）',3],['＋4 制約を高める',4]].filter(([n,k])=>k<=Math.min(4,FS)).map(([n,k])=>{const p=tocParams(k);const R=simBM(p);return{n,R,K:tocKPI(R,p),p};});
   const L=loads2025();const l3=L&&L.find(x=>x[0]==='LINE-3'),l4=L&&L.find(x=>x[0]==='LINE-4');const moved=l3?mean(REF.dem.slice(24))*TOC.transfer/100:0;const l4new=l4?l4[1]+moved/l4[2]*100:null;
   $('fiveOut').innerHTML=tbl(['2025年の平均','スループット T（出荷 個/日）','在庫 I（DC在庫＋工場の仕掛り，個）','うち工場の仕掛り（生産待ち）','投入を止めている指示（個）','補充リードタイム（日）','受注残（個）','LINE-3の能力（個/日）'],sc.map(s=>[`<b>${s.n}</b>`,Math.round(s.K.T)+(s.K.moved?`<br><small>うちLINE-4 ${Math.round(s.K.moved)}</small>`:''),Math.round(s.K.I),Math.round(s.K.WIP),Math.round(s.K.Q),s.K.LT.toFixed(1),Math.round(s.K.B),Math.round(s.K.cap)]))+
-   lineChart({title:'受注残（個）',series:sc.map((s,i)=>({name:s.n,data:s.R.B,x:s.R.t,color:PAL[i]})),w:760,h:220,xt:MX,ymin:0})+lineChart({title:'工場の仕掛り（生産待ち，個）',series:sc.map((s,i)=>({name:s.n,data:s.R.W,x:s.R.t,color:PAL[i]})),w:760,h:200,xt:MX,ymin:0})+(FS<5?fsTip(FS):
+   lineChart({title:'受注残（個）',series:sc.map((s,i)=>({name:s.n,data:s.R.B,x:s.R.t,color:PAL[i]})),w:760,h:220,xt:dsTicks(DS0).MX,ymin:0,xfmt:d=>dayLabel(d,DS0)})+lineChart({title:'工場の仕掛り（生産待ち，個）',series:sc.map((s,i)=>({name:s.n,data:s.R.W,x:s.R.t,color:PAL[i]})),w:760,h:200,xt:dsTicks(DS0).MX,ymin:0,xfmt:d=>dayLabel(d,DS0)})+(FS<5?fsTip(FS):
    `<div class="tip"><b>ステップ5 繰り返す</b>：LINE-3の需要の${TOC.transfer}％（約${Math.round(moved)}個/日）をLINE-4へ移すと，LINE-4の負荷率は約${l4new?l4new.toFixed(0):'—'}％${l4new>95?'。<b class="warn">LINE-4が新しい制約になる</b>':'。まだ余裕がある（ただし品目の作り分けや段取りが増える点は別に確かめる）'}。<br><b>読み方</b>：徹底活用（段取り・停止の削減）は能力を増やし，T（出荷）が増えて受注残が減る。従属（DBR）は，ロープで投入を能力に合わせ，安全在庫の引き上げをやめる。Tはほとんど変わらないが，<b>工場の中の仕掛りが大きく減る</b>（膨らんだ指示は「投入を止めている指示」として工場の外で待つ。材料を工場に流し込まないので，混雑と補充の遅れが起きにくい）。制約を高める（移管）と，LINE-3の需要が能力の内側に入る。</div>`);}};
 // ---- 操作
 function bind(){
@@ -1354,7 +1394,7 @@ function bind(){
   if(t.id==='bOpen'){$('fOpen').click();return;}
   if(t.id==='bDxCld'){download(fname('CLD-'+G.title.replace(/[\s（）()：:]/g,'').slice(0,20),'drawio'),cldToDrawio());return;}
   if(t.id==='bIM'){download(fname('SD-'+G.title.replace(/[\s（）()：:]/g,'').slice(0,20),'InsightMaker'),applyIMPOS(buildGeneric(C),'run').xml());return;}
-  if(t.id==='bIMbm'){download(fname('SD-BM-LINE3-ブルウィップと能力','InsightMaker'),applyIMPOS(buildBM(BMP),'bw').xml());return;}
+  if(t.id==='bIMbm'){download(fname('SD-BM-'+(DS===DS0?'LINE3':safeName(DS.name))+'-ブルウィップと能力','InsightMaker'),applyIMPOS(buildBM(BMP),'bw').xml());return;}
   const pr=t.closest('[data-pre]');if(pr){const k=pr.dataset.pre;Object.assign(BMP,BMDEF);if(k==='bw')BMP.beta=0.2;if(k==='share')BMP.share=1;if(k==='smooth')BMP.Tf=90;render();return;}
   const sb=t.closest('[data-sub]');if(sb){SUBT=sb.dataset.sub;render();return;}
   if(t.id==='dAgain'){DG.seed++;render();return;}
@@ -1622,7 +1662,7 @@ function bmCoverNote(){if(!isBM()||!C)return '';const cov=bmCovered();const miss
   return `<div class="covnote"><b>${esc(G.title)}</b> と，このモデル：${full?'このCLDは，モデルの主な構造をほぼすべて描いている。下の図（InsightMaker）で，色の付いた部品がCLDに対応する。':`このCLDで<b>描いていない部分</b>（${miss.map(esc).join('・')}）も，モデルには入っている。下の図（InsightMaker）では，描いていない部品を<b>薄く</b>表示している。<b>CLDの細かさが違っても会社は1つ</b>なので，計算はどちらのCLDでも同じ。描かなかった構造が在庫や受注残の動きにどう効いているかを見る。`}</div>`;}
 function bmCutPanel(){const av=bmCutsAvail();if(!isBM())return '';
   if(!av.length)return `<div class="cutpanel"><h3>描いていない部分を切ってみる</h3><p class="hint">このCLDは「顧客の取消」「需要」を描いているので，切る部分はない。簡略版のCLDを選ぶと，描いていない部分を切ったモデルと比べられる。</p></div>`;
-  const P0=window._simBM0(BMP),P1=window._simBM0(bmEff(BMP));const pc=x=>(x*100).toFixed(0)+'％';const y=(R,k)=>Math.round(mean(R[k].slice(730)));
+  const P0=window._simBM0(BMP),P1=window._simBM0(bmEff(BMP));const pc=x=>(x*100).toFixed(0)+'％';const y=(R,k)=>Math.round(mean(R[k].slice(-365)));
   return `<div class="cutpanel"><h3>描いていない部分を切ってみる：「${esc(G.title)}」だけでモデルを作ると？</h3>
    ${av.map(c=>`<label class="tg"><input type="checkbox" data-cut="${c.k}" ${CUT[c.k]?'checked':''}> <b>${c.t}</b>（このCLDに「${c.v}」がない）<br><small>${c.d}</small></label>`).join('')}
    <p class="hint">部品サプライヤ：このモデルでは部品は生産を止めない（部品発注の膨らみを見るための段）。切っても在庫・受注残は変わらないので，切り替えは置いていない。</p>
@@ -1903,5 +1943,412 @@ function nvRefit(){/* SVG は箱に合わせて伸び縮みする（viewBox は�
     d.querySelector('#dlfTry').onclick=()=>{const b=document.createElement('a');b.href=URL.createObjectURL(new Blob([text]));b.setAttribute('download',name);document.body.appendChild(b);orig.call(b);b.remove();};}
   HTMLAnchorElement.prototype.click=function(){const dl=this.hasAttribute('download');try{orig.call(this);}catch(e){}if(dl&&/^(blob:|data:)/.test(this.href||''))show(this);};
 })();
+
+</script>
+<script>
+// ===== システム分析ラボ v6：グラフの値・保存，結果の書き出し，設定の保存，自分のデータ，実績合わせ・シナリオ，ツール間の受け渡し =====
+(function(){const st=document.createElement('style');st.textContent=`
+.chartbox{position:relative;max-width:100%}.chart{max-width:100%}
+.lctool{position:absolute;right:4px;top:2px;display:flex;gap:2px;opacity:.25;transition:opacity .15s;z-index:2}.chartbox:hover .lctool,.lctool:focus-within{opacity:1}
+.lctool button{font-size:10.5px;padding:0 5px;line-height:16px;border-radius:4px;background:#fff}
+#lcTip{position:fixed;z-index:9999;pointer-events:none;background:rgba(27,58,75,.94);color:#fff;font-size:12px;line-height:1.45;border-radius:6px;padding:5px 8px;max-width:280px;display:none;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+#lcTip i{display:inline-block;width:10px;height:3px;margin-right:5px;vertical-align:middle}#lcTip b{color:#F2B33D;font-weight:normal}
+.blow{background:#FBEAE6;border:2px solid #C8553D;color:#7A2A1A;border-radius:8px;padding:6px 10px;margin:4px 0;font-size:13px;line-height:1.6}
+.resbar{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin:2px 0 6px;font-size:12.5px;color:#3B4A52}.resbar button{font-size:12px;padding:2px 8px}
+.clsbox{background:#F4FAFB;border:1px solid #BFDCE2;border-radius:8px;padding:4px 8px;margin:4px 0 8px;font-size:12.5px}.clsbox summary{font-size:13px}.clsbox select{font-size:12px}
+.clsbox table.t td{padding:2px 4px}
+#labToast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#1B3A4B;color:#fff;border-radius:8px;padding:8px 14px;font-size:13.5px;z-index:9998;max-width:min(92vw,640px);box-shadow:0 3px 12px rgba(0,0,0,.3);display:none;line-height:1.6}
+#labToast button{margin-left:8px;font-size:12px}
+.dpdrop{border:2px dashed #9FC3CB;border-radius:10px;padding:14px;text-align:center;background:#FBFDFE;margin:6px 0}.dpdrop.on{background:#EAF4F6;border-color:#0F7C8C}
+.dpgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:4px 10px;font-size:12.5px;margin:4px 0}
+.dpgrid label{display:flex;gap:4px;align-items:center;border:1px solid #E3E9EC;border-radius:6px;padding:2px 6px;background:#fff}.dpgrid select{font-size:11.5px;margin-left:auto}
+.dpv{font-size:12.5px;line-height:1.6;border-radius:8px;padding:5px 9px;margin:4px 0}.dpv.ok{background:#E6F4EA}.dpv.ng{background:#FBEAE6}.dpv.wa{background:#FFF7E6}
+.dpbind td{vertical-align:top}.dpbind select{max-width:100%;font-size:12px}
+.fitbox{background:#fff;border:1px solid #D5DCE0;border-radius:10px;padding:8px 10px;margin:10px 0}.fitbox h3{margin:2px 0 6px}
+.fitrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:3px 0;font-size:12.5px}.fitrow input[type=number]{width:76px}
+.tblw{max-width:100%;overflow-x:auto}
+.u-small{font-size:11.5px;color:#5F6E76}
+@media (max-width:900px){
+ .row{flex-direction:column}.row>.col,.row>.col.side,.row>.col.side[style]{flex:1 1 auto!important;width:100%!important;max-width:100%!important;min-width:0}
+ .row2,.row2x,.lesfig{grid-template-columns:minmax(0,1fr)!important}.fsteps{flex-wrap:wrap}.fs{flex:1 1 140px}
+ table.t{display:block;overflow-x:auto;max-width:100%}.imgrid{flex-direction:column}
+ main{padding:8px 10px}header{padding:6px 10px}.stat3{flex-wrap:wrap}.stat3 div{flex:1 1 30%}
+ input[type=range]{width:min(150px,42vw)}.sl{width:auto;min-width:96px}
+ .edtools,.nvbar,.presets,.stepper{flex-wrap:wrap}
+}
+@media (max-width:520px){.sl{display:block}#tabs button{font-size:12px;padding:3px 6px}.tgrp{max-width:100%}.tgrp>div{display:flex;flex-wrap:wrap;gap:3px}
+ header h1{font-size:16px}header .sub{font-size:11px}.lctool{opacity:.7}.ar{flex-wrap:wrap}.ar .al{flex:1 1 100%}code{max-width:100%}.eqt code{max-width:100%}
+ .bigmsg{font-size:13px}.helpbox{padding:10px}}
+img{max-width:100%}select{max-width:100%}
+`;document.head.appendChild(st);})();
+
+// ---- 小さな道具
+function labToast(html,ms){let d=$('labToast');if(!d){d=document.createElement('div');d.id='labToast';document.body.appendChild(d);}d.innerHTML=html+' <button onclick="this.parentNode.style.display=\'none\'">閉じる</button>';d.style.display='block';clearTimeout(labToast._t);labToast._t=setTimeout(()=>{d.style.display='none';},ms||6000);}
+function lsJ(k,d){try{const s=localStorage.getItem(k);return s?JSON.parse(s):d;}catch(e){return d;}}
+function lsS(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true;}catch(e){return false;}}
+const safeName=s=>String(s||'').replace(/[\s（）()：:\/\\?*\[\]"<>|]/g,'').slice(0,30);
+function saveBlob(blob,name){if(typeof SCMIO!=='undefined')SCMIO.download(blob,name);else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();}}
+const r4=v=>v==null||!isFinite(v)?null:Math.round(v*1e4)/1e4;
+
+// ---- グラフ：値を見る（ホバー）・保存（CSV・SVG・PNG）
+(function(){
+  const bs=(a,x)=>{let lo=0,hi=a.length-1;if(hi<0)return -1;while(hi-lo>1){const m=(lo+hi)>>1;if(a[m]<x)lo=m;else hi=m;}return Math.abs(a[lo]-x)<=Math.abs(a[hi]-x)?lo:hi;};
+  function tipEl(){let d=$('lcTip');if(!d){d=document.createElement('div');d.id='lcTip';document.body.appendChild(d);}return d;}
+  function hide(){const d=$('lcTip');if(d)d.style.display='none';document.querySelectorAll('.lchov').forEach(x=>x.remove());}
+  function move(ev){const sv=ev.target.closest&&ev.target.closest('svg.chart[data-lc]');if(!sv){hide();return;}const L=LC[sv.dataset.lc];if(!L)return;
+    const pt=sv.createSVGPoint();pt.x=ev.clientX;pt.y=ev.clientY;const m=sv.getScreenCTM();if(!m)return;const q=pt.matrixTransform(m.inverse());
+    if(q.x<L.l-4||q.x>L.W-L.r+4){hide();return;}const xv=(q.x-L.l)/(L.W-L.l-L.r)*L.n;let xs=null,rows=[];
+    L.S.forEach(s=>{const xa=s.x||s.data.map((_,i)=>i);const j=bs(xa,xv);if(j<0)return;const v=s.data[j];if(xs==null)xs=xa[j];rows.push(`<div><i style="background:${s.color}"></i>${esc(s.name)}：<b>${v==null||!isFinite(v)?'—':fmtN(v)}</b>${s.band?` <small>（${fmtN(s.band[0][j])}〜${fmtN(s.band[1][j])}）</small>`:''}</div>`);});
+    if(xs==null){hide();return;}const xl=L.xfmt?L.xfmt(xs):`${fmtN(xs)}${L.xl?' '+L.xl:''}`;
+    const d=tipEl();d.innerHTML=`<div style="color:#BFDCE2">${esc(xl)}${L.yl?` <small>（${esc(L.yl)}）</small>`:''}</div>`+rows.join('');d.style.display='block';
+    const w=d.offsetWidth,h=d.offsetHeight;let x=ev.clientX+14,y=ev.clientY+12;if(x+w>innerWidth-6)x=ev.clientX-w-14;if(y+h>innerHeight-6)y=ev.clientY-h-12;d.style.left=Math.max(4,x)+'px';d.style.top=Math.max(4,y)+'px';
+    let ln=sv.querySelector('.lchov');if(!ln){ln=document.createElementNS('http://www.w3.org/2000/svg','line');ln.setAttribute('class','lchov');ln.setAttribute('stroke','#1B3A4B');ln.setAttribute('stroke-dasharray','2 2');ln.setAttribute('pointer-events','none');sv.appendChild(ln);}
+    const X=L.l+(L.W-L.l-L.r)*xs/L.n;ln.setAttribute('x1',X);ln.setAttribute('x2',X);ln.setAttribute('y1',L.t);ln.setAttribute('y2',L.H-L.b);}
+  document.addEventListener('pointermove',move);document.addEventListener('pointerleave',hide);document.addEventListener('scroll',hide,true);
+  function svgText(sv){const c=sv.cloneNode(true);c.querySelectorAll('.lchov').forEach(x=>x.remove());c.setAttribute('xmlns','http://www.w3.org/2000/svg');const vb=sv.viewBox.baseVal;c.setAttribute('width',vb.width);c.setAttribute('height',vb.height);
+    c.setAttribute('font-family','"Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",Meiryo,sans-serif');const bg=document.createElementNS('http://www.w3.org/2000/svg','rect');bg.setAttribute('width','100%');bg.setAttribute('height','100%');bg.setAttribute('fill','#fff');c.insertBefore(bg,c.firstChild);
+    // 凡例を図の下に足す
+    const L=LC[sv.dataset.lc];if(L&&L.S.length){const H=vb.height,lh=16;const g=document.createElementNS('http://www.w3.org/2000/svg','g');let x=L.l,y=H+12;L.S.forEach(s=>{const w=Math.min(260,tw(s.name)*0.85+26);if(x+w>vb.width){x=L.l;y+=lh;}g.innerHTML+=`<rect x="${x}" y="${y-5}" width="14" height="3" fill="${s.color}"/><text x="${x+18}" y="${y}" font-size="11" fill="#3B4A52">${esc(s.name)}</text>`;x+=w;});c.appendChild(g);c.setAttribute('height',y+10);c.setAttribute('viewBox',`0 0 ${vb.width} ${y+10}`);}
+    return new XMLSerializer().serializeToString(c);}
+  function chartRows(L){const same=L.S.every(s=>s.x===L.S[0].x||(s.x&&L.S[0].x&&s.x.length===L.S[0].x.length&&s.x.every((v,i)=>v===L.S[0].x[i])));
+    const xn=L.xl||'x';if(same){const xa=L.S[0].x||L.S[0].data.map((_,i)=>i);const head=[xn].concat(L.xfmt?['ラベル']:[]).concat(L.S.flatMap(s=>s.band?[s.name,s.name+'（下）',s.name+'（上）']:[s.name]));
+      return [head].concat(xa.map((x,j)=>[x].concat(L.xfmt?[L.xfmt(x)]:[]).concat(L.S.flatMap(s=>s.band?[r4(s.data[j]),r4(s.band[0][j]),r4(s.band[1][j])]:[r4(s.data[j])]))));}
+    const rows=[['系列',xn,'値']];L.S.forEach(s=>s.data.forEach((v,j)=>rows.push([s.name,s.x?s.x[j]:j,r4(v)])));return rows;}
+  document.addEventListener('click',ev=>{const b=ev.target.closest&&ev.target.closest('[data-lcsave]');if(!b)return;const L=LC[b.dataset.lc],sv=$(b.dataset.lc);if(!L||!sv)return;
+    const nm=fname('グラフ-'+safeName(L.title||'図'),b.dataset.lcsave);
+    if(b.dataset.lcsave==='csv'){saveBlob(new Blob([SCMIO.toCsv(chartRows(L))],{type:'text/csv;charset=utf-8'}),nm);return;}
+    const txt=svgText(sv);if(b.dataset.lcsave==='svg'){saveBlob(new Blob([txt],{type:'image/svg+xml'}),nm);return;}
+    const img=new Image();const url=URL.createObjectURL(new Blob([txt],{type:'image/svg+xml'}));img.onload=()=>{const k=2,cv=document.createElement('canvas');cv.width=img.width*k;cv.height=img.height*k;const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,cv.width,cv.height);x.drawImage(img,0,0,cv.width,cv.height);URL.revokeObjectURL(url);cv.toBlob(bl=>{if(bl)saveBlob(bl,nm);},'image/png');};
+    img.onerror=()=>{URL.revokeObjectURL(url);labToast('PNG にできなかった。SVG で保存する。');};img.src=url;});
+  window.chartRows=chartRows;
+})();
+function fmtN(v){if(v==null||!isFinite(v))return '—';const a=Math.abs(v);return a>=1e9?(v/1e9).toFixed(2)+'G':a>=1e6?(v/1e6).toFixed(2)+'M':a>=1000?Math.round(v).toLocaleString('ja-JP'):a>=100?v.toFixed(1):a>=1?v.toFixed(2):v.toFixed(3);}
+
+// ---- 結果の書き出し（Excel・CSV）：SD入門・③・④・⑤
+function paramsRows(list){return [['項目','値','説明']].concat(list.map(r=>[r[0],r[1]==null?'':r[1],r[2]||'']));}
+const RESB={
+ les:()=>{const L=G.les;const R=lesSim(L,L.pv);const u=n=>{const o=[...L.P,...L.S,...L.A,...L.F].find(x=>x.n===n);return o&&o.u?`${n}（${o.u}）`:n;};
+   const names=[...L.S.map(s=>s.n),...L.F.map(f=>f.n),...L.A.map(a=>a.n),...L.P.map(p=>p.n)];
+   return{name:'SD入門-'+safeName(L.title.split('：')[0]),rows:[[`時刻（${L.U}）`].concat(names.map(u))].concat(R.t.map((t,i)=>[t].concat(names.map(n=>r4(R[n][i]))))),
+     params:[['モデル',L.title],['期間',L.T,L.U],['刻み（dt）',L.dt,L.U],['計算方法','オイラー法（InsightMaker の RK1 と同じ）']].concat(L.P.map(p=>[p.n,L.pv[p.n],p.u||'']))};},
+ gen:()=>{const R=simGeneric(C);const V=C.V;return{name:'SD-'+safeName(G.title),rows:[['時刻（日）'].concat(V.map(v=>`${v}（${TYPES[C.T[v]]}，基準＝1）`))].concat(R.t.map((t,i)=>[t].concat(V.map(v=>r4(R[v][i]))))),
+   params:[['CLD',G.title],['モデル','感度モデル（どの変数も基準値＝1）'],['期間',G.T,'日'],['刻み（dt）',0.25,'日（0.5日ごとに記録）'],['効き方',G.elas],['外から変える変数',G.shock],['変える大きさ',G.shockSize/100,'10日目から'],
+     ['発散',R.blow?`${R.blow.t}日目に「${R.blow.v}」が発散（計算を止めた）`:'なし']].concat(V.filter(v=>C.T[v]==='stock').map(v=>[v+'の時間',G.tau[v],'日'])).concat(G.E.filter(e=>e.p!=='?').map(e=>[`強さ：${e.c} → ${e.e}（${e.p}）`,G.str[e.c+'>'+e.e]??1])).concat(V.map(v=>['種類：'+v,TYPES[C.T[v]]]))};},
+ bw:()=>{const R=simBM(BMP),ds=R.ds;const lab=d=>dayLabel(d,ds);
+   const daily=[['日','期間','需要（個/日）','補充指示（個/日）','部品発注（個/日）','生産（個/日）','出荷（個/日）','DC在庫（個）','受注残（個）','生産待ち（個）','投入待ち（個）','補充リードタイム（日）','部品在庫（個）','生産能力（個/日）','安全在庫日数（日）']].concat(R.t.map((t,i)=>[t,lab(t),r4(R.D[i]),r4(R.O[i]),r4(R.PO[i]),r4(R.P[i]),r4(R.ship[i]),r4(R.I[i]),r4(R.B[i]),r4(R.W[i]),r4(R.Q[i]),r4(R.LT[i]),r4(R.PI[i]),r4(R.cap[i]),R.ss[i]]));
+   const g=(a,i)=>a&&a[i]!=null?a[i]:null;const per=[['期間','日数','需要 モデル（個/日）','需要 データ','生産 モデル（個/日）','生産 実績','DC在庫 モデル（個）','DC在庫 実績','受注残 モデル（個）','受注残 実績']].concat(ds.m.map((m,i)=>[m,ds.days[i],r4(R.M.D[i]),g(ds.dem,i),r4(R.M.P[i]),g(ds.prod,i),r4(R.M.I[i]),g(ds.inv,i),r4(R.M.B[i]),g(ds.bo,i)]));
+   const fs=[['系列','期間数','NRMSE','平均のずれ（÷実績の平均）','相関 r','U_M（平均）','U_S（ばらつき）','U_C（動き）']].concat([['生産','P'],['DC在庫','I'],['受注残','B']].map(([n,k])=>{const s=R.stats[k];return s?[n,s.n,r4(s.nrmse),r4(s.bias),r4(s.r),r4(s.UM),r4(s.US),r4(s.UC)]:[n,0,'実績なし'];}))
+     .concat([[],['増幅率 補充指示',r4(R.amp.O)],['増幅率 部品発注',r4(R.amp.PO)],['部品不足で生産を抑えた日',r4(R.partsDays)]]);
+   return{name:'BM-ブルウィップ-'+safeName(ds===DS0?'LINE3':ds.name),rows:daily,extra:[{name:'期間別（実績と比較）',rows:per},{name:'当てはまり',rows:fs}],params:bmParamRows(BMP,ds)};},
+ dice:()=>{const R=simDice(DG);return{name:'TOC-マッチ棒ゲーム',rows:[['回','出来高の累計（本）','平均どおりなら（本）','仕掛りの合計（本）','ボトルネックの前（本）']].concat(R.out.map((o,i)=>[i+1,o,R.exp[i],R.wip[i],DG.mode==='neck'?R.neckq[i]:null])),
+   params:[['条件',DG.mode==='neck'?'3番目だけ1〜4（ボトルネック）':'全員が1〜6'],['ロープ（DBR）',DG.rope?'あり':'なし'],['バッファ',DG.buf,'本'],['回数',DG.rounds],['乱数の種',DG.seed],['工程の数',DG.st]]};},
+ five:()=>{const sc=[['現状',1],['＋2 徹底活用',2],['＋3 従属（DBR）',3],['＋4 制約を高める',4]].filter(([n,k])=>k<=Math.max(2,Math.min(4,FS))).map(([n,k])=>{const p=tocParams(k);const R=simBM(p);return{n,R,K:tocKPI(R,p),p};});
+   const kpi=[['対策','スループット T（出荷 個/日）','うちLINE-4（個/日）','在庫 I（個）','工場の仕掛り（個）','投入を止めている指示（個）','補充リードタイム（日）','受注残（個）','LINE-3の能力（個/日）']].concat(sc.map(s=>[s.n,r4(s.K.T),r4(s.K.moved),r4(s.K.I),r4(s.K.WIP),r4(s.K.Q),r4(s.K.LT),r4(s.K.B),r4(s.K.cap)]));
+   const R0=sc[0].R;const daily=[['日','期間'].concat(sc.flatMap(s=>[s.n+' 受注残（個）',s.n+' 生産待ち（個）']))].concat(R0.t.map((t,i)=>[t,dayLabel(t,DS0)].concat(sc.flatMap(s=>[r4(s.R.B[i]),r4(s.R.W[i])]))));
+   return{name:'TOC-5つの集中ステップ',rows:kpi,extra:[{name:'日別',rows:daily}],params:[['データ',DS0.name],['段取り短縮率（ステップ2）',TOC.setupCut,'％'],['移管率（ステップ4）',TOC.transfer,'％'],['集計','最後の1年の平均（ばらつき0）']]};}};
+function bmParamRows(p,ds){const L={dem:'需要',noise:'日々のばらつき（％）',seed:'乱数の種',Tf:'予測期間（日）',Ta:'調整時間（日）',beta:'発注残の考慮度 β',ss0:'安全在庫日数（日）',raise:'安全在庫を引き上げる',raiseDay:'引き上げる日（日目）',ss1:'引き上げ後（日）',cyc:'サイクル在庫日数（日）',plan:'計画時間（時間/日，データがないとき）',down:'停止時間（時間/日，データがないとき）',setup:'段取り時間（時間/日，データがないとき）',speed:'処理速度（個/時）',LT:'生産LT（日）',allow:'顧客が待てる日数（日）',capData:'計画・停止・段取りはデータ（期間別）',share:'情報共有',pLT:'部品の調達日数（日）',pcov:'部品在庫カバー日数（日）',pTf:'部品の予測期間（日）',setupCut:'段取り短縮率（％）',downCut:'停止削減率（％）',rope:'ロープ（DBR）',buf:'バッファ日数',transfer:'移管率（％）',elev:'能力増強率（％）',initRef:'初期値を実績の最初の期間にそろえる'};
+  return [['データ',ds.name,ds.src||''],['期間',`${ds.m[0]}〜${ds.m[ds.m.length-1]}（${ds.days.length}期間・${dsDays(ds)}日）`],['計算','刻み 0.25日・オイラー法']].concat(Object.keys(L).map(k=>[L[k],p[k],k]));}
+function resExport(key,fmt){const b=RESB[key];if(!b)return;let o;try{o=b();}catch(e){labToast('書き出せなかった：'+esc(e.message));return;}
+  if(fmt==='csv'){saveBlob(new Blob([SCMIO.toCsv(o.rows)],{type:'text/csv;charset=utf-8'}),fname(o.name+'-結果','csv'));return;}
+  const sheets=[{name:'結果',rows:o.rows}].concat(o.extra||[]).concat([{name:'パラメータ',rows:paramsRows(o.params)}]);saveBlob(SCMIO.writeXlsx(sheets),fname(o.name+'-結果','xlsx'));}
+const resBar=key=>`<div class="resbar">計算結果を保存：<button data-resx="${key}" data-fmt="xlsx">Excel（結果＋パラメータ）</button><button data-resx="${key}" data-fmt="csv">CSV</button><span class="u-small">グラフの右上の CSV・SVG・PNG で図ごとにも保存できる</span></div>`;
+document.addEventListener('click',ev=>{const b=ev.target.closest&&ev.target.closest('[data-resx]');if(b)resExport(b.dataset.resx,b.dataset.fmt);});
+
+// ---- 画面に「結果を保存」「初期値に戻す」「変数の種類」を足す
+{const r0=VIEW.run;VIEW.run=()=>{let h=r0();if(!h)return h;
+  if(G.les){h=h.replace('</h2>','</h2>'+resBar('les')).replace('<h3>試してみる</h3>','<p><button data-lreset="1">初期値に戻す</button> <small class="hint">スライダーの値はこのブラウザに保存される</small></p><h3>試してみる</h3>');return h;}
+  const cnt=t=>C.V.filter(v=>C.T[v]===t);const S=cnt('stock'),A=cnt('aux'),K=cnt('const');const chg=C.V.filter(v=>G.ov[v]&&G.ov[v]!==C.auto[v]);
+  const box=`<details class="clsbox"${chg.length||Object.keys(C.note||{}).length?' open':''}><summary>変数の種類：ストック <b>${S.length}</b>・補助変数 ${A.length}・定数 ${K.length}${chg.length?` <span class="warn">（${chg.length}つ変更）</span>`:''}</summary>
+   <p class="hint" style="margin:2px 0">ストック：<b>${S.map(esc).join('，')||'なし'}</b>。自動の判定（理由は②の表）が違うと思ったら，ここで変えるとすぐ計算し直す。</p>
+   <div class="tblw">${tbl(['変数','種類'],C.V.map(v=>[esc(v)+(C.note&&C.note[v]?' <small class="hint">（名前から）</small>':''),`<select data-ov="${esc(v)}">${Object.entries(TYPES).map(([k,t])=>`<option value="${k}" ${C.T[v]===k?'selected':''}>${t}</option>`).join('')}</select>${chg.includes(v)?' <small class="warn">変更</small>':''}`]))}</div>
+   ${C.bad.length?`<p class="warn">ストックのないループが ${C.bad.length}本ある。どれかの変数をストックにする。</p>`:''}</details>`;
+  h=h.replace('<div class="col side"><h3>条件</h3>','<div class="col side">'+box+'<h3>条件</h3>').replace('<div id="runChart"></div>',resBar('gen')+'<div id="runChart"></div>')
+   .replace('<h3>ストックが目標に近づく時間','<p><button data-greset="1">初期値に戻す</button> <small class="hint">このCLDの設定（強さ・時間・効き方・期間・種類）はブラウザに保存される</small></p><h3>ストックが目標に近づく時間');return h;};}
+{const d0=VIEW.dice,f0=VIEW.five;VIEW.dice=()=>d0().replace('</h2>','</h2>'+resBar('dice'));
+ VIEW.five=()=>f0().replace('</h2>','</h2>'+resBar('five')).replace('<h3>ステップ2・4の強さ</h3>','<h3>ステップ2・4の強さ <button data-treset="1" style="font-size:11px">初期値に戻す</button></h3>')
+  .replace('<p class="hint">カードを押すと','<p class="hint">⑤Bは，いつも演習データ（LINE-3）で計算する（⑥で自分のデータを選んでいても変わらない）。カードを押すと');}
+
+// ---- 設定の保存（このブラウザ）：CLDごとの③の設定・SD入門のスライダー・④・⑤
+const PKEY='lab.params.v1';const PS=lsJ(PKEY,{gen:{},les:{},bmp:null,toc:null,dg:null});
+const gid=()=>G.src&&(G.src.id||G.title)||G.title||'';
+let psT=null;function psSave(){clearTimeout(psT);psT=setTimeout(()=>{if(C&&!G.les&&gid())PS.gen[gid()]={str:G.str,tau:G.tau,elas:G.elas,shock:G.shock,shockSize:G.shockSize,T:G.T,ov:G.ov};
+  Object.values(LES).forEach(L=>{PS.les[L.id]=L.pv;});const b=Object.assign({},BMP);delete b.ds;PS.bmp=b;PS.toc={setupCut:TOC.setupCut,transfer:TOC.transfer};PS.dg={mode:DG.mode,rope:DG.rope,buf:DG.buf,rounds:DG.rounds,seed:DG.seed};
+  const ks=Object.keys(PS.gen);if(ks.length>60)ks.slice(0,ks.length-60).forEach(k=>delete PS.gen[k]);lsS(PKEY,PS);},250);}
+['input','change','click'].forEach(t=>document.addEventListener(t,ev=>{if(ev.target.closest&&ev.target.closest('#main,#tabs'))psSave();}));
+{const _l=loadCLD;loadCLD=function(src,title,pos){const r=_l(src,title,pos);const s=PS.gen[gid()];if(s&&!G.les){Object.assign(G,{str:Object.assign({},s.str||{}),tau:Object.assign({},s.tau||{}),elas:s.elas??1,shockSize:s.shockSize??20,T:s.T??60,ov:Object.assign({},s.ov||{})});G.shock=s.shock||G.shock;recalc();}return r;};}
+(function(){Object.values(LES).forEach(L=>{const v=PS.les[L.id];if(v)L.pv=Object.assign({},L.def,v);});if(PS.bmp)Object.keys(BMDEF).forEach(k=>{if(PS.bmp[k]!=null)BMP[k]=PS.bmp[k];});if(PS.toc)Object.assign(TOC,PS.toc);if(PS.dg)Object.assign(DG,PS.dg);})();
+document.addEventListener('click',ev=>{const t=ev.target;if(!t.closest)return;
+  if(t.closest('[data-greset]')){delete PS.gen[gid()];lsS(PKEY,PS);Object.assign(G,{str:{},tau:{},elas:1,shockSize:20,T:60,ov:{},shock:null,show:new Set()});recalc();render();labToast('③の設定を初期値に戻した');return;}
+  if(t.closest('[data-lreset]')&&G.les){G.les.pv=Object.assign({},G.les.def);render();return;}
+  if(t.closest('[data-treset]')){TOC.setupCut=50;TOC.transfer=10;FS=5;render();return;}});
+
+// ===== ⑥ データ：自分の時系列（Excel・CSV）を取り込み，④のモデルの入力・実績に使う =====
+const SKEY='lab.series.v1',BKEY='lab.bind.v1',SER_MAX=3500000;
+let SER=lsJ(SKEY,{});if(!SER||typeof SER!=='object')SER={};
+let BIND=lsJ(BKEY,{active:false});if(!BIND||typeof BIND!=='object')BIND={active:false};
+function serSave(){const txt=JSON.stringify(SER);if(txt.length>SER_MAX){return{ok:false,msg:`保存できる量（約${Math.round(SER_MAX/1e6)}MB）を超える（いま ${(txt.length/1e6).toFixed(1)}MB）。日別より月別にまとめるか，使わない系列を消す。`};}
+  try{localStorage.setItem(SKEY,txt);return{ok:true};}catch(e){return{ok:false,msg:'このブラウザに保存できなかった（容量・設定）。この画面を閉じるまでは使える。'};}}
+const bindSave=()=>lsS(BKEY,BIND);
+const DFIELDS=[
+ {key:'date',label:'期間',aliases:['月','年月','日付','年月日','期間','date','month','week','週','日','period','対象月','計上月']},
+ {key:'dem',label:'需要',aliases:['需要','受注','受注数','受注数量','受注量','注文','注文数','demand','orders','販売数','販売数量']},
+ {key:'plan',label:'計画時間',aliases:['計画','計画時間','稼働時間','計画稼働時間','稼働計画','planned','plannedhours','hours']},
+ {key:'down',label:'停止時間',aliases:['停止','停止時間','故障','故障時間','downtime']},
+ {key:'setup',label:'段取り時間',aliases:['段取り','段取り時間','段取替え','段取','setup','changeover']},
+ {key:'prod',label:'生産',aliases:['生産','生産数','生産数量','生産量','出来高','production','output']},
+ {key:'inv',label:'在庫',aliases:['在庫','DC在庫','製品在庫','在庫数','inventory','stock']},
+ {key:'bo',label:'受注残',aliases:['受注残','バックオーダー','backlog','未出荷','欠品残','注残']}];
+const BFIELDS=[['dem','需要','rate','モデルの入力（顧客の需要）'],['plan','計画時間','rate','入力：生産能力の計算に使う（なければスライダーの値）'],['down','停止時間','rate','入力'],['setup','段取り時間','rate','入力'],
+ ['prod','生産（実績）','rate','比べる・合わせる'],['inv','DC在庫（実績）','level','比べる・合わせる'],['bo','受注残（実績）','level','比べる・合わせる']];
+const DP={file:'',sheets:[],si:0,hdr:null,cols:[],objs:[],date:null,vals:[],agg:{},period:'month',prefix:'',res:null,msg:'',recv:null};
+// ---- 期間のキー
+const p2=x=>String(x).padStart(2,'0');
+const isoD=d=>`${d.getUTCFullYear()}-${p2(d.getUTCMonth()+1)}-${p2(d.getUTCDate())}`;
+const parseD=s=>{const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(s);return m?new Date(Date.UTC(+m[1],+m[2]-1,+m[3])):null;};
+function perKey(iso,per){if(per==='month')return iso.slice(0,7);const d=parseD(iso);if(per==='week'){const w=(d.getUTCDay()+6)%7;d.setUTCDate(d.getUTCDate()-w);}return isoD(d);}
+function perNext(k,per){if(per==='month'){let y=+k.slice(0,4),m=+k.slice(5,7)+1;if(m>12){m=1;y++;}return `${y}-${p2(m)}`;}const d=parseD(k);d.setUTCDate(d.getUTCDate()+(per==='week'?7:1));return isoD(d);}
+function perDays(k,per){if(per==='month'){const m=/^(\d{4})-(\d{2})/.exec(k);return m?new Date(Date.UTC(+m[1],+m[2],0)).getUTCDate():30;}return per==='week'?7:1;}
+const unitOf=h=>{const m=String(h).match(/[（(]([^）)]+)[）)]\s*$/);return m?m[1]:'';};
+const perDayOf=h=>/\/\s*日|日あたり|per\s*day|\/day/i.test(String(h));
+// ---- ファイルを読む
+async function dpLoadFile(f){const nm=f.name||'';if(/\.xls$/i.test(nm)){DP.msg='<span class="warn">.xls（古い形式）は読めない。Excel で「名前を付けて保存」→「Excel ブック（.xlsx）」にしてから選ぶ。</span>';TAB='data';render();return;}
+  let sh;try{sh=await SCMIO.readFile(f);}catch(e){DP.msg='<span class="warn">読み込めなかった：'+esc(e.message||e)+'</span>';TAB='data';render();return;}
+  sh=(sh||[]).filter(s=>s.rows&&s.rows.some(r=>r&&r.some(v=>v!=null&&v!=='')));if(!sh.length){DP.msg='<span class="warn">データの入ったシートが見つからない。</span>';TAB='data';render();return;}
+  Object.assign(DP,{file:nm,sheets:sh,msg:'',res:null,prefix:nm.replace(/\.[^.]+$/,'').replace(/^\d{8}_[^_]+_/,'').slice(0,24)});
+  const pref=sh.findIndex(s=>/データ|data/i.test(s.name));DP.si=pref>=0?pref:sh.reduce((b,s,i)=>s.rows.length>sh[b].rows.length?i:b,0);DP.hdr=null;dpPrep(true);TAB='data';render();}
+function dpPrep(guess){const S=DP.sheets[DP.si];if(!S)return;const o=SCMIO.toObjects(S.rows,DP.hdr==null?undefined:DP.hdr);if(DP.hdr==null)DP.hdr=SCMIO.findHeaderRow(S.rows);DP.cols=o.columns;DP.objs=o.rows;
+  if(guess){const g=SCMIO.guessMapping(DP.cols,DFIELDS);const dateOk=c=>{const v=DP.objs.slice(0,60).map(r=>r[c]).filter(v=>v!=null&&v!=='');return v.length&&v.filter(x=>SCMIO.toDate(x)).length>=v.length*0.6;};
+    DP.date=g.date&&dateOk(g.date)?g.date:(DP.cols.find(dateOk)||g.date||DP.cols[0]);
+    const numOk=c=>{const v=DP.objs.map(r=>r[c]).filter(v=>v!=null&&v!=='');return v.length&&v.filter(x=>SCMIO.toNum(x)!=null).length>=v.length*0.6;};
+    const nums=DP.cols.filter(c=>c!==DP.date&&numOk(c));const hit=DFIELDS.slice(1).map(f=>g[f.key]).filter(c=>c&&nums.includes(c));
+    DP.vals=(hit.length?hit:nums).slice(0,8);DP.agg={};nums.forEach(c=>DP.agg[c]=STOCKLIKE.test(c)&&!/^受注$|需要|生産|出荷/.test(c)?'mean':'sum');
+    // 期間：1日に1行なら日・週・月を選べる（既定は月）
+    DP.period='month';}
+  dpCompute();}
+function dpCompute(){const per=DP.period,R={t:[],cols:{},badDate:[],badNum:{},gaps:[],multi:0,n:0};const acc={};
+  DP.objs.forEach((r,i)=>{const d=SCMIO.toDate(r[DP.date]);if(!d){if(DP.vals.some(c=>r[c]!=null&&r[c]!==''))R.badDate.push(i+DP.hdr+2);return;}R.n++;const k=perKey(d,per);const a=acc[k]||(acc[k]={rows:0,v:{}});a.rows++;
+    DP.vals.forEach(c=>{const raw=r[c];if(raw==null||raw==='')return;const x=SCMIO.toNum(raw);if(x==null){R.badNum[c]=(R.badNum[c]||0)+1;return;}const q=a.v[c]||(a.v[c]={s:0,n:0,last:null});q.s+=x;q.n++;q.last=x;});});
+  const ks=Object.keys(acc).sort();if(!ks.length){DP.res=R;return R;}
+  let k=ks[0];const end=ks[ks.length-1];let guard=0;while(k<=end&&guard++<20000){R.t.push(k);if(!acc[k])R.gaps.push(k);else if(acc[k].rows>1)R.multi++;k=perNext(k,per);}
+  DP.vals.forEach(c=>{const ag=DP.agg[c]||'sum';R.cols[c]={unit:unitOf(c),perDay:perDayOf(c),agg:ag,v:R.t.map(k=>{const q=acc[k]&&acc[k].v[c];if(!q||!q.n)return null;return ag==='mean'?q.s/q.n:ag==='last'?q.last:q.s;})};});
+  DP.res=R;return R;}
+function dpPreviewChart(){const R=DP.res;if(!R||!R.t.length||!DP.vals.length)return '';const xi=R.t.map((_,i)=>i);const tk=dsTicks({m:R.t,days:R.t.map(()=>1)}).MXM;
+  return lineChart({title:'取り込む系列（'+({month:'月別',week:'週別',day:'日別'}[DP.period])+'）',series:DP.vals.map((c,i)=>({name:c+'（'+({sum:'合計',mean:'平均',last:'最後'}[R.cols[c].agg])+'）',data:R.cols[c].v,x:xi,color:PAL[i%PAL.length]})),w:760,h:240,xt:tk,xfmt:i=>R.t[Math.round(i)]||'',yl:'値（列の単位）'});}
+function dpValidation(){const R=DP.res;if(!R)return '';const out=[];const lst=a=>a.slice(0,8).map(esc).join('，')+(a.length>8?` ほか${a.length-8}`:'');
+  if(!R.t.length)return `<div class="dpv ng"><b>期間の列「${esc(DP.date)}」から日付が読めない</b>。年月（2024-04，2024/4，2024年4月）か日付の列を選ぶ。</div>`;
+  out.push(`<div class="dpv ok">読めた行：<b>${R.n}</b>行 → <b>${R.t.length}</b>期間（${esc(R.t[0])}〜${esc(R.t[R.t.length-1])}）${R.multi?`。1期間に複数行ある期間が${R.multi}（列ごとの「合計・平均・最後」でまとめた）`:''}</div>`);
+  if(R.badDate.length)out.push(`<div class="dpv wa">日付として読めない行：<b>${R.badDate.length}</b>行（${lst(R.badDate.map(String))} 行目）→ 読み飛ばした</div>`);
+  const bn=Object.entries(R.badNum);if(bn.length)out.push(`<div class="dpv wa">数値として読めないセル：${bn.map(([c,n])=>`「${esc(c)}」${n}`).join('，')} → 空欄とみなした</div>`);
+  if(R.gaps.length)out.push(`<div class="dpv wa">データのない期間：<b>${R.gaps.length}</b>（${lst(R.gaps)}）→ 空欄で保存。④の需要に使うときは前後の値から補う</div>`);
+  DP.vals.forEach(c=>{const v=R.cols[c].v;const nn=v.filter(x=>x==null).length;if(nn&&nn!==R.gaps.length)out.push(`<div class="dpv wa">「${esc(c)}」は空欄が${nn}期間</div>`);if(v.some(x=>x!=null&&x<0))out.push(`<div class="dpv wa">「${esc(c)}」にマイナスの値がある</div>`);});
+  if(R.t.length<3)out.push('<div class="dpv ng">期間が短すぎる（3期間以上いる）</div>');return out.join('');}
+function dpSaveSeries(){const R=DP.res;if(!R||R.t.length<3||!DP.vals.length){labToast('保存できる系列がない（期間の列と値の列を選ぶ）');return;}const pre=(DP.prefix||'').trim();const S=DP.sheets[DP.si];const names=[];
+  DP.vals.forEach(c=>{const nm=(pre?pre+'：':'')+c;SER[nm]={period:DP.period,t:R.t.slice(),v:R.cols[c].v.map(r4),unit:R.cols[c].unit,perDay:R.cols[c].perDay,agg:R.cols[c].agg,src:`${DP.file}!${S?S.name:''}!${c}`,created:new Date().toISOString()};names.push(nm);});
+  const r=serSave();DP.msg=(r.ok?`<span class="pos">${names.length}つの系列を保存した</span>：${names.map(esc).join('，')}`:`<span class="warn">${r.msg}</span>`);
+  // まだ割り当てがなければ，名前から割り当てる
+  if(!BIND.dem)dpAutoBind(names);render();}
+function dpAutoBind(names){names=names||Object.keys(SER);const g=SCMIO.guessMapping(names.map(n=>n.split('：').pop()),DFIELDS.slice(1));let k=0;
+  Object.entries(g).forEach(([f,col])=>{const nm=names.find(n=>n.split('：').pop()===col);if(nm&&(!BIND[f]||!SER[BIND[f].s])){BIND[f]={s:nm,conv:'auto'};k++;}});bindSave();return k;}
+// ---- ④のデータセットを作る
+function convMode(f,S,mode){const rate=(BFIELDS.find(b=>b[0]===f)||[])[2]==='rate';if(mode==='raw'||mode==='perday')return mode;if(!rate||S.perDay||S.period==='day')return 'raw';return S.agg==='sum'?'perday':'raw';}
+function fillGaps(a){const v=a.slice();const idx=v.map((x,i)=>x!=null&&isFinite(x)?i:-1).filter(i=>i>=0);if(!idx.length)return v;let n=0;
+  for(let i=0;i<v.length;i++){if(v[i]!=null&&isFinite(v[i]))continue;n++;const pi=idx.filter(j=>j<i).pop(),ni=idx.find(j=>j>i);v[i]=pi==null?v[ni]:ni==null?v[pi]:v[pi]+(v[ni]-v[pi])*(i-pi)/(ni-pi);}v.filled=n;return v;}
+function bindDS(){const b=BIND,warn=[];const D=b.dem&&SER[b.dem.s];if(!D)return{err:'需要の系列を選ぶ（④のモデルは需要から動く）'};
+  const t=D.t.slice(),per=D.period,days=t.map(k=>perDays(k,per));const ds={id:'user',name:'自分のデータ：'+b.dem.s,period:per,m:t,days,src:D.src||'',units:{}};
+  BFIELDS.forEach(([f,lab,kind])=>{const x=b[f];if(!x||!SER[x.s]){ds[f]=null;return;}const S=SER[x.s];if(S.period!==per){warn.push(`「${lab}」の系列（${x.s}）は期間の単位が需要と違う（${S.period}／${per}）ので使わない`);ds[f]=null;return;}
+    const mp={};S.t.forEach((k,i)=>mp[k]=S.v[i]);const mode=convMode(f,S,x.conv);let v=t.map((k,i)=>{const y=mp[k];return y==null||!isFinite(y)?null:mode==='perday'?y/days[i]:y;});
+    const nn=v.filter(y=>y!=null).length;if(nn<t.length)warn.push(`「${lab}」は ${t.length}期間のうち ${nn}期間だけ（ない期間は${f==='dem'?'前後から補う':kind==='rate'&&f!=='prod'?'スライダーの値を使う':'比べない'}）`);
+    if(f==='dem'){v=fillGaps(v);if(v.every(y=>y==null))return;}ds[f]=v;ds.units[f]=(mode==='perday'?(S.unit||'').replace(/\/?(月|週)$/,'')+'/日（換算）':S.unit||'');});
+  if(!ds.dem||ds.dem.some(y=>y==null))return{err:'需要に数値がない'};if(t.length<3)return{err:'期間が短すぎる'};return{ds,warn};}
+function applyBind(on){if(!on){BIND.active=false;bindSave();setDS(DS0);BMP.initRef=0;labToast('④は埋め込みの LINE-3 データに戻した');return true;}
+  const r=bindDS();if(r.err){labToast('<span style="color:#F2B33D">'+esc(r.err)+'</span>');return false;}BIND.active=true;bindSave();setDS(r.ds);BMP.initRef=1;if(BMP.raiseDay>=dsDays(r.ds)||!r.ds.m.some(m=>m>='2024-04'))BMP.raise=0;
+  labToast(`④は「${esc(r.ds.name)}」（${r.ds.days.length}期間・${dsDays(r.ds)}日）で計算する。${r.warn.length?'<br>'+r.warn.map(esc).join('<br>'):''}`,9000);return true;}
+function capCheck(ds,p){const ST=ds.days.length;let c=0;for(let m=0;m<ST;m++)c+=capOf(p,m,ds);c/=ST;const d=mean(ds.dem)*(1-p.transfer/100);return{cap:c,dem:d,ratio:c/Math.max(d,1e-9)};}
+// ---- テンプレート
+function dpTemplate(){const head=['月','需要（個/日）','計画時間（時間/日）','停止時間（時間/日）','段取り時間（時間/日）','生産（個/日）','在庫（個）','受注残（個）'];
+  const rows=[head].concat(REF.m.map((m,i)=>[m,REF.dem[i],REF.plan[i],REF.down[i],REF.setup[i],REF.prod[i],REF.inv[i],REF.bo[i]]));
+  const note=[['システム分析ラボ：④ブルウィップ効果のモデルに入れるデータの書き方'],[],['列','中身','単位・注意'],
+   ['月','期間。2024-04 / 2024/4 / 2024年4月 / 日付（2024-04-01）のどれでもよい。日別・週別のデータは⑥で月・週・日にまとめられる','1行に1期間（同じ月が何行あっても⑥で合計・平均できる）'],
+   ['需要','顧客の注文（受注）数量。モデルの入力','「（個/日）」と書けば日あたりのまま使う。月の合計なら「需要（個/月）」と書くか，⑥の換算で「÷日数」を選ぶ'],
+   ['計画時間・停止時間・段取り時間','LINE の1日あたりの時間。生産能力＝（計画−停止−段取り）×処理速度','なければ空欄のままでよい（④のスライダーの値を使う）'],
+   ['生産','生産の実績。モデルと比べる・合わせる（キャリブレーション）','個/日（月の合計なら換算を選ぶ）'],
+   ['在庫','DC（製品倉庫）の在庫の実績（月の平均または月末）','個'],['受注残','まだ出荷していない注文の実績','個'],[],
+   ['使い方','⑥「データ」タブで このファイルを選ぶ → 列を確かめて「系列として保存」→ 右の表で需要・実績に割り当てる →「この割り当てで④を動かす」'],
+   ['例','「データ」シートには，演習（ブルーマウンテン社 LINE-3，2023-01〜2025-12）の値が入っている。自分のデータで上書きして使う']];
+  saveBlob(SCMIO.writeXlsx([{name:'データ',rows},{name:'説明',rows:note,noteRows:[0]}]),fname('ラボ用データのテンプレート-LINE3例','xlsx'));}
+// ---- 画面
+function dpSerTable(){const ks=Object.keys(SER);if(!ks.length)return '<p class="hint">まだ保存した系列はない。</p>';const used=new Set(Object.values(BIND).filter(x=>x&&x.s).map(x=>x.s));
+  return `<div class="tblw">${tbl(['系列','期間','数','範囲','単位・まとめ方','平均',''],ks.map(k=>{const S=SER[k];return [`<b>${esc(k)}</b>${used.has(k)?' <small class="pos">④で使用</small>':''}<br><small class="hint">${esc(S.src||'')}</small>`,{month:'月',week:'週',day:'日'}[S.period]||S.period,S.t.length,`${esc(S.t[0])}〜${esc(S.t[S.t.length-1])}`,`${esc(S.unit||'—')}${S.perDay?'（日あたり）':''} ／ ${({sum:'合計',mean:'平均',last:'最後'})[S.agg]||'—'}`,fmtN(mean(S.v)),`<button data-serdel="${esc(k)}" class="danger">消す</button>`];}))}</div>
+   <p class="hint">このブラウザに保存（${(JSON.stringify(SER).length/1e6).toFixed(2)}MB／約${(SER_MAX/1e6).toFixed(1)}MB まで）。<button data-serxls="1">保存した系列を Excel に書き出す</button></p>`;}
+function dpBindPanel(){const ks=Object.keys(SER);const opt=(f)=>`<option value="">—（使わない）</option>`+ks.map(k=>`<option value="${esc(k)}" ${BIND[f]&&BIND[f].s===k?'selected':''}>${esc(k)}</option>`).join('');
+  const r=bindDS();const ds=r.ds;
+  const rows=BFIELDS.map(([f,lab,kind,what])=>{const x=BIND[f];const S=x&&SER[x.s];const mode=S?convMode(f,S,x.conv):null;const v=ds&&ds[f]?mean(ds[f].filter(y=>y!=null)):null;
+    return [`<b>${lab}</b><br><small class="hint">${what}</small>`,`<select data-bind="${f}" style="width:100%">${opt(f)}</select>`+(kind==='rate'?`<br><select data-bconv="${f}" style="width:100%;margin-top:2px"><option value="auto" ${!x||x.conv==='auto'?'selected':''}>換算：自動${mode?'（'+(mode==='perday'?'÷日数':'そのまま')+'）':''}</option><option value="raw" ${x&&x.conv==='raw'?'selected':''}>換算：そのまま（日あたり）</option><option value="perday" ${x&&x.conv==='perday'?'selected':''}>換算：÷期間の日数</option></select>`:'')+(v!=null?`<br><small class="hint">平均（換算後）${fmtN(v)}</small>`:'')];});
+  let cc='';if(ds){const k=capCheck(ds,BMP);cc=`<p class="hint">能力（データ期間の平均）≈ <b>${fmtN(k.cap)}</b> 個/日，需要の平均 ≈ <b>${fmtN(k.dem)}</b> 個/日（${(k.ratio*100).toFixed(0)}％）。${k.ratio<1?'<span class="warn">能力が需要より小さい：受注残が増え続ける。</span>':k.ratio>3?'能力にかなり余裕がある（能力の制約は効かない）。':''} <button data-capfit="1">処理速度を需要に合わせる（能力＝需要の平均×1.15）</button></p>`;}
+  return `<h3>④ブルウィップ効果のモデルに使う</h3><p class="hint">系列を需要・時間・実績に割り当てる。期間は<b>需要の系列</b>で決まる（長さ・月の並び）。生産・時間は「1日あたり」に直して使う。</p>
+   <div class="tblw"><table class="t dpbind"><tr><th style="width:38%">モデルの部品</th><th>系列・換算</th></tr>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</table></div>
+   <p><button data-bauto="1">名前から割り当てる</button></p>
+   ${r.err?`<p class="hint">${esc(r.err)}</p>`:`<p class="hint">→ ${esc(ds.name)}：${ds.days.length}期間（${esc(ds.m[0])}〜${esc(ds.m[ds.m.length-1])}），${dsDays(ds)}日。${r.warn.length?'<br><span class="warn">'+r.warn.map(esc).join('<br>')+'</span>':''}</p>${cc}`}
+   <p><button class="primary" data-bapply="1" ${r.err?'disabled':''}>この割り当てで④を動かす ▶</button> <button data-bline3="1">LINE-3（埋め込み）に戻す</button></p>
+   <p class="hint">いま④で使っているデータ：<b>${esc(DS.name)}</b>${DS!==DS0?'（実績の最初の期間に在庫・受注残の初期値をそろえる。安全在庫の引き上げは止める）':''}</p>`;}
+VIEW.data=()=>{const S=DP.sheets[DP.si];const R=DP.res;
+  const recv=DP.recv?`<div class="dpv ok"><b>データブラウザから受け取った</b>：${DP.recv.names.map(esc).join('，')}。${DP.recv.names.map(n=>BFIELDS.map(([f,lab])=>`<button data-qbind="${f}" data-s="${esc(n)}" style="font-size:11.5px">${esc(n.split('：').pop())} を${lab}に</button>`).join(' ')).join('<br>')}</div>`:'';
+  return `<div class="row"><div class="col"><h2>⑥ データ：自分の時系列を取り込む（Excel・CSV）</h2>
+   <p class="hint">需要・受注・生産・在庫・受注残・計画時間・段取り時間などの<b>時系列</b>を取り込み，④のモデルの入力と，実績（比べる・合わせる）に使う。ファイルはこのブラウザの中だけで読み，外へは送らない。</p>
+   ${recv}<div class="dpdrop" id="dpDrop"><b>ここに .xlsx / .csv をドロップ</b> または <button id="dpPick" class="primary">ファイルを選ぶ</button><input type="file" id="dpFile" accept=".xlsx,.xlsm,.csv,.tsv,.txt" style="display:none">　<button id="dpTpl">テンプレート（Excel）を保存</button><br><small class="hint">1行目（または上の方）に列の見出し，1列に期間（年月・日付），ほかの列に数値。テンプレートには演習の LINE-3 の値が例として入っている。</small></div>
+   ${DP.msg?`<p>${DP.msg}</p>`:''}
+   ${S?`<h3>1 シートと列を選ぶ　<small class="hint">${esc(DP.file)}</small></h3>
+    <p class="zl">シート：<select id="dpSheet">${DP.sheets.map((s,i)=>`<option value="${i}" ${i===DP.si?'selected':''}>${esc(s.name)}（${s.rows.length}行）</option>`).join('')}</select>　見出しの行：<input type="number" id="dpHdr" min="1" max="${Math.min(20,S.rows.length)}" value="${(DP.hdr||0)+1}" style="width:56px"> 行目</p>
+    <p class="zl">期間（日付）の列：<select id="dpDate">${DP.cols.map(c=>`<option ${c===DP.date?'selected':''}>${esc(c)}</option>`).join('')}</select>　まとめる単位：<select id="dpPer">${[['month','月'],['week','週（月曜はじまり）'],['day','日（そのまま）']].map(([k,t])=>`<option value="${k}" ${DP.period===k?'selected':''}>${t}</option>`).join('')}</select></p>
+    <p class="zl">値の列（複数選べる）と，1期間に複数行あるときのまとめ方：</p>
+    <div class="dpgrid">${DP.cols.filter(c=>c!==DP.date).map(c=>`<label><input type="checkbox" data-dpv="${esc(c)}" ${DP.vals.includes(c)?'checked':''}> ${esc(c)}<select data-dpagg="${esc(c)}">${[['sum','合計'],['mean','平均'],['last','最後']].map(([k,t])=>`<option value="${k}" ${(DP.agg[c]||'sum')===k?'selected':''}>${t}</option>`).join('')}</select></label>`).join('')}</div>
+    <h3>2 確かめる</h3>${dpValidation()}${dpPreviewChart()}
+    <h3>3 系列として保存</h3><p class="zl">名前の頭：<input id="dpPre" value="${esc(DP.prefix)}" size="18"> <button id="dpSave" class="primary" ${R&&R.t.length>=3&&DP.vals.length?'':'disabled'}>系列として保存（${DP.vals.length}つ）</button></p>`:''}
+   <h3>保存した系列</h3>${dpSerTable()}</div>
+   <div class="col side">${dpBindPanel()}<div class="tip"><b>単位のこと</b>：④のモデルは「1日あたり」（個/日，時間/日）で動く。月の合計を取り込んだときは「÷期間の日数」で日あたりに直す（見出しに「（個/日）」とあれば，そのまま使う）。在庫・受注残は「その時点の量」なので換算しない。<br><b>期間</b>：月別なら1か月ごと，週別なら7日ごと，日別なら1日ごとに値が変わる。<br>④の右の「実績に合わせる」で，モデルのパラメータを実績に合わせられる。</div></div></div>`;};
+AFTER.data=()=>{};
+TABS.push(['data','⑥ データ（自分の時系列）']);(TGRP.find(g=>g[1].includes('bw'))||TGRP[1])[1].push('data');
+// ---- 操作
+window.addEventListener('DOMContentLoaded',()=>{const M=$('main');
+  M.addEventListener('click',ev=>{if(TAB!=='data')return;const t=ev.target;
+    if(t.id==='dpPick'){$('dpFile').click();return;}if(t.id==='dpTpl'){dpTemplate();return;}if(t.id==='dpSave'){dpSaveSeries();return;}
+    const d=t.closest('[data-serdel]');if(d){const k=d.dataset.serdel;if(!confirm(`系列「${k}」を消す？`))return;delete SER[k];Object.keys(BIND).forEach(f=>{if(BIND[f]&&BIND[f].s===k)delete BIND[f];});bindSave();serSave();if(BIND.active&&!BIND.dem)applyBind(false);render();return;}
+    if(t.closest('[data-serxls]')){const ks=Object.keys(SER);saveBlob(SCMIO.writeXlsx(ks.map(k=>({name:k.slice(0,28),rows:[['期間',k+(SER[k].unit?'（'+SER[k].unit+'）':'')]].concat(SER[k].t.map((x,i)=>[x,SER[k].v[i]]))}))),fname('ラボの系列','xlsx'));return;}
+    if(t.closest('[data-bauto]')){const n=dpAutoBind();labToast(n?`${n}つ割り当てた`:'名前から割り当てられる系列がなかった');render();return;}
+    if(t.closest('[data-bapply]')){if(applyBind(true)){TAB='bw';render();}return;}
+    if(t.closest('[data-bline3]')){applyBind(false);render();return;}
+    if(t.closest('[data-capfit]')){const r=bindDS();if(!r.ds)return;const p=Object.assign({},BMP,{speed:1});const k=capCheck(r.ds,p);BMP.speed=Math.max(1,Math.round(k.dem*1.15/Math.max(k.cap,1e-9)));render();labToast(`処理速度を ${BMP.speed} 個/時 にした`);return;}
+    const q=t.closest('[data-qbind]');if(q){BIND[q.dataset.qbind]={s:q.dataset.s,conv:'auto'};bindSave();render();return;}});
+  M.addEventListener('change',ev=>{if(TAB!=='data')return;const t=ev.target;
+    if(t.id==='dpFile'){const f=t.files[0];t.value='';if(f)dpLoadFile(f);return;}
+    if(t.id==='dpSheet'){DP.si=+t.value;DP.hdr=null;dpPrep(true);render();return;}
+    if(t.id==='dpHdr'){DP.hdr=Math.max(0,(+t.value||1)-1);dpPrep(true);render();return;}
+    if(t.id==='dpDate'){DP.date=t.value;DP.vals=DP.vals.filter(c=>c!==t.value);dpCompute();render();return;}
+    if(t.id==='dpPer'){DP.period=t.value;dpCompute();render();return;}
+    if(t.id==='dpPre'){DP.prefix=t.value;return;}
+    if(t.dataset.dpv!=null){const c=t.dataset.dpv;DP.vals=t.checked?[...new Set(DP.vals.concat([c]))]:DP.vals.filter(x=>x!==c);dpCompute();render();return;}
+    if(t.dataset.dpagg!=null){DP.agg[t.dataset.dpagg]=t.value;dpCompute();render();return;}
+    if(t.dataset.bind!=null){const f=t.dataset.bind;if(t.value)BIND[f]={s:t.value,conv:(BIND[f]&&BIND[f].conv)||'auto'};else delete BIND[f];bindSave();render();return;}
+    if(t.dataset.bconv!=null){const f=t.dataset.bconv;if(BIND[f]){BIND[f].conv=t.value;bindSave();render();}return;}});
+  M.addEventListener('dragover',ev=>{if(TAB!=='data')return;ev.preventDefault();const z=$('dpDrop');if(z)z.classList.add('on');});
+  M.addEventListener('dragleave',()=>{const z=$('dpDrop');if(z)z.classList.remove('on');});
+  M.addEventListener('drop',ev=>{if(TAB!=='data')return;ev.preventDefault();const f=ev.dataTransfer.files[0];if(f)dpLoadFile(f);});
+  if(BIND.active){const r=bindDS();if(r.ds)setDS(r.ds);else{BIND.active=false;bindSave();}if(TAB==='bw')render();}});
+
+// ===== ④：実績に合わせる（当てはまりの指標・自動フィット）・感度・シナリオ =====
+const FITP=[['Tf','予測期間（日）',1,120,1],['Ta','調整時間（日）',1,30,0.5],['beta','発注残の考慮度 β',0,1,0.05],['ss0','安全在庫日数（日）',0,40,0.5],['ss1','引き上げ後の安全在庫日数（日）',0,40,0.5],['cyc','サイクル在庫日数（日）',0,40,0.5],
+ ['speed','処理速度（個/時）',null,null,1],['LT','生産LT（日）',1,10,0.5],['allow','顧客が待てる日数（日）',10,400,5],['pTf','部品の予測期間（日）',1,60,1],['pLT','部品の調達日数（日）',1,60,1],['pcov','部品在庫カバー日数（日）',1,40,0.5],['setupCut','段取り短縮率（％）',0,80,1],['downCut','停止削減率（％）',0,100,1]];
+const FPL=Object.fromEntries(FITP.map(x=>[x[0],x]));
+const fpBounds=k=>{const f=FPL[k];if(k==='speed'){const v=BMP.speed;return[Math.max(1,Math.round(v*0.6)),Math.round(v*1.5)];}return[f[2],f[3]];};
+const FIT={rows:[{k:'speed'},{k:'allow'},{k:'Ta'}],n:2,use:{P:1,I:1,B:1},noise0:1,res:null,busy:false,prog:0};
+FIT.rows.forEach(r=>{[r.lo,r.hi]=fpBounds(r.k);});
+const SNS={k:'beta',lo:0,hi:1,n:7,seeds:3,out:'B',res:null};
+const SKEY2='lab.scen.v1';let SCNS=lsJ(SKEY2,[]);if(!Array.isArray(SCNS))SCNS=[];const SCV={metric:'B'};
+const OUTS={B:['受注残（個）','B'],I:['DC在庫（個）','I'],P:['生産（個/日）','P'],D:['需要（個/日）','D'],WQ:['生産待ち＋投入待ち（個）','WQ']};
+const pct=v=>v==null||!isFinite(v)?'—':(v*100).toFixed(0)+'％';
+function fitObj(p){const R=simBM(p);const ks=['P','I','B'].filter(k=>FIT.use[k]&&R.stats[k]);if(!ks.length)return{v:NaN,R};return{v:mean(ks.map(k=>R.stats[k].nrmse)),R};}
+function fitStatsTable(R){const rows=[['生産','P'],['DC在庫','I'],['受注残','B']].map(([n,k])=>{const s=R.stats[k];return s?[n,s.n,`<b>${pct(s.nrmse)}</b>`,(s.bias>0?'+':'')+pct(s.bias),s.r.toFixed(2),s.UM.toFixed(2),s.US.toFixed(2),s.UC.toFixed(2)]:[n,'—','<small class="hint">実績なし</small>','','','','',''];});
+  return `<div class="tblw">${tbl(['実績','期間数','NRMSE','平均のずれ','相関 r','U<sub>M</sub>（平均）','U<sub>S</sub>（ばらつき）','U<sub>C</sub>（動き）'],rows)}</div>
+   <p class="hint">NRMSE＝誤差の二乗平均の平方根÷実績の平均。平均のずれ＝（モデルの平均−実績の平均）÷実績の平均。Theil の不一致係数は U<sub>M</sub>＋U<sub>S</sub>＋U<sub>C</sub>＝1：U<sub>M</sub> が大きい → 水準（平均）がずれている（処理速度・初期値・安全在庫など）。U<sub>S</sub> が大きい → 振れ幅が違う（調整時間・β・予測期間など）。U<sub>C</sub> が大きい → 山と谷の時期が合わない（日々のばらつきなど，説明できない動きなら大きくても構わない）。</p>`;}
+function nelderMead(f,x0,max,onProg,onDone){const d=x0.length;const cl=x=>x.map(v=>Math.max(0,Math.min(1,v)));let S=[cl(x0)];for(let i=0;i<d;i++){const x=S[0].slice();x[i]+=x[i]<0.5?0.3:-0.3;S.push(cl(x));}let F=S.map(f),ev=d+1;
+  const step=()=>{for(let k=0;k<4&&ev<max;k++){const ix=F.map((v,i)=>i).sort((a,b)=>(isFinite(F[a])?F[a]:1e9)-(isFinite(F[b])?F[b]:1e9));S=ix.map(i=>S[i]);F=ix.map(i=>F[i]);
+      const c=Array(d).fill(0);for(let i=0;i<d;i++)for(let j=0;j<d;j++)c[j]+=S[i][j]/d;const W=S[d],fw=F[d];const pt=a=>cl(c.map((v,j)=>v+a*(W[j]-v)));
+      const xr=pt(-1),fr=f(xr);ev++;
+      if(fr<F[0]){const xe=pt(-2),fe=f(xe);ev++;if(fe<fr){S[d]=xe;F[d]=fe;}else{S[d]=xr;F[d]=fr;}}
+      else if(fr<F[d-1]){S[d]=xr;F[d]=fr;}
+      else{const xc=fr<fw?pt(-0.5):pt(0.5),fc=f(xc);ev++;if(fc<Math.min(fr,fw)){S[d]=xc;F[d]=fc;}else{for(let i=1;i<=d;i++){S[i]=cl(S[i].map((v,j)=>S[0][j]+0.5*(v-S[0][j])));F[i]=f(S[i]);ev++;}}}}
+    const spread=Math.max(...F.filter(isFinite))-Math.min(...F.filter(isFinite));const size=Math.max(...S.map(x=>Math.max(...x.map((v,j)=>Math.abs(v-S[0][j])))));
+    const bi=F.reduce((b,v,i)=>v<F[b]?i:b,0);
+    if(ev<max&&!(spread<1e-5&&size<1e-3)){onProg(ev/max,F[bi]);setTimeout(step,0);}else onDone(S[bi],F[bi],ev);};
+  setTimeout(step,0);}
+function runFit(){const rows=FIT.rows.slice(0,FIT.n).filter(r=>r.k&&FPL[r.k]&&r.hi>r.lo);if(!rows.length){labToast('合わせるパラメータと範囲を選ぶ');return;}
+  const base=Object.assign({},BMP);if(FIT.noise0)base.noise=0;const b0=fitObj(base);if(!isFinite(b0.v)){labToast('比べる実績がない（⑥で実績の系列を割り当てる）');return;}
+  const toX=u=>{const p=Object.assign({},base);rows.forEach((r,i)=>p[r.k]=r.lo+(r.hi-r.lo)*u[i]);return p;};const f=u=>fitObj(toX(u)).v;
+  const u0=rows.map(r=>Math.max(0,Math.min(1,(BMP[r.k]-r.lo)/(r.hi-r.lo))));FIT.busy=true;FIT.prog=0;FIT.res=null;AFTER.bw();
+  nelderMead(f,u0,60+60*rows.length,(pr,fb)=>{FIT.prog=pr;const el=$('fitProg');if(el)el.textContent=`計算中… ${(pr*100).toFixed(0)}％（いまの最良 ${pct(fb)}）`;},(u,fb,ev)=>{
+    const p=toX(u);rows.forEach(r=>{const st=FPL[r.k][4]||0.01;p[r.k]=Math.round(p[r.k]/st)*st;p[r.k]=+p[r.k].toFixed(4);});const a=fitObj(p);
+    FIT.res={rows:rows.map(r=>({k:r.k,from:BMP[r.k],to:p[r.k]})),before:b0,after:a,ev,noise0:FIT.noise0};FIT.busy=false;if(TAB==='bw')AFTER.bw();});}
+function fitPanel(R){const has=['P','I','B'].filter(k=>R.stats[k]);const opt=k=>FITP.map(([x,l])=>`<option value="${x}" ${x===k?'selected':''}>${l}</option>`).join('');
+  const rs=FIT.res;let res='';
+  if(rs){const sel=['P','I','B'].filter(k=>FIT.use[k]&&rs.after.R.stats[k]);const ds=rs.after.R.ds,xi=ds.m.map((_,i)=>i),tk=dsTicks(ds);const ref={P:ds.prod,I:ds.inv,B:ds.bo},nm={P:'生産（個/日）',I:'DC在庫（個）',B:'受注残（個）'};
+    res=`<h3>結果　<small class="hint">${rs.ev}回計算${rs.noise0?'・日々のばらつき0':'・乱数の種 '+BMP.seed+' に固定'}</small></h3><div class="tblw">${tbl(['','合わせる前','合わせた後'],rs.rows.map(r=>[esc(FPL[r.k][1]),fmtN(r.from),`<b>${fmtN(r.to)}</b>`]).concat([['当てはまり（選んだ実績の NRMSE の平均）',pct(rs.before.v),`<b>${pct(rs.after.v)}</b>`]]).concat(['P','I','B'].filter(k=>rs.after.R.stats[k]).map(k=>['NRMSE：'+nm[k].split('（')[0],pct(rs.before.R.stats[k].nrmse),pct(rs.after.R.stats[k].nrmse)])))}</div>
+     <p><button class="primary" data-fitapply="1">この値を使う</button> <button data-fitclr="1">結果を消す</button> <small class="hint">「この値を使う」で右のスライダーに入る（あとで「初期値に戻す」で戻せる）</small></p>
+     <div class="row2">${sel.map(k=>lineChart({title:nm[k],series:[{name:'実績',data:ref[k],x:xi,color:'#7A8A92',dash:'5 3'},{name:'合わせる前',data:rs.before.R.M[k],x:xi,color:'#B7791F',w:1.6},{name:'合わせた後',data:rs.after.R.M[k],x:xi,color:'#0F7C8C',w:2.4}],w:370,h:200,xt:tk.MXM,ymin:0,xfmt:i=>ds.m[Math.round(i)]||''})).join('')}</div>`;}
+  return `<div class="fitbox"><h3>実績に合わせる（キャリブレーション）</h3>${has.length?fitStatsTable(R):'<p class="hint">いまのデータには比べる実績（生産・在庫・受注残）がない。⑥で実績の系列を割り当てる。</p>'}
+   ${has.length?`<h3>自動で合わせる <small class="hint">（1〜3個のパラメータ・範囲の中で，Nelder–Mead 法）</small></h3>
+   <div class="fitrow">合わせる数：<select id="fitN">${[1,2,3].map(n=>`<option ${FIT.n===n?'selected':''}>${n}</option>`).join('')}</select>　比べる実績：${[['P','生産'],['I','在庫'],['B','受注残']].map(([k,l])=>`<label><input type="checkbox" data-fituse="${k}" ${FIT.use[k]?'checked':''} ${R.stats[k]?'':'disabled'}> ${l}</label>`).join(' ')}　<label><input type="checkbox" id="fitNoise" ${FIT.noise0?'checked':''}> 日々のばらつきを0にして合わせる</label></div>
+   ${FIT.rows.slice(0,FIT.n).map((r,i)=>`<div class="fitrow">${i+1}. <select data-fitk="${i}">${opt(r.k)}</select> 下限 <input type="number" data-fitlo="${i}" value="${r.lo}" step="any"> 上限 <input type="number" data-fithi="${i}" value="${r.hi}" step="any"> <small class="hint">いま ${fmtN(BMP[r.k])}</small></div>`).join('')}
+   <p><button class="primary" id="fitRun" ${FIT.busy?'disabled':''}>自動で合わせる</button> <span id="fitProg" class="hint">${FIT.busy?'計算中…':''}</span></p>
+   <p class="hint">合わせたパラメータが範囲の端に張りつくときは，範囲を広げるか，別のパラメータ（構造）を疑う。合うことは「正しい」ことの証明ではない：値が現場の感覚（調整時間・リードタイムなど）と合うかを確かめる。</p>${res}`:''}
+   ${sensPanel()}</div>`;}
+function runSens(){const S=SNS;const vals=Array.from({length:S.n},(_,i)=>S.lo+(S.hi-S.lo)*i/Math.max(1,S.n-1));const runs=[];const ds=DS;
+  vals.forEach(v=>{for(let j=0;j<S.seeds;j++){const p=Object.assign({},BMP,{[S.k]:v,seed:BMP.seed+j});const R=simBM(p);runs.push({v,j,M:R.M[S.out],y:R.y3(S.out==='WQ'?'W':S.out),amp:R.amp.O,fit:R.fit});}});
+  const NP=ds.days.length;const lo=[],hi=[],md=[];for(let m=0;m<NP;m++){const a=runs.map(r=>r.M[m]).filter(isFinite).sort((x,y)=>x-y);const q=f=>a[Math.min(a.length-1,Math.max(0,Math.round(f*(a.length-1))))];lo.push(q(0.05));hi.push(q(0.95));md.push(q(0.5));}
+  const base=simBM(BMP);S.res={vals,runs,lo,hi,md,cur:base.M[S.out],ds,k:S.k,out:S.out,tab:vals.map(v=>{const rr=runs.filter(r=>r.v===v);return[v,mean(rr.map(r=>r.y)),mean(rr.map(r=>r.amp))];})};AFTER.bw();}
+function sensPanel(){const S=SNS,r=S.res;const opt=FITP.map(([x,l])=>`<option value="${x}" ${x===S.k?'selected':''}>${l}</option>`).join('');
+  let out='';if(r){const xi=r.ds.m.map((_,i)=>i),tk=dsTicks(r.ds);out=lineChart({title:`${FPL[r.k][1]} を ${fmtN(r.vals[0])}〜${fmtN(r.vals[r.vals.length-1])} で動かしたときの ${OUTS[r.out][0]}`,series:[{name:`${r.vals.length}通り×乱数${S.seeds}通りの 5〜95％の幅（線は中央値）`,data:r.md,band:[r.lo,r.hi],x:xi,color:'#7B3FA0',w:1.8},{name:'いまの設定',data:r.cur,x:xi,color:'#0F7C8C',w:2.4}],w:760,h:240,xt:tk.MXM,ymin:0,xfmt:i=>r.ds.m[Math.round(i)]||''})
+    +`<div class="tblw">${tbl([esc(FPL[r.k][1]),'最後の1年の平均：'+OUTS[r.out][0],'補充指示の増幅率'],r.tab.map(([v,y,a])=>[fmtN(v),fmtN(y),a.toFixed(2)]))}</div>`;}
+  return `<h3>感度を見る <small class="hint">（1つのパラメータを動かし，結果の幅を帯で出す）</small></h3>
+   <div class="fitrow"><select id="snK">${opt}</select> を <input type="number" id="snLo" value="${S.lo}" step="any"> 〜 <input type="number" id="snHi" value="${S.hi}" step="any"> で <select id="snN">${[3,5,7,9,11].map(n=>`<option ${S.n===n?'selected':''}>${n}</option>`).join('')}</select> 通り，乱数 <select id="snSeeds">${[1,3,5].map(n=>`<option ${S.seeds===n?'selected':''}>${n}</option>`).join('')}</select> 通り。見る結果：<select id="snOut">${Object.entries(OUTS).map(([k,[l]])=>`<option value="${k}" ${S.out===k?'selected':''}>${l}</option>`).join('')}</select> <button id="snRun">感度を計算</button></div>${out}`;}
+// ---- シナリオ
+function scenKpi(R){return{ampO:R.amp.O,ampPO:R.amp.PO,T:R.y3('ship'),I:R.y3('I'),B:R.y3('B'),W:R.y3('W'),LT:R.y3('LT'),fitP:R.fit.P,fitI:R.fit.I,fitB:R.fit.B};}
+const KPIH=[['ampO','増幅率（補充指示）',v=>v.toFixed(2)],['ampPO','増幅率（部品発注）',v=>v.toFixed(2)],['T','出荷（個/日）',fmtN],['I','DC在庫（個）',fmtN],['B','受注残（個）',fmtN],['W','生産待ち（個）',fmtN],['LT','補充LT（日）',v=>v.toFixed(1)],['fitP','ずれ 生産',pct],['fitI','ずれ 在庫',pct],['fitB','ずれ 受注残',pct]];
+function scenSave(name){if(SCNS.length>=5){labToast('シナリオは5つまで。どれかを消してから保存する。');return;}const R=simBM(BMP);const p=Object.assign({},BMP);delete p.ds;
+  SCNS.push({name:name||('シナリオ'+(SCNS.length+1)),created:new Date().toISOString(),ds:R.ds.name,m:R.ds.m.slice(),params:p,M:{D:R.M.D.map(r4),P:R.M.P.map(r4),I:R.M.I.map(r4),B:R.M.B.map(r4),WQ:R.M.WQ.map(r4)},kpi:scenKpi(R)});if(!lsS(SKEY2,SCNS))labToast('ブラウザに保存できなかった（この画面を閉じるまでは残る）');AFTER.bw();}
+function scenPanel(R){const cur={name:'いまの設定',kpi:scenKpi(R),M:R.M,m:R.ds.m,ds:R.ds.name};const all=SCNS.concat([cur]);
+  const rows=all.map((s,i)=>[`<b>${esc(s.name)}</b><br><small class="hint">${esc(s.ds||'')}</small>`].concat(KPIH.map(([k,,f])=>s.kpi[k]==null?'—':f(s.kpi[k]))).concat([i<SCNS.length?`<button data-scload="${i}" style="font-size:11px">この設定に戻す</button> <button data-scdel="${i}" class="danger" style="font-size:11px">消す</button>`:'']));
+  const mt=OUTS[SCV.metric];const xi=R.ds.m.map((_,i)=>i),tk=dsTicks(R.ds);
+  const ch=lineChart({title:'シナリオを重ねる：'+mt[0],series:all.map((s,i)=>({name:s.name,data:s.M[mt[1]],x:s.M[mt[1]].map((_,j)=>j),color:i===all.length-1?'#1B3A4B':PAL[i%PAL.length],w:i===all.length-1?2.6:1.8,dash:i===all.length-1?'5 3':null})),w:760,h:240,xt:tk.MXM,ymin:0,xfmt:i=>R.ds.m[Math.round(i)]||''});
+  return `<div class="fitbox"><h3>シナリオを比べる <small class="hint">（5つまで・このブラウザに保存）</small></h3>
+   <p class="fitrow"><input id="scName" placeholder="シナリオの名前" size="18" value="シナリオ${SCNS.length+1}"> <button class="primary" id="scSave" ${SCNS.length>=5?'disabled':''}>シナリオとして保存</button> <button id="scX" ${SCNS.length?'':'disabled'}>比べた表を Excel に保存</button> <button id="scC" ${SCNS.length?'':'disabled'}>CSV</button></p>
+   <div class="tblw">${tbl(['シナリオ'].concat(KPIH.map(x=>x[1])).concat(['']),rows)}</div><p class="hint">出荷・在庫・受注残・生産待ち・補充LT は最後の1年の平均。ずれは実績との NRMSE。</p>
+   <p class="zl">重ねる結果：<select id="scMet">${Object.entries(OUTS).map(([k,[l]])=>`<option value="${k}" ${SCV.metric===k?'selected':''}>${l}</option>`).join('')}</select></p>${ch}</div>`;}
+function scenRows(){const head=['シナリオ','データ'].concat(KPIH.map(x=>x[1]));return [head].concat(SCNS.map(s=>[s.name,s.ds].concat(KPIH.map(([k])=>r4(s.kpi[k])))));}
+function scenExport(fmt){if(fmt==='csv'){saveBlob(new Blob([SCMIO.toCsv(scenRows())],{type:'text/csv;charset=utf-8'}),fname('BM-シナリオ比較','csv'));return;}
+  const n=Math.max(...SCNS.map(s=>s.m.length));const per=[['期間'].concat(SCNS.flatMap(s=>Object.keys(OUTS).map(k=>`${s.name}：${OUTS[k][0]}`)))];for(let i=0;i<n;i++)per.push([SCNS.map(s=>s.m[i]).find(x=>x)||i].concat(SCNS.flatMap(s=>Object.keys(OUTS).map(k=>s.M[k]?s.M[k][i]:null))));
+  const ks=Object.keys(BMDEF);const par=[['パラメータ'].concat(SCNS.map(s=>s.name))].concat(ks.map(k=>[k].concat(SCNS.map(s=>s.params[k]))));
+  saveBlob(SCMIO.writeXlsx([{name:'KPI',rows:scenRows()},{name:'期間別',rows:per},{name:'パラメータ',rows:par}]),fname('BM-シナリオ比較','xlsx'));}
+function bwExtras(R){const a=$('bwFit'),b=$('bwScen');if(a)a.innerHTML=fitPanel(R);if(b)b.innerHTML=scenPanel(R);}
+window.addEventListener('DOMContentLoaded',()=>{const M=$('main');
+  M.addEventListener('click',ev=>{if(TAB!=='bw')return;const t=ev.target;
+    if(t.id==='fitRun'){runFit();return;}if(t.closest('[data-fitapply]')){if(FIT.res){FIT.res.rows.forEach(r=>BMP[r.k]=r.to);FIT.res=null;render();labToast('合わせた値をスライダーに入れた');}return;}
+    if(t.closest('[data-fitclr]')){FIT.res=null;AFTER.bw();return;}if(t.id==='snRun'){runSens();return;}
+    if(t.id==='scSave'){scenSave(($('scName')||{}).value);return;}if(t.id==='scX'){scenExport('xlsx');return;}if(t.id==='scC'){scenExport('csv');return;}
+    const ld=t.closest('[data-scload]');if(ld){const s=SCNS[+ld.dataset.scload];if(s){Object.keys(BMDEF).forEach(k=>{if(s.params[k]!=null)BMP[k]=s.params[k];});render();labToast(`「${esc(s.name)}」の設定に戻した${s.ds!==DS.name?'（データは今のまま：'+esc(DS.name)+'）':''}`);}return;}
+    const dl=t.closest('[data-scdel]');if(dl){SCNS.splice(+dl.dataset.scdel,1);lsS(SKEY2,SCNS);AFTER.bw();return;}});
+  M.addEventListener('change',ev=>{if(TAB!=='bw')return;const t=ev.target;
+    if(t.id==='fitN'){FIT.n=+t.value;AFTER.bw();return;}if(t.id==='fitNoise'){FIT.noise0=t.checked?1:0;return;}
+    if(t.dataset.fituse&&t.type==='checkbox'){FIT.use[t.dataset.fituse]=t.checked?1:0;return;}
+    if(t.dataset.fitk!=null){const r=FIT.rows[+t.dataset.fitk];r.k=t.value;[r.lo,r.hi]=fpBounds(r.k);AFTER.bw();return;}
+    if(t.dataset.fitlo!=null){FIT.rows[+t.dataset.fitlo].lo=+t.value;return;}if(t.dataset.fithi!=null){FIT.rows[+t.dataset.fithi].hi=+t.value;return;}
+    if(t.id==='snK'){SNS.k=t.value;[SNS.lo,SNS.hi]=fpBounds(t.value);AFTER.bw();return;}if(t.id==='snLo'){SNS.lo=+t.value;return;}if(t.id==='snHi'){SNS.hi=+t.value;return;}
+    if(t.id==='snN'){SNS.n=+t.value;return;}if(t.id==='snSeeds'){SNS.seeds=+t.value;return;}if(t.id==='snOut'){SNS.out=t.value;return;}
+    if(t.id==='scMet'){SCV.metric=t.value;AFTER.bw();return;}});});
+
+// ===== ツール間の受け渡し（SCMIO）：ワークベンチ・ナビ・データブラウザから受け取る／ワークベンチへ戻す =====
+function labReceive(env){const p=env.payload||{};const k=env.kind;
+  if(k==='cld'){const ar=(p.arrows||[]).filter(a=>a&&a.c&&a.e&&String(a.c).trim()!==String(a.e).trim());if(!ar.length){labToast('受け取ったCLDに矢印がない');return;}
+    const seen=new Set(),E=[];let q=0;ar.forEach(a=>{const c=String(a.c).trim(),e=String(a.e).trim(),key=c+'|'+e;if(seen.has(key))return;seen.add(key);if(a.p!=='+'&&a.p!=='-')q++;E.push({c,e,p:a.p==='-'?'-':'+',d:!!a.d});});
+    const V=[...new Set(E.flatMap(e=>[e.c,e.e]))];const title=p.title||env.title||'受け取ったCLD';
+    labRegister(title,V,E,scalePos(p.pos||{}),p.sdKey?{sdKey:p.sdKey}:null);
+    labToast(`${({workbench:'ワークベンチ',navi:'ナビ'})[env.from]||'ほかのツール'}から CLD「${esc(title)}」（変数${V.length}・矢印${E.length}）を受け取り，「自分のCLD」に加えた。${q?`<br>＋／−が「?」の矢印 ${q}本は「＋」にした（①の編集で直せる）。`:''}`,9000);return;}
+  if(k==='problem'){const src=p.src||p;if(!src||(!src.docs&&!src.bridge)){labToast('受け取った問題にCLD（資料の矢印）がない');return;}const title=src.title||env.title||'ナビの問題';
+    const f=new File([JSON.stringify({src:Object.assign({},src,{title}),pos:p.pos||{}})],title+'.json',{type:'application/json'});
+    openAnyFile(f).then(()=>labToast(`ナビから「${esc(title)}」を受け取り，「自分のCLD」に加えた`)).catch(e=>labToast('読み込めなかった：'+esc(e.message)));return;}
+  if(k==='series'){const per=['month','week','day'].includes(p.period)?p.period:'month';const names=[];
+    Object.entries(p.series||{}).forEach(([n,o])=>{if(!o||!Array.isArray(o.v))return;const nm=(p.title||env.title||'データブラウザ')+'：'+n;const t=(p.t||[]).map(x=>{const d=SCMIO.toDate(x);return d?(per==='month'?d.slice(0,7):d):String(x);});
+      SER[nm]={period:per,t,v:o.v.map(x=>r4(SCMIO.toNum(x))),unit:o.unit||'',perDay:perDayOf(o.unit?'（'+o.unit+'）':''),agg:STOCKLIKE.test(n)&&!/受注$|需要|生産|出荷/.test(n)?'mean':'sum',src:'データブラウザ'+(p.source?'：'+p.source:''),created:new Date().toISOString()};names.push(nm);});
+    if(!names.length){labToast('受け取ったデータに系列がない');return;}const r=serSave();if(!BIND.dem)dpAutoBind(names);DP.recv={names};TAB='data';render();
+    labToast(`データブラウザから ${names.length}つの系列を受け取った（⑥ データ）。${r.ok?'':'<br>'+esc(r.msg)}`,8000);return;}
+  labToast(`このツールでは使えない受け渡し（${esc(k)}）だった`);}
+{const _o=openAnyFile;openAnyFile=async function(f){const nm=f.name||'';if(/\.(xlsx|xlsm|xls|csv|tsv)$/i.test(nm)){await dpLoadFile(f);return;}
+  const text=await f.text();const env=typeof SCMIO!=='undefined'?SCMIO.envelopeFromText(text):null;if(env){labReceive(env);return;}return _o(f);};}
+function sendToWorkbench(){if(!G.E.length){labToast('渡すCLDがない');return;}const arrows=G.E.map(e=>({c:e.c,e:e.e,p:e.p==='-'?'-':e.p==='+'?'+':'?',d:!!e.d}));const pos={};C.V.forEach(v=>{if(G.pos[v])pos[v]=[Math.round(G.pos[v][0]),Math.round(G.pos[v][1])];});
+  const pl={title:G.title,arrows,pos};if(G.src&&G.src.sdKey)pl.sdKey=G.src.sdKey;const env=SCMIO.envelope('cld','lab',pl,G.title);
+  labToast('ワークベンチを開いて渡している…');SCMIO.sendTo('workbench',env,{done:r=>labToast(r==='delivered'?`CLD「${esc(G.title)}」をワークベンチに渡した`:'ワークベンチに直接は渡せなかったので，受け渡しファイル（.scm.json）を保存した。ワークベンチの「開く」で読み込む。',9000)});}
+window.addEventListener('DOMContentLoaded',()=>{$('main').addEventListener('click',ev=>{if(ev.target.id==='bToWb')sendToWorkbench();});
+  if(typeof SCMIO!=='undefined')SCMIO.receive('lab',env=>{try{labReceive(env);}catch(e){labToast('受け取れなかった：'+esc(e.message));}});});
+document.addEventListener('click',ev=>{const pr=ev.target.closest&&ev.target.closest('[data-pre]');if(!pr||DS===DS0)return;BMP.initRef=1;if(!DS.m.some(m=>m>='2024-04')||BMP.raiseDay>=dsDays(DS))BMP.raise=0;render();});
+{const h0=VIEW.help;VIEW.help=()=>h0().replace('<p>InsightMaker：insightmaker.com','<h3>自分のデータで使う（v6）</h3><ul><li><b>⑥ データ</b>：Excel（.xlsx）・CSV の時系列（需要・受注・生産・在庫・受注残・計画時間・停止・段取り）を取り込む。シート・見出しの行・期間の列・値の列を選び，月・週・日にまとめる（合計・平均・最後）。日付や数値の読めない行，抜けている期間を表示する。「テンプレート（Excel）を保存」で書き方の見本（LINE-3 の値入り）が出る。</li><li>保存した系列を，④のモデルの<b>需要・計画時間・停止・段取り</b>（入力）と<b>生産・在庫・受注残</b>（実績）に割り当てる。期間（長さ・月の並び）は需要の系列で決まる。月の合計は「÷日数」で1日あたりに直す。</li><li><b>④ 実績に合わせる</b>：実績ごとの NRMSE・平均のずれ・Theil の U<sub>M</sub>／U<sub>S</sub>／U<sub>C</sub> を見て，1〜3個のパラメータを範囲の中で自動で合わせる（Nelder–Mead，ばらつき0か乱数の種を固定）。「この値を使う」でスライダーに入る。感度（1つのパラメータを動かした幅）と，シナリオ（5つまで）の比較もできる。</li><li><b>書き出し</b>：各画面の「計算結果を保存」で Excel（結果＋パラメータのシート）・CSV。グラフの右上で図ごとに CSV・SVG・PNG。グラフにマウスを重ねると値が出る。</li><li><b>設定の保存</b>：③のCLDごとの設定・SD入門のスライダー・④⑤の設定はこのブラウザに保存される（「初期値に戻す」で戻る）。</li><li><b>ツールの受け渡し</b>：ワークベンチ・ナビから送られたCLD，データブラウザから送られた系列は自動で受け取る（受け渡しファイル .scm.json は「ファイルを開く」でも読める）。①の「ワークベンチへ戻す」で，いまのCLDをワークベンチへ渡す。</li></ul><p>③の感度モデルで値が際限なく増えると「発散しました」と出て計算を止める（効き方・矢印の強さを下げる）。InsightMaker に書き出す④のモデルは，日々の需要のばらつきをこのツールと同じ乱数の表で入れてあるので，同じ結果になる。</p><p>InsightMaker：insightmaker.com');}
 
 </script></body></html>
